@@ -255,20 +255,20 @@ function stepStates(art, opts) {
     const isCurrent = !completed && cur !== null && s.no === cur;
     const isLocked = !isPassed && !isCurrent;
 
-    const practiceSub = draftCount
-      ? `有 ${draftCount} 组未提交`
-      : (times ? `已练 ${times} 次${rec.lastTier ? ' · 最近：' + rec.lastTier : ''}` : '');
-
+    // 副文案要短：它在半宽卡片里跟左侧的"三档标准"抢横向空间，
+    // 一长就把左边挤到折行（真机验收反馈）。所以这里只留最少的信息。
     let state, stateText, stateSub;
     if (isPassed) {
       state = 'passed'; stateText = '已通过';
-      stateSub = times ? `已练 ${times} 次${rec.lastTier ? ' · 最近：' + rec.lastTier : ''}` : '';
+      stateSub = times ? `已练 ${times} 次` : '';
     } else if (isCurrent) {
       state = 'current'; stateText = '进行中';
-      stateSub = practiceSub || '可以开始练';
+      stateSub = draftCount ? `${draftCount} 组未提交` : (times ? `已练 ${times} 次` : '可以开始练');
     } else {
       state = 'locked'; stateText = '未解锁';
-      stateSub = `先通过第 ${cur} 式`;
+      // 不写"先通过第 N 式"：同一句话在列表里重复 8 遍是噪音，
+      // 而且"未解锁"本身已经说清了。要看细节，点进去详情页会讲明白。
+      stateSub = '';
     }
     return {
       no: s.no,

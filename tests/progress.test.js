@@ -303,24 +303,25 @@ test('stepStates：锁定式推进下只有三态（已通过 / 进行中 / 未�
   assert.strictEqual(st[0].stateText, '进行中');
   assert.strictEqual(st[0].times, 2);
   assert.strictEqual(st[0].lastTier, '初级', '取最近一次的成绩');
-  assert.strictEqual(st[0].stateSub, '已练 2 次 · 最近：初级');
+  assert.strictEqual(st[0].stateSub, '已练 2 次', '副文案只留最少信息（真机反馈：太长会挤折左侧等级描述）');
+  assert.ok(st[0].stateSub.length <= 6, '副文案必须短');
   assert.ok(st.slice(1).every(s => s.state === 'locked' && s.stateText === '未解锁'), '当前式之后都不能练');
-  assert.strictEqual(st[1].stateSub, '先通过第 1 式');
+  assert.strictEqual(st[1].stateSub, '', '未解锁行不再写"先通过第 N 式"（同一句重复 8 遍是噪音）');
 
   // ② 第 1 式通过 → 第 2 式自动变成进行中（不需要任何额外操作）
   st = P.stepStates(art, { passed: { 'pushup-01': true }, sessions });
   assert.strictEqual(st[0].state, 'passed');
   assert.strictEqual(st[0].stateText, '已通过');
-  assert.strictEqual(st[0].stateSub, '已练 2 次 · 最近：初级', '已通过也要看得到练过几次');
+  assert.strictEqual(st[0].stateSub, '已练 2 次', '已通过也要看得到练过几次');
   assert.strictEqual(st[1].state, 'current', '回归：达标后下一式必须是进行中');
   assert.strictEqual(st[1].stateSub, '可以开始练');
   assert.ok(st.slice(2).every(s => s.isLocked));
 
-  // ③ 只有草稿（记了一组但没提交）→ 当前式副文案要显示"有 N 组未提交"
+  // ③ 只有草稿（记了一组但没提交）→ 当前式副文案要显示"N 组未提交"
   st = P.stepStates(art, { passed: {}, sessions: [], drafts: [{ stepId: 'pushup-01', values: [25] }] });
   assert.strictEqual(st[0].state, 'current');
   assert.strictEqual(st[0].draftCount, 1);
-  assert.strictEqual(st[0].stateSub, '有 1 组未提交');
+  assert.strictEqual(st[0].stateSub, '1 组未提交');
 
   // ④ 唯一性：任何情况下"进行中"最多一个
   const passed3 = { 'pushup-01': true, 'pushup-02': true };

@@ -18,7 +18,7 @@ const SHOTS = path.join(__dirname, 'shots');
 const STORAGE_KEY = 'cf_state_v1';
 // 期望的断言条数：用来发现"中途崩了但显示全部通过"
 // （每次增删断言都要改这个数——它是这道保险的代价，值得）
-const EXPECTED_CHECKS = 79;
+const EXPECTED_CHECKS = 80;
 const results = [];
 let shotIndex = 0;
 let scenario = '(启动)';
@@ -338,13 +338,16 @@ async function recordSet(mp, value) {
     const artData = await readData(mp);
     check('列表：当前式显示"进行中"（可练）',
       artData.steps[0].stateText === '进行中', artData.steps[0].stateText);
-    check('列表：副文案写清"已练 1 次 · 最近：中级"（回归：曾经看不出练过）',
-      /已练 1 次/.test(artData.steps[0].stateSub) && artData.steps[0].lastTier === '中级',
-      artData.steps[0].stateSub);
+    check('列表：副文案短到"已练 1 次"（回归①：曾经看不出练过；②：曾经太长挤折左侧）',
+      artData.steps[0].stateSub === '已练 1 次' && artData.steps[0].lastTier === '中级',
+      JSON.stringify(artData.steps[0].stateSub));
     check('列表：未达标的下一式 = 未解锁（没通过就不解锁）',
       artData.steps[1].stateText === '未解锁', artData.steps[1].stateText);
-    check('列表：未解锁的行写明先通过哪一式',
-      /先通过第 1 式/.test(artData.steps[1].stateSub), artData.steps[1].stateSub);
+    check('列表：未解锁的行不再重复"先通过第 N 式"（同一句重复 8 遍是噪音）',
+      artData.steps[1].stateSub === '', JSON.stringify(artData.steps[1].stateSub));
+    check('列表：副文案都很短（半宽卡片里不跟左侧抢位置）',
+      artData.steps.every(s => (s.stateSub || '').length <= 6),
+      artData.steps.map(s => s.stateSub).filter(Boolean).join(' | '));
 
     const stepPage = await mp.reLaunch('/pages/step/step?artId=pushup&no=1');
     await stepPage.waitFor(900);

@@ -382,7 +382,7 @@ test('锁定：草稿也算"动过"——当前式记一组没提交，列表副
   art.onLoad({ artId: 'pushup' });
   art.onShow();
   assert.strictEqual(art.data.steps[2].state, 'current');
-  assert.strictEqual(art.data.steps[2].stateSub, '有 2 组未提交');
+  assert.strictEqual(art.data.steps[2].stateSub, '2 组未提交');
   assert.strictEqual(art.data.steps[0].stateSub, '', '第 1 式没练过就没副文案');
 });
 
@@ -605,7 +605,7 @@ test('列表页：三态文字与标记正确（已通过 / 进行中 / 未解�
     page.data.steps.slice(0, 5).map(s => s.stateText),
     ['已通过', '已通过', '已通过', '进行中', '未解锁']
   );
-  assert.strictEqual(page.data.steps[4].stateSub, '先通过第 4 式');
+  assert.strictEqual(page.data.steps[4].stateSub, '', '未解锁行只显示"未解锁"，不再重复"先通过第 N 式"');
   assert.strictEqual(page.data.lockedCount, 6);
 
   // 通关后：10 行全部已通过，进度 100%
@@ -634,9 +634,9 @@ test('往返：未达标提交 → 回列表 → 显示"进行中 · 已练 1 �
   art.onShow();
   assert.strictEqual(art.data.steps[0].state, 'current');
   assert.strictEqual(art.data.steps[0].stateText, '进行中');
-  assert.strictEqual(art.data.steps[0].stateSub, '已练 1 次 · 最近：中级',
-    '提交过就必须看得出练过几次、最近什么成绩');
-  assert.strictEqual(art.data.steps[0].lastTier, '中级');
+  assert.strictEqual(art.data.steps[0].stateSub, '已练 1 次',
+    '提交过就必须看得出练过几次（但副文案要短，不能挤折左边的三档标准）');
+  assert.strictEqual(art.data.steps[0].lastTier, '中级', '最近成绩仍留在数据里（详情页历史里能看到）');
   assert.strictEqual(art.data.practicedCount, 1);
   assert.strictEqual(art.data.sessionsTotal, 1);
   assert.strictEqual(art.data.steps[1].stateText, '未解锁', '没通过就不该解锁下一式');

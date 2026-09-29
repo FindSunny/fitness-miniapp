@@ -16,7 +16,7 @@ npm test          # ② 跑测试（84 项，0 依赖，用 Node 内置测试器
 npm run qr        # ③ 编译 + 出真机预览码（手机扫码就能用）
 npm run upload    # ④ 上传开发版（之后去后台「选为体验版」发给别人）
 npm run e2e:serve # ⑤ 起自动化服务（跑 E2E 前先执行一次）
-npm run e2e       # ⑥ 真机 E2E：79 条断言
+npm run e2e       # ⑥ 真机 E2E：80 条断言
 npm run e2e:shots # ⑦ 真机 E2E 截图：12 张状态图 → e2e/shots/
 npm run fix:config      # 配置被工具改坏时，一条命令补回 miniprogramRoot
 npm run export:figures  # 重新生成动作图（已生成过）
@@ -270,7 +270,7 @@ git commit -m "feat(progress): 锁定式推进 + 一键按标准记录"
 
 **为什么第一个 tag 可以信**：打 tag 之前，在**同一棵代码树**上重跑了三层验证，全绿才冻结 ——
 `npm test` 69/69 ｜ `npm run e2e` 63/63 ｜ `npm run e2e:shots` 10/10（详见 `TESTING.md`）。
-本轮（v0.1.5）的对应数字是 **84 / 79 / 12**，同样全绿，但它要等你真机验收完才算数。
+本轮（v0.1.5）的对应数字是 **84 / 80 / 12**，同样全绿，但它要等你真机验收完才算数。
 
 不进库的东西（`.gitignore`）：`node_modules/`（依赖）、`.chrome-tmp/`（渲染临时目录）、
 `preview/preview-qr.jpg`（含临时 token）、`preview/index.html`（一条命令可再生）、`e2e/shots/`（每次跑都会变）。

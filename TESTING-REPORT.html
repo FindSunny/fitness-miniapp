@@ -215,7 +215,7 @@
     <div class="thesis">能在低层抓住的问题，绝不留给高层。</div>
     <div class="stats">
       <div class="stat"><b>84</b><span>Node 断言 · <em>0.12 秒</em></span></div>
-      <div class="stat"><b>79</b><span>E2E 断言 · 13 场景</span></div>
+      <div class="stat"><b>80</b><span>E2E 断言 · 13 场景</span></div>
       <div class="stat"><b>12</b><span>界面证据图</span></div>
       <div class="stat"><b>0</b><span>运行时依赖</span></div>
     </div>
@@ -254,7 +254,7 @@
       <div class="layer l6">
         <div class="tag">L6<br>集成</div>
         <div class="what"><b>真实运行时集成断言</b><div><code>miniprogram-automator</code> → 开发者工具里的小程序运行时（<b>非物理真机</b>）</div></div>
-        <div class="right"><div class="cnt">79 条</div><div class="ms">1–2 min</div><div class="bar"><i class="warm" style="width:100%"></i></div></div>
+        <div class="right"><div class="cnt">80 条</div><div class="ms">1–2 min</div><div class="bar"><i class="warm" style="width:100%"></i></div></div>
       </div>
     </div>
     <p class="tiny muted" style="margin-top:12px">
@@ -319,7 +319,7 @@
       </div>
       <p class="tiny muted" style="margin:10px 0 0">
         最能说明问题的一次：R2 访谈那轮用户当场带出 <b>3 个可用性 bug</b>
-        —— 而当时 <b>84 项 Node + 79 条 E2E 断言全绿</b>。
+        —— 而当时 <b>84 项 Node + 80 条 E2E 断言全绿</b>。
         因为它们全都在验证"实现是否按我设想的方式工作"。
       </p>
     </div>
@@ -375,10 +375,10 @@ E2E：<span class="ok">19 / 19 通过</span>
         <div class="body">
           <ol class="why" style="font-size:13.5px;margin:0;padding-left:20px">
             <li>崩溃时补记一条失败：<code>check('场景「X」执行完成', false, err)</code></li>
-            <li>加 <code>EXPECTED_CHECKS = 79</code>：<b>实际条数对不上就报警 + exit 1</b></li>
+            <li>加 <code>EXPECTED_CHECKS = 80</code>：<b>实际条数对不上就报警 + exit 1</b></li>
           </ol>
           <div class="term" style="margin-top:12px">⚠ 断言条数异常：本次只跑了 <span class="no">20</span> 条，
-期望 <span class="ok">79</span> 条 —— 说明中途崩了，
+期望 <span class="ok">80</span> 条 —— 说明中途崩了，
 别把它当"通过"。</div>
           <p class="tiny muted" style="margin-top:10px">
             代价：每次增删断言要改这个常量。<b>值得</b> —— 这是唯一能发现"测试没跑完"的办法。
@@ -427,7 +427,7 @@ E2E：<span class="ok">19 / 19 通过</span>
         <div class="arrow">→</div>
         <div class="node"><b>evaluate + getCurrentPages()</b><span>调 onShow / addSet / finish</span></div>
         <div class="arrow">→</div>
-        <div class="node"><b>79 条断言</b><span>+ 独立截图 pass</span></div>
+        <div class="node"><b>80 条断言</b><span>+ 独立截图 pass</span></div>
       </div>
       <p class="tiny muted" style="margin:12px 0 0">
         为什么不用 <code>element.tap()</code>：在自动化实例里点不到 <code>bindtap</code>（试过多轮）；
