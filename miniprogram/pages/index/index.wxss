@@ -109,11 +109,40 @@
   font-weight: 700;
   width: 100%;
 }
+.store-diag .dbg {
+  color: #94a3b8;
+}
 .art-card.is-done .bar-in { background: #16a34a; }
 .done-text {
   font-size: 22rpx;
   font-weight: 700;
   color: #15803d;
+}
+
+/* 艺卡片底部：一行装下"状态 + 进度"，不折行（卡片只有半屏宽） */
+.art-state {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 10rpx;
+}
+.art-state-text {
+  font-size: 24rpx;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.art-state-text.doing { color: #1d4ed8; }
+.art-state-text.done { color: #15803d; }
+.art-state-text.todo { color: #94a3b8; font-weight: 400; }
+.art-state-num {
+  font-size: 22rpx;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+.fig-tag {
+  margin-top: 6rpx;
+  font-size: 19rpx;
+  color: #cbd5e1;
 }
 
 /* 六艺全部通关 */

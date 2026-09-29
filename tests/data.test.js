@@ -10,10 +10,20 @@ const path = require('node:path');
 const { ARTS, TIER_NAMES, ART_MAP, getArt, getStep, getStepById, getNextStep } = require('../miniprogram/data/arts.js');
 
 const ASSETS = path.join(__dirname, '..', 'miniprogram', 'assets', 'movements');
+const ROOT = path.join(__dirname, '..');
 const EXPECTED_ARTS = [
   ['pushup', '俯卧撑'], ['squat', '深蹲'], ['pullup', '引体向上'],
   ['legraise', '举腿'], ['bridge', '桥'], ['handstand', '倒立撑']
 ];
+
+test('构建标记：build-info 的 version 必须与 package.json 一致', () => {
+  // 踩过：两处各写一个版本号，结果 package.json 是 0.1.4、界面记录里是 0.1.0
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8').replace(/^\uFEFF/, ''));
+  const build = require('../miniprogram/build-info.js');
+  assert.strictEqual(build.version, pkg.version,
+    `build-info.js 的 version(${build.version}) 应等于 package.json 的 version(${pkg.version})，跑 npm run stamp 可自动同步`);
+  assert.match(build.stamp, /^\d{4}-\d{2}-\d{2}\.\d+$/, 'stamp 形如 2026-09-29.8（发布时用来确认手机上是新包）');
+});
 
 test('六艺齐全，顺序与名称正确', () => {
   assert.strictEqual(ARTS.length, 6);

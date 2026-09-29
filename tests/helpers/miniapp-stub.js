@@ -14,8 +14,9 @@
  */
 function install() {
   const storage = {};
-  const calls = { toast: [], modal: [], nav: [], title: [] };
+  const calls = { toast: [], modal: [], nav: [], title: [], sheet: [] };
   const pendingModals = [];
+  const pendingSheets = [];
 
   global.wx = {
     getStorageSync: k => storage[k],
@@ -26,7 +27,8 @@ function install() {
     navigateTo: o => { calls.nav.push(o); },
     redirectTo: o => { calls.nav.push(o); },
     navigateBack: () => { calls.nav.push({ back: true }); },
-    setNavigationBarTitle: o => { calls.title.push(o); }
+    setNavigationBarTitle: o => { calls.title.push(o); },
+    showActionSheet: o => { calls.sheet.push(o); pendingSheets.push(o); }
   };
 
   let lastDef = null;
@@ -55,9 +57,17 @@ function install() {
       o.success({ confirm: !!confirm, cancel: !confirm });
       return o;
     },
+    /** 回答最近一个未处理的 actionSheet（传被点的序号） */
+    answerSheet(tapIndex) {
+      const o = pendingSheets.shift();
+      if (!o || !o.success) return null;
+      o.success({ tapIndex: tapIndex || 0 });
+      return o;
+    },
     resetCalls() {
-      calls.toast.length = 0; calls.modal.length = 0; calls.nav.length = 0; calls.title.length = 0;
-      pendingModals.length = 0;
+      calls.toast.length = 0; calls.modal.length = 0; calls.nav.length = 0;
+      calls.title.length = 0; calls.sheet.length = 0;
+      pendingModals.length = 0; pendingSheets.length = 0;
     }
   };
 }

@@ -99,28 +99,68 @@ function formatStdLine(step) {
 }
 
 /**
+ * 当前式 = **第一个还没通过的式**（推导出来的，不存储）
+ *
+ * 为什么改成推导：以前 currentNo 是个独立存储状态（"用户选中的式"），
+ * 于是"达标了但用户没点弹窗按钮"时它就不动 → 列表上出现"没有进行中"的怪状态。
+ * 现在达标即自动解锁下一式，不需要任何一步额外操作。
+ *
+ * @returns {number|null} 十式全通过 → null
+ */
+function currentNo(art, opts) {
+  const o = opts || {};
+  if (o.completed) return null;
+  const passedMap = o.passed || {};
+  const first = art.steps.find(s => !passedMap[s.id]);
+  return first ? first.no : null;
+}
+
+/**
+ * 这一式现在能不能记录（锁定式推进的核心规则）
+ *   已通过的式 → 能（复习）
+ *   当前式     → 能
+ *   更靠后的式 → 不能（只能看）
+ */
+function canPractice(art, step, opts) {
+  const o = opts || {};
+  if (o.completed || (o.passed || {})[step.id]) return true;
+  const cur = currentNo(art, o);
+  return cur !== null && step.no <= cur;
+}
+
+/**
  * 某个艺的进度
  * @param {object} art
- * @param {{currentNo:number, passedCount:number, completed:boolean}} opts
- *   currentNo   当前在练第几式（用户可选）
- *   passedCount 已通过（达成升级标准）的式数
+ * @param {{passed:Object, completed:boolean, sessions:Array}} opts
+ *   passed    每一式的"已通过"表；当前式由它推导
+ *   sessions  本艺的训练记录（用来区分"未开始"和"练过没过"）
  */
 function artStatus(art, opts) {
   const o = opts || {};
   const total = art.steps.length;
-  const current = Math.min(Math.max(o.currentNo || 1, 1), total);
-  const completed = !!o.completed;
-  // 通关 = 十式全部通过（completed 为真时直接算满，兼容只写了 completed 的老数据）
-  const passed = completed ? total : Math.min(Math.max(o.passedCount || 0, 0), total);
+  const passedMap = o.passed || {};
+  const passedRaw = art.steps.filter(s => passedMap[s.id]).length;
+  // completed 为真但已通过表不全（老数据）也按"全通过"算，避免进度条倒退
+  const completed = !!o.completed || passedRaw >= total;
+  const passed = completed ? total : passedRaw;
+  const cur = currentNo(art, { passed: passedMap, completed });
+  // 「动过」才算开始：过了至少一式，或有过训练记录。
+  // 踩过：以前直接用"当前式"当标签，于是全新用户六个艺全显示"进行中"（真机验收发现）
+  const started = completed || passedRaw > 0 || (o.sessions || []).length > 0;
   return {
-    current,
+    current: cur === null ? total : cur,
     total,
     done: passed,
     passed,
+    started,
+    remaining: total - passed,
     percent: Math.round((passed / total) * 100),
-    completed: completed || passed >= total,
-    atLastStep: current >= total,
-    label: (completed || passed >= total) ? '已通关' : `当前第 ${current} 式`
+    completed,
+    atLastStep: cur === total,
+    // stateText：短，给首页卡片那种窄地方用（不折行）
+    stateText: completed ? '已通关' : (started ? `第 ${cur} 式` : '未开始'),
+    // label：长，给列表页进度卡那种宽地方用
+    label: completed ? '已通关' : (started ? `进行中 · 第 ${cur} 式` : '未开始')
   };
 }
 
@@ -169,23 +209,28 @@ function recommend(arts, opts) {
 }
 
 /**
- * 十式列表里每一式的展示状态
+ * 十式列表里每一式的展示状态（锁定式推进：只有三态）
  *
- * 两个维度分开：
- *   ① 已通过 = 达成过这一式的升级标准（按式独立记录，不再用"式号 < 当前式"推断）
- *   ② 当前   = 用户正在练的那一式（可以自己选，不必等晋级）
- *   ③ 已练 N 次 = 有训练记录但还没通过
+ *   已通过 passed  = 达成过这一式的升级标准（可以点进去复习、可以继续记录）
+ *   进行中 current = 当前式（第一个未通过的式）—— **唯一能记录的一式**
+ *   未解锁 locked  = 排在当前式后面的式，只能看动作图和标准，不能记录
+ *
+ * "进行中"是推导的（第一个未通过的式），所以天然只有一个；不需要用户自选当前式。
  *
  * @param art
- * @param {{currentNo:number, passed:Object, completed:boolean, sessions:Array<{no,tier,ts}>}} opts
- * @returns [{no, state:'passed'|'current'|'practiced'|'todo', stateText, times, lastTier, lastTs, isCurrent, isPassed}]
+ * @param {{passed:Object, completed:boolean,
+ *          sessions:Array<{no,tier,ts}>,
+ *          drafts:Array<{stepId,values}>}} opts
+ * @returns [{no, state:'passed'|'current'|'locked', stateText, stateSub,
+ *            isPassed, isCurrent, isLocked, times, draftCount, lastTier, lastTs}]
  */
 function stepStates(art, opts) {
   const o = opts || {};
-  const cur = Math.min(Math.max(o.currentNo || 1, 1), art.steps.length);
-  const completed = !!o.completed;
   const passedMap = o.passed || {};
+  const completed = !!o.completed;
+  const cur = currentNo(art, { passed: passedMap, completed });
 
+  // 已提交的记录：按式号汇总
   const byNo = {};
   (o.sessions || []).forEach(s => {
     const n = Number(s && s.no);
@@ -195,29 +240,46 @@ function stepStates(art, opts) {
     if ((s.ts || 0) >= r.lastTs) { r.lastTs = s.ts || 0; r.lastTier = s.tier || null; }
   });
 
+  // 未提交的组（草稿）：按 stepId 汇总组数
+  const draftByStep = {};
+  (Array.isArray(o.drafts) ? o.drafts : []).forEach(d => {
+    if (!d || !d.stepId) return;
+    draftByStep[d.stepId] = (draftByStep[d.stepId] || 0) + (Array.isArray(d.values) ? d.values.length : 0);
+  });
+
   return art.steps.map(s => {
     const rec = byNo[s.no];
-    const isCurrent = !completed && s.no === cur;
+    const times = rec ? rec.times : 0;
+    const draftCount = draftByStep[s.id] || 0;
     const isPassed = completed || !!passedMap[s.id];
-    let state, stateText;
+    const isCurrent = !completed && cur !== null && s.no === cur;
+    const isLocked = !isPassed && !isCurrent;
+
+    const practiceSub = draftCount
+      ? `有 ${draftCount} 组未提交`
+      : (times ? `已练 ${times} 次${rec.lastTier ? ' · 最近：' + rec.lastTier : ''}` : '');
+
+    let state, stateText, stateSub;
     if (isPassed) {
       state = 'passed'; stateText = '已通过';
-    } else if (isCurrent && rec) {
-      state = 'current'; stateText = `已练 ${rec.times} 次`;
+      stateSub = times ? `已练 ${times} 次${rec.lastTier ? ' · 最近：' + rec.lastTier : ''}` : '';
     } else if (isCurrent) {
       state = 'current'; stateText = '进行中';
-    } else if (rec) {
-      state = 'practiced'; stateText = `已练 ${rec.times} 次`;
+      stateSub = practiceSub || '可以开始练';
     } else {
-      state = 'todo'; stateText = '未开始';
+      state = 'locked'; stateText = '未解锁';
+      stateSub = `先通过第 ${cur} 式`;
     }
     return {
       no: s.no,
       state,
       stateText,
-      isCurrent,
+      stateSub,
       isPassed,
-      times: rec ? rec.times : 0,
+      isCurrent,
+      isLocked,
+      times,
+      draftCount,
       lastTier: rec ? rec.lastTier : null,
       lastTs: rec ? rec.lastTs : 0
     };
@@ -227,7 +289,8 @@ function stepStates(art, opts) {
 /**
  * 单式的状态说明（详情页顶部用它告诉用户"这一式现在是什么状态"）
  * @param {object} art @param {object} step
- * @param {{currentNo:number, isPassed:boolean, completed:boolean, times:number, lastTier:string}} o
+ * @param {{isPassed:boolean, isCurrent:boolean, completed:boolean,
+ *          times:number, lastTier:string, unlockHint:string}} o
  */
 function stepBanner(art, step, o) {
   const opts = o || {};
@@ -241,20 +304,19 @@ function stepBanner(art, step, o) {
         : (step.no < total ? `可以进入第 ${step.no + 1} 式继续` : '这是最后一式')
     };
   }
-  if (step.no === opts.currentNo) {
+  if (opts.isCurrent) {
     return {
       kind: 'current',
       title: '当前在练这一式',
-      sub: opts.times ? `已练 ${opts.times} 次${opts.lastTier ? ' · 最近：' + opts.lastTier : ''}` : '还没有提交过记录'
+      sub: opts.times
+        ? `已练 ${opts.times} 次${opts.lastTier ? ' · 最近：' + opts.lastTier : ''}`
+        : '还没有提交过记录'
     };
   }
-  if (step.no < opts.currentNo) {
-    return { kind: 'behind', title: `还没通过这一式`, sub: `当前在练第 ${opts.currentNo} 式，也可以在这里继续练` };
-  }
   return {
-    kind: 'ahead',
-    title: `这是第 ${step.no} 式（当前在练第 ${opts.currentNo} 式）`,
-    sub: opts.times ? `你在这里练过 ${opts.times} 次` : '可以先在这里练，提交后当前式会跟过来'
+    kind: 'locked',
+    title: '🔒 这一式还没解锁',
+    sub: opts.unlockHint || '先把前面没过的那一式练到达标'
   };
 }
 
@@ -288,7 +350,8 @@ function countRecentDays(sessions, days, now) {
 
 module.exports = {
   tiersOf, evaluate, reached, gapTo,
-  gapText, tierText, formatTier, formatStdLine, artStatus, recommend,
+  gapText, tierText, formatTier, formatStdLine,
+  currentNo, canPractice, artStatus, recommend,
   stepStates, stepBanner, formatTime, sessionText,
   latestSession, countRecentDays, unitLabel, cleanValues
 };

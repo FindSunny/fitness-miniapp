@@ -34,22 +34,23 @@ const STATES = [
     state: empty(), url: '/pages/index/index'
   },
   {
-    name: '02-art-fresh', desc: '十式列表 · 全新（第 1 式为当前）',
+    name: '02-art-fresh', desc: '十式列表 · 全新（第 1 式进行中，其余未解锁）',
     state: empty(), url: '/pages/art/art?artId=pushup'
   },
   {
-    name: '03-art-practiced', desc: '十式列表 · 练过但未通过 + 当前式在第 2 式',
+    name: '03-art-practiced', desc: '十式列表 · 第 1 式已通过（练过 2 次）+ 第 2 式进行中（有未提交的组）',
     state: {
-      version: 2, arts: { pushup: { currentNo: 2 } },
+      version: 2, arts: {},
       sessions: [session('pushup', 1, [25, 25], '中级', now - 2 * day), session('pushup', 1, [20, 20], '初级', now - day)],
-      drafts: {}, steps: {}
+      drafts: { 'pushup-02': { values: [12, 12], ts: now } },
+      steps: { 'pushup-01': { passedAt: now - 2 * day } }
     },
     url: '/pages/art/art?artId=pushup'
   },
   {
-    name: '04-art-passed', desc: '十式列表 · 前三式已通过',
+    name: '04-art-passed', desc: '十式列表 · 前三式已通过（第 4 式进行中，其余未解锁）',
     state: {
-      version: 2, arts: { pushup: { currentNo: 4 } },
+      version: 2, arts: {},
       sessions: [session('pushup', 3, [30, 30, 30], '升级', now - day)],
       drafts: {},
       steps: { 'pushup-01': { passedAt: now }, 'pushup-02': { passedAt: now }, 'pushup-03': { passedAt: now } }
@@ -59,7 +60,7 @@ const STATES = [
   {
     name: '05-step-current', desc: '详情页 · 当前在练（有历史记录）',
     state: {
-      version: 2, arts: { pushup: { currentNo: 1 } },
+      version: 2, arts: {},
       sessions: [session('pushup', 1, [25, 25], '中级', now - day)],
       drafts: {}, steps: {}
     },
@@ -68,7 +69,7 @@ const STATES = [
   {
     name: '06-step-passed', desc: '详情页 · 已通过（横幅应为绿色）',
     state: {
-      version: 2, arts: { pushup: { currentNo: 3 } },
+      version: 2, arts: {},
       sessions: [session('pushup', 1, [50, 50, 50], '升级', now - 3 * day)],
       drafts: {}, steps: { 'pushup-01': { passedAt: now - 3 * day } }
     },
@@ -77,7 +78,7 @@ const STATES = [
   {
     name: '07-step-draft', desc: '详情页 · 有未提交的组（草稿恢复提示）',
     state: {
-      version: 2, arts: { pushup: { currentNo: 1 } }, sessions: [],
+      version: 2, arts: {}, sessions: [],
       drafts: { 'pushup-01': { values: [20, 18], ts: now } }, steps: {}
     },
     url: '/pages/step/step?artId=pushup&no=1'
@@ -85,7 +86,7 @@ const STATES = [
   {
     name: '08-step-last', desc: '详情页 · 第十式（九个已通过）',
     state: {
-      version: 2, arts: { pushup: { currentNo: 10 } },
+      version: 2, arts: {},
       sessions: [session('pushup', 9, [6, 6, 6], '中级', now - day)],
       drafts: {},
       steps: ['01', '02', '03', '04', '05', '06', '07', '08', '09']
@@ -97,7 +98,7 @@ const STATES = [
     name: '09-home-progress', desc: '首页 · 俯卧撑已通关，推荐顺延到深蹲',
     state: {
       version: 2,
-      arts: { pushup: { currentNo: 10, completed: true, completedAt: now, lastCompletedAt: now } },
+      arts: { pushup: { completed: true, completedAt: now, lastCompletedAt: now } },
       sessions: [session('pushup', 10, [10, 10], '升级', now)],
       drafts: {}, steps: {}
     },
@@ -108,12 +109,25 @@ const STATES = [
     state: (() => {
       const arts = {}, steps = {};
       ['pushup', 'squat', 'pullup', 'legraise', 'bridge', 'handstand'].forEach(a => {
-        arts[a] = { currentNo: 10, completed: true, completedAt: now, lastCompletedAt: now };
+        arts[a] = { completed: true, completedAt: now, lastCompletedAt: now };
         for (let i = 1; i <= 10; i++) steps[a + '-' + String(i).padStart(2, '0')] = { passedAt: now };
       });
       return { version: 2, arts, sessions: [session('bridge', 10, [3, 3], '升级', now)], drafts: {}, steps };
     })(),
     url: '/pages/index/index'
+  },
+  {
+    name: '11-step-locked', desc: '详情页 · 未解锁的式（只能看，不能记）',
+    state: empty(),
+    url: '/pages/step/step?artId=pushup&no=3',
+  },
+  {
+    name: '12-step-quick-tier', desc: '详情页 · 一键按【中级】填入 2 组 × 25',
+    state: {
+      version: 2, arts: {}, sessions: [],
+      drafts: { 'pushup-01': { values: [25, 25], ts: now } }, steps: {}
+    },
+    url: '/pages/step/step?artId=pushup&no=1',
   }
 ];
 
@@ -132,11 +146,16 @@ const STATES = [
       await seed(mp, s.state);
       await retry(() => mp.reLaunch(s.url), 3, 800);
       await sleep(1200);                                 // 留足渲染时间
+      // 说明：不要试图在截图前滚动页面。试过 page.scrollTop()（只对 scroll-view 有效）和
+      // wx.pageScrollTo（会把页面滚成空白，截出来是一张空图），结果都是坏证据 ——
+      // 详情页关键区域的视觉证据交给真机验收，截图只做"首屏"的稳定证据。
       const r = await mp.screenshot({ path: file(s.name) });
       if (!fs.existsSync(file(s.name)) && r) fs.writeFileSync(file(s.name), r, 'base64');
-      const ok = fs.existsSync(file(s.name));
-      results.push({ name: s.name, ok });
-      console.log(ok ? '✓' : '✗ 无文件');
+      // 空图也算"成功"会骗人（踩过：pageScrollTo 之后截出一张 10KB 的白板，却报 ✓）
+      const size = fs.existsSync(file(s.name)) ? fs.statSync(file(s.name)).size : 0;
+      const ok = size > 15000;
+      results.push({ name: s.name, ok, err: ok ? '' : `疑似空白图（${(size / 1024).toFixed(1)} KB）` });
+      console.log(ok ? '✓' : `✗ 疑似空白图（${(size / 1024).toFixed(1)} KB）`);
     } catch (e) {
       results.push({ name: s.name, ok: false, err: e.message });
       console.log('✗ ' + e.message);

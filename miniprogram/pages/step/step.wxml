@@ -60,43 +60,67 @@
     </view>
   </view>
 
-  <!-- 本次训练 -->
+  <!-- 本次训练：未解锁的式只能看，不能记 -->
   <view class="card">
     <view class="card-title">记录这一式（每记一组立即保存到本机）</view>
 
-    <view class="restored-tip" wx:if="{{restored}}">
-      已恢复上次未提交的 {{values.length}} 组记录，可以接着记
-    </view>
-
-    <view class="last-result" wx:if="{{lastSummary}}">
-      <view class="last-title">上一次记录已保存</view>
-      <view class="muted" style="font-size:24rpx;">{{lastSummary.count}} 组（{{lastSummary.setsText}}）{{lastSummary.unitLabel}}｜{{lastSummary.tierText}}</view>
-      <view class="accent" style="font-size:24rpx;margin-top:6rpx;">{{lastSummary.gapText}}</view>
-      <view class="{{lastSummary.savedOk ? 'light' : 'danger'}}" style="font-size:20rpx;margin-top:6rpx;">{{lastSummary.savedLine}}</view>
-    </view>
-
-    <view class="input-row">
-      <input class="num-input" type="number" placeholder="这次做了多少{{unitLabel}}"
-             value="{{input}}" bindinput="onInput" confirm-type="done" bindconfirm="addSet" />
-      <view class="add-btn" bindtap="addSet">记一组</view>
-    </view>
-
-    <view class="sets" wx:if="{{values.length}}">
-      <view class="chip on" wx:for="{{values}}" wx:key="index" data-i="{{index}}" bindtap="removeSet">
-        第 {{index + 1}} 组 {{item}}{{unitLabel}} ×
+    <block wx:if="{{locked}}">
+      <view class="locked-box">
+        <view class="locked-title">🔒 这一式还没解锁</view>
+        <view class="locked-sub">{{lockHint}}</view>
+        <view class="locked-note">动作图和标准都可以看；练到达标才能解锁它。</view>
+        <view class="btn primary" bindtap="goCurrent">去练第 {{currentNo}} 式</view>
       </view>
-      <view class="chip" bindtap="clearSets">清空</view>
-    </view>
-    <view class="light" style="font-size:22rpx;margin-top:12rpx;" wx:else>
-      点上方"记一组"逐组记录；点标签可删除。每组都会立即保存，离开页面也不会丢
-    </view>
+    </block>
 
-    <view class="verdict" wx:if="{{values.length}}">
-      <view class="accent">{{tierText}}</view>
-      <view class="muted" style="margin-top:6rpx;">{{gapText}}</view>
-    </view>
+    <block wx:else>
+      <view class="restored-tip" wx:if="{{restored}}">
+        已恢复上次未提交的 {{values.length}} 组记录，可以接着记
+      </view>
 
-    <view class="btn primary" bindtap="finish">完成本次训练</view>
+      <view class="last-result" wx:if="{{lastSummary}}">
+        <view class="last-title">上一次记录已保存</view>
+        <view class="muted" style="font-size:24rpx;">{{lastSummary.count}} 组（{{lastSummary.setsText}}）{{lastSummary.unitLabel}}｜{{lastSummary.tierText}}</view>
+        <view class="accent" style="font-size:24rpx;margin-top:6rpx;">{{lastSummary.gapText}}</view>
+        <view class="{{lastSummary.savedOk ? 'light' : 'danger'}}" style="font-size:20rpx;margin-top:6rpx;">{{lastSummary.savedLine}}</view>
+      </view>
+
+      <!-- 按标准一键填入：不用逐组手输次数 -->
+      <view class="quick-label">按标准一键记录</view>
+      <view class="quick-row">
+        <view class="quick-btn {{item.done ? 'on' : ''}}" wx:for="{{tiers}}" wx:key="tier"
+              data-i="{{index}}" bindtap="applyTier">
+          <text class="q-tier">{{item.tier}}</text>
+          <text class="q-val">{{item.text}}</text>
+        </view>
+      </view>
+      <view class="light" style="font-size:20rpx;margin-top:8rpx;">
+        点一下即按该档标准填入（会覆盖当前未提交的组）；也可以自己逐组输
+      </view>
+
+      <view class="input-row" style="margin-top:16rpx;">
+        <input class="num-input" type="number" placeholder="这次做了多少{{unitLabel}}"
+               value="{{input}}" bindinput="onInput" confirm-type="done" bindconfirm="addSet" />
+        <view class="add-btn" bindtap="addSet">记一组</view>
+      </view>
+
+      <view class="sets" wx:if="{{values.length}}">
+        <view class="chip on" wx:for="{{values}}" wx:key="index" data-i="{{index}}" bindtap="removeSet">
+          第 {{index + 1}} 组 {{item}}{{unitLabel}} ×
+        </view>
+        <view class="chip" bindtap="clearSets">清空</view>
+      </view>
+      <view class="light" style="font-size:22rpx;margin-top:12rpx;" wx:else>
+        每组都会立即保存，离开页面也不会丢
+      </view>
+
+      <view class="verdict" wx:if="{{values.length}}">
+        <view class="accent">{{tierText}}</view>
+        <view class="muted" style="margin-top:6rpx;">{{gapText}}</view>
+      </view>
+
+      <view class="btn primary" bindtap="finish">完成本次训练</view>
+    </block>
   </view>
 
   <!-- 历史记录：默认只显示最近几条 -->

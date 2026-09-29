@@ -100,7 +100,7 @@ function storageInfo() {
 }
 
 function emptyState() {
-  return { version: 2, arts: {}, sessions: [], drafts: {}, steps: {} };
+  return { version: 2, arts: {}, sessions: [], drafts: {}, steps: {}, debug: null };
 }
 
 function getState() {
@@ -111,25 +111,16 @@ function getState() {
     arts: s.arts || {},
     sessions: Array.isArray(s.sessions) ? s.sessions : [],
     drafts: (s.drafts && typeof s.drafts === 'object') ? s.drafts : {},
-    // steps：每一式"是否已通过（达成升级标准）"——按式独立记录，
-    // 不再用"式号 < 当前式"推断（那样用户手动选式就乱了）
-    steps: (s.steps && typeof s.steps === 'object') ? s.steps : {}
+    // steps：每一式"是否已通过（达成升级标准）"——**这是唯一的进度真相**。
+    // 以前还存了一个 currentNo（用户选中的式），现在删掉了：
+    // 当前式 = 第一个没通过的式，由 steps 推导（见 utils/progress.js 的 currentNo）。
+    // 少一个状态源 = 少一整类"状态不跟随"的 bug。
+    steps: (s.steps && typeof s.steps === 'object') ? s.steps : {},
+    debug: s.debug || null
   };
 }
 
 function saveState(s) { rawSet(s); return s; }
-
-/** 某个艺当前练到第几式（默认第 1 式） */
-function currentNo(artId) {
-  const s = getState();
-  return (s.arts[artId] && s.arts[artId].currentNo) || 1;
-}
-
-function setCurrentNo(artId, no) {
-  const s = getState();
-  s.arts[artId] = Object.assign({}, s.arts[artId], { currentNo: no });
-  return saveState(s);
-}
 
 /** 是否已通关（第十式达成升级标准） */
 function isCompleted(artId) {
@@ -148,14 +139,13 @@ function setCompleted(artId, value) {
 }
 
 /**
- * 通关：当前已是第十式且达标 —— 不前进，而是标记完成
+ * 通关：十式全部达标 —— 只记里程碑，不动"当前式"（它是推导出来的）
  * completedAt 保留"首次通关时间"（里程碑，复习时不覆盖），lastCompletedAt 记最近一次
  */
 function completeArt(artId) {
   const s = getState();
   const prev = s.arts[artId] || {};
   s.arts[artId] = Object.assign({}, prev, {
-    currentNo: prev.currentNo || 10,
     completed: true,
     completedAt: prev.completedAt || Date.now(),
     lastCompletedAt: Date.now()
@@ -163,13 +153,22 @@ function completeArt(artId) {
   return saveState(s);
 }
 
-/** 重置某个艺的进度（连同通关状态与通关时间） */
+/**
+ * 重置某个艺的进度（连同通关状态、通关时间、本艺未提交的草稿）
+ *
+ * 为什么连草稿一起清：草稿会让式子保持"进行中"，重置后进度归 0 却还留着"进行中"，
+ * 自相矛盾。训练记录（sessions）仍然保留，那是历史。
+ */
 function resetArt(artId, stepIds) {
   const s = getState();
-  s.arts[artId] = Object.assign({}, s.arts[artId], {
-    currentNo: 1, completed: false, completedAt: null, lastCompletedAt: null
+  const prev = s.arts[artId] || {};
+  const next = Object.assign({}, prev, { completed: false, completedAt: null, lastCompletedAt: null });
+  delete next.currentNo;   // 老数据里的字段，一并清掉
+  s.arts[artId] = next;
+  (stepIds || []).forEach(id => {
+    if (s.steps) delete s.steps[id];
+    if (s.drafts) delete s.drafts[id];
   });
-  (stepIds || []).forEach(id => { if (s.steps) delete s.steps[id]; });
   return saveState(s);
 }
 
@@ -191,12 +190,72 @@ function setStepPassed(stepId, value) {
   return saveState(s);
 }
 
-/** 晋级到下一式（返回新的式号；已在第 10 式则保持不变） */
-function advance(artId, total) {
-  const cur = currentNo(artId);
-  const next = Math.min(cur + 1, total || 10);
-  setCurrentNo(artId, next);
-  return next;
+/* ---------------- 调试/验收用：造进度与还原（正式版隐藏入口） ---------------- */
+
+/**
+ * 备份"真实进度"，只备份一次（连点调试不会把备份覆盖成调试态）
+ * @returns {boolean} 是否新做了备份
+ */
+function debugSnapshot() {
+  const s = getState();
+  if (s.debug && s.debug.snapshot) return false;
+  s.debug = {
+    at: Date.now(),
+    snapshot: {
+      steps: JSON.parse(JSON.stringify(s.steps || {})),
+      arts: JSON.parse(JSON.stringify(s.arts || {}))
+    }
+  };
+  saveState(s);
+  return true;
+}
+
+/** 把某个艺解锁到第 no 式：1..no-1 记为已通过，no..末式清掉 */
+function debugUnlockTo(artId, no, stepIds) {
+  debugSnapshot();
+  const s = getState();
+  s.steps = s.steps || {};
+  (stepIds || []).forEach((id, i) => {
+    if (i < no - 1) s.steps[id] = s.steps[id] || { passedAt: Date.now() };
+    else delete s.steps[id];
+  });
+  const prev = s.arts[artId] || {};
+  s.arts[artId] = Object.assign({}, prev, { completed: false, completedAt: null, lastCompletedAt: null });
+  saveState(s);
+  return s.steps;
+}
+
+/** 六艺全部通关（演示"全通关"长什么样） */
+function debugUnlockAll(arts) {
+  debugSnapshot();
+  const s = getState();
+  s.steps = s.steps || {};
+  (arts || []).forEach(a => {
+    (a.steps || []).forEach(st => { s.steps[st.id] = s.steps[st.id] || { passedAt: Date.now() }; });
+    s.arts[a.id] = Object.assign({}, s.arts[a.id], {
+      completed: true,
+      completedAt: (s.arts[a.id] && s.arts[a.id].completedAt) || Date.now(),
+      lastCompletedAt: Date.now()
+    });
+  });
+  saveState(s);
+  return true;
+}
+
+/** 还原到备份的真实进度 */
+function debugRestore() {
+  const s = getState();
+  if (!s.debug || !s.debug.snapshot) return false;
+  s.steps = s.debug.snapshot.steps || {};
+  s.arts = s.debug.snapshot.arts || {};
+  s.debug = null;
+  saveState(s);
+  return true;
+}
+
+function hasDebugSnapshot() {
+  const s = getState();
+  return !!(s.debug && s.debug.snapshot);
 }
 
 /** 追加一次训练记录 */
@@ -224,9 +283,10 @@ function recentSessions(n) {
 function reset() { saveState(emptyState()); }
 
 module.exports = {
-  getState, saveState, currentNo, setCurrentNo, advance,
+  getState, saveState,
   isCompleted, setCompleted, completeArt, resetArt,
   passedMap, isStepPassed, setStepPassed,
   addSession, sessionsOf, recentSessions, reset, storageInfo, KEY,
-  getDraft, saveDraft, clearDraft, pendingSets, pendingList
+  getDraft, saveDraft, clearDraft, pendingSets, pendingList,
+  debugSnapshot, debugUnlockTo, debugUnlockAll, debugRestore, hasDebugSnapshot
 };

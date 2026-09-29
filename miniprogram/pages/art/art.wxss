@@ -59,14 +59,14 @@
   border-left-color: #16a34a;
   background: #fbfefc;
 }
-.step-item.practiced {
-  border-left-color: #38bdf8;
-  background: #f8fdff;
-}
 .step-item.current {
   border-left-color: #2563eb;
   border-color: #bfdbfe;
   background: #f8fbff;
+}
+.step-item.locked {
+  border-left-color: #e2e8f0;
+  background: #fcfcfd;
 }
 
 .step-no {
@@ -83,13 +83,13 @@
 }
 .step-item.passed .step-no { background: #16a34a; color: #fff; }
 .step-item.current .step-no { background: #2563eb; color: #fff; }
-.step-item.practiced .step-no { background: #e0f2fe; color: #0369a1; }
+.step-item.locked .step-no { background: #f1f5f9; color: #cbd5e1; font-size: 22rpx; }
 
 .step-body { flex: 1; margin-left: 20rpx; min-width: 0; }
 .step-name { font-size: 30rpx; font-weight: 700; }
-.step-item.todo .step-name { color: #334155; }
+.step-item.locked .step-name { color: #94a3b8; }
 
-/* 右侧状态：主行 + 次行（练过几次/最近成绩） */
+/* 右侧状态：主行 + 次行（练过几次/最近成绩/有几组未提交） */
 .step-state {
   flex: none;
   margin-left: 12rpx;
@@ -108,10 +108,9 @@
 }
 .step-state.passed { color: #15803d; background: #dcfce7; }
 .step-state.current { color: #1d4ed8; background: #dbeafe; font-weight: 700; }
-.step-state.practiced { color: #0369a1; background: #e0f2fe; }
-.step-state.todo { color: #94a3b8; background: #f1f5f9; }
+.step-state.locked { color: #94a3b8; background: #f1f5f9; }
 
-/* 列表图例：说清楚左右两边分别是什么意思 */
+/* 列表图例：说清楚三种状态分别是什么意思 */
 .list-legend {
   display: flex;
   flex-wrap: wrap;
@@ -122,3 +121,18 @@
 }
 .list-legend .lg.passed { color: #15803d; }
 .list-legend .lg.current { color: #1d4ed8; }
+.list-legend .lg.locked { color: #94a3b8; }
+
+/* 调试入口（仅开发版/体验版可见） */
+.debug-line {
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 2rpx dashed #e2e8f0;
+  font-size: 20rpx;
+  color: #94a3b8;
+}
+.debug-restore {
+  margin-left: 12rpx;
+  color: #2563eb;
+  text-decoration: underline;
+}

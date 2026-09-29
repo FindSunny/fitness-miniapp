@@ -114,29 +114,114 @@ test('formatStdLine / formatTier 文案', () => {
   assert.strictEqual(P.formatTier({ sets: 2, value: 10, unit: 'reps', perSide: true }), '2 组 × 10次（每侧）');
 });
 
+test('currentNo：当前式 = 第一个没通过的式（推导，不存储）', () => {
+  const art = getArt('pushup');
+  const ids = art.steps.map(s => s.id);
+  const passedOf = n => {
+    const m = {};
+    ids.slice(0, n).forEach(id => { m[id] = true; });
+    return m;
+  };
+
+  assert.strictEqual(P.currentNo(art, { passed: {} }), 1, '一式都没过 → 第 1 式');
+  assert.strictEqual(P.currentNo(art, { passed: passedOf(3) }), 4);
+  assert.strictEqual(P.currentNo(art, { passed: passedOf(9) }), 10);
+  assert.strictEqual(P.currentNo(art, { passed: passedOf(10) }), null, '十式全通过 → 没有当前式');
+  assert.strictEqual(P.currentNo(art, { passed: passedOf(10), completed: true }), null);
+  // 中间挖空（老数据/异常数据）也要取"第一个"没过的
+  const gap = passedOf(3); delete gap[ids[1]];
+  assert.strictEqual(P.currentNo(art, { passed: gap }), 2);
+});
+
+test('canPractice：只有"已通过的式"和"当前式"能记录（锁定式推进）', () => {
+  const art = getArt('pushup');
+  const ids = art.steps.map(s => s.id);
+  const passed = { [ids[0]]: true, [ids[1]]: true };   // 1、2 式通过 → 当前式 = 3
+  const opts = { passed };
+  const step = no => art.steps[no - 1];
+
+  assert.strictEqual(P.canPractice(art, step(1), opts), true, '已通过的式可以复习记录');
+  assert.strictEqual(P.canPractice(art, step(2), opts), true);
+  assert.strictEqual(P.canPractice(art, step(3), opts), true, '当前式可以记录');
+  assert.strictEqual(P.canPractice(art, step(4), opts), false, '当前式之后不能记录');
+  assert.strictEqual(P.canPractice(art, step(10), opts), false);
+  assert.strictEqual(P.canPractice(art, step(10), { passed, completed: true }), true, '通关后随便复习');
+});
+
 test('artStatus 进度换算（含通关）', () => {
   const art = getArt('pushup');
-  // 新签名：{currentNo, passedCount, completed}
+  const ids = art.steps.map(s => s.id);
+  const passedOf = n => {
+    const m = {};
+    ids.slice(0, n).forEach(id => { m[id] = true; });
+    return m;
+  };
+
   assert.deepStrictEqual(
     [
-      P.artStatus(art, { currentNo: 1, passedCount: 0 }).percent,
-      P.artStatus(art, { currentNo: 5, passedCount: 4 }).percent,
-      P.artStatus(art, { currentNo: 10, passedCount: 9 }).percent
+      P.artStatus(art, { passed: {} }).percent,
+      P.artStatus(art, { passed: passedOf(4) }).percent,
+      P.artStatus(art, { passed: passedOf(9) }).percent
     ],
     [0, 40, 90]
   );
-  assert.strictEqual(P.artStatus(art, { currentNo: 99, passedCount: 0 }).current, 10);   // 越界收敛
-  assert.strictEqual(P.artStatus(art, { currentNo: 0, passedCount: 0 }).current, 1);
-  assert.strictEqual(P.artStatus(art, { currentNo: 10, passedCount: 9 }).atLastStep, true);
-  assert.strictEqual(P.artStatus(art, { currentNo: 10, passedCount: 9 }).label, '当前第 10 式');
+  assert.strictEqual(P.artStatus(art, { passed: {} }).current, 1);
+  assert.strictEqual(P.artStatus(art, { passed: passedOf(9) }).current, 10, '当前式由"已通过表"推导');
+  assert.strictEqual(P.artStatus(art, { passed: passedOf(9) }).atLastStep, true);
+  assert.strictEqual(P.artStatus(art, { passed: passedOf(9) }).label, '进行中 · 第 10 式');
+  assert.strictEqual(P.artStatus(art, { passed: passedOf(4) }).remaining, 6);
 
-  const done = P.artStatus(art, { currentNo: 10, passedCount: 10, completed: true });
+  const done = P.artStatus(art, { passed: passedOf(10), completed: true });
   assert.strictEqual(done.percent, 100);
   assert.strictEqual(done.done, 10);
   assert.strictEqual(done.completed, true);
   assert.strictEqual(done.label, '已通关');
-  // completed 为真时直接算满（兼容只写了 completed 的数据）
-  assert.strictEqual(P.artStatus(art, { currentNo: 3, completed: true }).percent, 100);
+  // 十式都通过 → 自动算通关（不依赖 completed 字段）
+  assert.strictEqual(P.artStatus(art, { passed: passedOf(10) }).completed, true);
+  assert.strictEqual(P.artStatus(art, { passed: passedOf(10) }).label, '已通关');
+  // completed 为真但 passed 表不全（老数据）也要按通关算
+  assert.strictEqual(P.artStatus(art, { completed: true }).percent, 100);
+});
+
+test('artStatus：「没练过」不能显示"进行中"（回归：真机验收发现六个艺全是进行中）', () => {
+  const art = getArt('pushup');
+  const ids = art.steps.map(s => s.id);
+  const passedOf = n => {
+    const m = {};
+    ids.slice(0, n).forEach(id => { m[id] = true; });
+    return m;
+  };
+
+  // ① 全新用户：一式没过、一条记录都没有 → 未开始
+  const fresh = P.artStatus(art, { passed: {}, sessions: [] });
+  assert.strictEqual(fresh.started, false);
+  assert.strictEqual(fresh.stateText, '未开始');
+  assert.strictEqual(fresh.label, '未开始', '宽地方（列表页进度卡）也不能写"进行中"');
+  assert.strictEqual(fresh.current, 1, '内部当前式仍然是第 1 式，只是不这么显示');
+
+  // ② 没有任何 sessions 参数时也不能误报成"进行中"（默认值要安全）
+  assert.strictEqual(P.artStatus(art, { passed: {} }).stateText, '未开始');
+
+  // ③ 过了至少一式 → 第 N 式
+  const some = P.artStatus(art, { passed: passedOf(3), sessions: [] });
+  assert.strictEqual(some.started, true);
+  assert.strictEqual(some.stateText, '第 4 式');
+  assert.strictEqual(some.label, '进行中 · 第 4 式');
+
+  // ④ 没过任何一式、但练过（有记录）→ 也算开始，不能显示"未开始"
+  const practiced = P.artStatus(art, { passed: {}, sessions: [{ no: 1, ts: 1 }] });
+  assert.strictEqual(practiced.started, true);
+  assert.strictEqual(practiced.stateText, '第 1 式');
+  assert.strictEqual(practiced.label, '进行中 · 第 1 式');
+
+  // ⑤ 通关 → 已通关（短/长两个文案一致）
+  const done = P.artStatus(art, { passed: passedOf(10), completed: true, sessions: [] });
+  assert.strictEqual(done.started, true);
+  assert.strictEqual(done.stateText, '已通关');
+  assert.strictEqual(done.label, '已通关');
+
+  // ⑥ stateText 必须短到能在半个卡片宽里一行放下
+  assert.ok(fresh.stateText.length <= 4 && some.stateText.length <= 5, '短文案不能超过 5 个字');
 });
 
 test('countRecentDays 只统计窗口内的天数', () => {
@@ -205,84 +290,85 @@ test('推荐：式号越界时收敛到有效范围', () => {
   assert.strictEqual(r.no, 10);
 });
 
-test('stepStates：通过 / 当前 / 已练 三个维度分开（回归：练完提交后仍显示进行中）', () => {
+test('stepStates：锁定式推进下只有三态（已通过 / 进行中 / 未解锁）', () => {
   const art = getArt('pushup');
   const sessions = [
     { no: 1, tier: '中级', ts: 1000 },
     { no: 1, tier: '初级', ts: 2000 }
   ];
 
-  // ① 没通过、是当前式、有记录 → "已练 2 次"（不能显示"进行中"）
-  let st = P.stepStates(art, { currentNo: 1, passed: {}, sessions });
+  // ① 一式都没过：第 1 式进行中，其余全部未解锁
+  let st = P.stepStates(art, { passed: {}, sessions });
   assert.strictEqual(st[0].state, 'current');
-  assert.strictEqual(st[0].stateText, '已练 2 次');
+  assert.strictEqual(st[0].stateText, '进行中');
   assert.strictEqual(st[0].times, 2);
   assert.strictEqual(st[0].lastTier, '初级', '取最近一次的成绩');
-  assert.strictEqual(st[0].isCurrent, true);
-  assert.strictEqual(st[0].isPassed, false);
-  assert.strictEqual(st[1].stateText, '未开始');
+  assert.strictEqual(st[0].stateSub, '已练 2 次 · 最近：初级');
+  assert.ok(st.slice(1).every(s => s.state === 'locked' && s.stateText === '未解锁'), '当前式之后都不能练');
+  assert.strictEqual(st[1].stateSub, '先通过第 1 式');
 
-  // ② 通过过 → "已通过"（与是不是当前式无关）
-  st = P.stepStates(art, { currentNo: 1, passed: { 'pushup-01': true }, sessions });
+  // ② 第 1 式通过 → 第 2 式自动变成进行中（不需要任何额外操作）
+  st = P.stepStates(art, { passed: { 'pushup-01': true }, sessions });
   assert.strictEqual(st[0].state, 'passed');
   assert.strictEqual(st[0].stateText, '已通过');
-  assert.strictEqual(st[0].isPassed, true);
+  assert.strictEqual(st[0].stateSub, '已练 2 次 · 最近：初级', '已通过也要看得到练过几次');
+  assert.strictEqual(st[1].state, 'current', '回归：达标后下一式必须是进行中');
+  assert.strictEqual(st[1].stateSub, '可以开始练');
+  assert.ok(st.slice(2).every(s => s.isLocked));
 
-  // ③ 用户手动把当前式切到第 3 式：第 1 式没通过就仍是"已练 N 次"，不会变成"已通过"
-  st = P.stepStates(art, { currentNo: 3, passed: {}, sessions });
-  assert.strictEqual(st[0].state, 'practiced');
-  assert.strictEqual(st[0].stateText, '已练 2 次');
+  // ③ 只有草稿（记了一组但没提交）→ 当前式副文案要显示"有 N 组未提交"
+  st = P.stepStates(art, { passed: {}, sessions: [], drafts: [{ stepId: 'pushup-01', values: [25] }] });
+  assert.strictEqual(st[0].state, 'current');
+  assert.strictEqual(st[0].draftCount, 1);
+  assert.strictEqual(st[0].stateSub, '有 1 组未提交');
+
+  // ④ 唯一性：任何情况下"进行中"最多一个
+  const passed3 = { 'pushup-01': true, 'pushup-02': true };
+  st = P.stepStates(art, {
+    passed: passed3,
+    sessions: [{ no: 1, tier: '初级', ts: 1 }, { no: 5, tier: '初级', ts: 2 }],
+    drafts: [{ stepId: 'pushup-02', values: [1, 1] }]
+  });
+  assert.strictEqual(st.filter(s => s.state === 'current').length, 1, '进行中只能有一个（锁定式推进的自然结果）');
   assert.strictEqual(st[2].state, 'current');
-  assert.strictEqual(st[2].stateText, '进行中', '当前式没练过才是"进行中"');
-  assert.strictEqual(st[3].stateText, '未开始');
+  assert.strictEqual(st[0].state, 'passed', '已通过的式即使有记录也还是"已通过"');
+  // 越权记录（异常数据：解锁前就有历史成绩）不改变状态，仍然是未解锁
+  assert.strictEqual(st[4].state, 'locked');
+  assert.strictEqual(st[4].times, 1, '但历史次数照实显示');
 
-  // ④ 空记录、当前式=1
-  st = P.stepStates(art, { currentNo: 1, passed: {}, sessions: [] });
-  assert.strictEqual(st[0].stateText, '进行中');
-  assert.ok(st.slice(1).every(s => s.stateText === '未开始'));
-
-  // ⑤ 通关 → 全部"已通过"
-  st = P.stepStates(art, { currentNo: 10, passed: {}, completed: true, sessions });
+  // ⑤ 通关 → 全部已通过，没有进行中
+  st = P.stepStates(art, { passed: {}, completed: true, sessions });
   assert.ok(st.every(s => s.state === 'passed' && s.stateText === '已通过'));
-
-  // ⑥ 越过当前式练过的式子（跳着练）→ "已练 N 次"
-  st = P.stepStates(art, { currentNo: 1, passed: {}, sessions: [{ no: 5, tier: '初级', ts: 1 }] });
-  assert.strictEqual(st[4].state, 'practiced');
-  assert.strictEqual(st[4].stateText, '已练 1 次');
-  assert.strictEqual(st[4].isCurrent, false);
+  assert.ok(st.every(s => !s.isCurrent));
 });
 
-test('stepBanner：详情页顶部状态说明', () => {
+test('stepBanner：详情页顶部状态说明（三种）', () => {
   const art = getArt('pushup');
   const step1 = getStep('pushup', 1);
 
   // 已通过
-  let b = P.stepBanner(art, step1, { currentNo: 1, isPassed: true, times: 3, lastTier: '升级' });
+  let b = P.stepBanner(art, step1, { isPassed: true, times: 3, lastTier: '升级' });
   assert.strictEqual(b.kind, 'passed');
   assert.match(b.title, /已通过/);
   assert.match(b.sub, /第 2 式/);
 
   // 当前式且练过
-  b = P.stepBanner(art, step1, { currentNo: 1, isPassed: false, times: 2, lastTier: '中级' });
+  b = P.stepBanner(art, step1, { isCurrent: true, times: 2, lastTier: '中级' });
   assert.strictEqual(b.kind, 'current');
   assert.match(b.sub, /已练 2 次/);
   assert.match(b.sub, /中级/);
 
   // 当前式但没练过
-  b = P.stepBanner(art, step1, { currentNo: 1, isPassed: false, times: 0 });
+  b = P.stepBanner(art, step1, { isCurrent: true, times: 0 });
+  assert.strictEqual(b.kind, 'current');
   assert.match(b.sub, /还没有提交过记录/);
 
-  // 落后于当前式（我在第 3 式练，看到第 1 式）
-  b = P.stepBanner(art, step1, { currentNo: 3, isPassed: false, times: 1 });
-  assert.strictEqual(b.kind, 'behind');
-  assert.match(b.sub, /当前在练第 3 式/);
-
-  // 领先于当前式
+  // 未解锁（回归：访谈里"进到没解锁的式，不知道该怎么办"）
   const step5 = getStep('pushup', 5);
-  b = P.stepBanner(art, step5, { currentNo: 2, isPassed: false, times: 0 });
-  assert.strictEqual(b.kind, 'ahead');
-  assert.match(b.title, /第 5 式/);
-  assert.match(b.sub, /当前式会跟过来/);
+  b = P.stepBanner(art, step5, { isPassed: false, isCurrent: false, unlockHint: '先通过第 2 式（上斜俯卧撑）' });
+  assert.strictEqual(b.kind, 'locked');
+  assert.match(b.title, /没解锁/);
+  assert.match(b.sub, /先通过第 2 式/);
 });
 
 test('formatTime / sessionText 文案', () => {

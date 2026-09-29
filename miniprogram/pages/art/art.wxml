@@ -4,8 +4,8 @@
   <view class="sub">{{art.en}} · 主练 {{art.focus}}</view>
   <view class="tagline">{{art.tagline}}</view>
 
-  <!-- 进度卡：区分"通过到第几式"和"总共练过多少" -->
-  <view class="progress-card {{completed ? 'is-done' : ''}}">
+  <!-- 进度卡：只认"已通过几式"，当前式由它推导 -->
+  <view class="progress-card {{completed ? 'is-done' : ''}}" bindlongpress="onCardLongPress">
     <view class="row-between">
       <view class="progress-label">
         <text wx:if="{{completed}}" class="done-tag">已通关</text>
@@ -20,25 +20,28 @@
       </text>
       <text class="chip" bindtap="resetProgress">重置</text>
     </view>
+    <view class="debug-line" wx:if="{{debugEnabled}}">
+      调试：长按本卡片可造进度{{hasDebugSnapshot ? '（当前有备份，可还原）' : ''}}
+      <text wx:if="{{hasDebugSnapshot}}" class="debug-restore" catchtap="restoreDebug">还原真实进度</text>
+    </view>
   </view>
 
-  <!-- 十式列表：左边是"是否通过"，右边是"练过几次" -->
+  <!-- 十式列表：只有三种状态 —— 已通过 / 进行中（唯一能练的）/ 未解锁 -->
   <view class="list-legend">
-    <text class="lg passed">✓ 已通过</text>
-    <text class="lg current">当前在练</text>
-    <text class="lg">已练 N 次 = 练过但还没达到升级标准</text>
+    <text class="lg passed">✓ 已通过（可复习）</text>
+    <text class="lg current">进行中 = 当前这一式</text>
+    <text class="lg locked">🔒 未解锁 = 先通过前面那式</text>
   </view>
 
   <view class="step-list">
-    <view class="step-item {{item.state}} {{item.isCurrent ? 'is-current' : ''}}" wx:for="{{steps}}" wx:key="id"
+    <view class="step-item {{item.state}}" wx:for="{{steps}}" wx:key="id"
           data-no="{{item.no}}" bindtap="goStep">
-      <view class="step-no">{{item.state === 'passed' ? '✓' : item.no}}</view>
+      <view class="step-no">{{item.state === 'passed' ? '✓' : (item.isLocked ? '🔒' : item.no)}}</view>
       <view class="step-body">
         <view class="step-name">
           {{item.name}}
           <text class="badge gray" wx:if="{{item.perSide}}" style="margin-left:10rpx;">每侧</text>
           <text class="badge gray" wx:if="{{item.unit === 'sec'}}" style="margin-left:10rpx;">按秒</text>
-          <text class="badge" wx:if="{{item.isCurrent}}" style="margin-left:10rpx;">当前</text>
         </view>
         <view class="muted" style="font-size:22rpx;margin-top:6rpx;">{{item.stdLine}}</view>
         <view class="light" style="font-size:20rpx;margin-top:4rpx;" wx:if="{{!item.hasArt}}">示意图待补</view>
@@ -46,7 +49,7 @@
       </view>
       <view class="step-state {{item.state}}">
         <text>{{item.stateText}}</text>
-        <text class="state-sub" wx:if="{{item.note2}}">{{item.note2}}</text>
+        <text class="state-sub" wx:if="{{item.stateSub}}">{{item.stateSub}}</text>
       </view>
     </view>
   </view>

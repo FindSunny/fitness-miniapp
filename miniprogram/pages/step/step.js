@@ -20,6 +20,11 @@ Page({
     canNext: false,
     isLast: false,
     completed: false,
+    isPassed: false,
+    isCurrent: false,
+    locked: false,
+    lockHint: '',
+    currentNo: 1,
     viewText: '侧视',
     lastSummary: null,
     restored: false,
@@ -76,6 +81,25 @@ Page({
       reached: i === result.tierIndex
     }));
 
+    // 进度真相：已通过的式表；当前式 = 第一个未通过的式（推导）
+    const passed = store.passedMap();
+    const completed = store.isCompleted(art.id);
+    const curNo = progress.currentNo(art, { passed, completed });
+    const isPassed = !!passed[step.id];
+    const isCurrent = !completed && curNo === step.no;
+    // 锁定式推进：只有"已通过的式"和"当前式"能记录，再往后只能看
+    const locked = !progress.canPractice(art, step, { passed, completed });
+    // 解锁提示要说"还差多少才能过"，不能拿【初级】的门槛糊弄人
+    // （踩过：这里曾用 evaluate(step, []) 的 gap，显示成"距【初级】还差 1 组 × 10次"，
+    //   而真正要达标的是【升级】档）
+    const curStep = curNo ? getStep(this.artId, curNo) : null;
+    let lockHint = '';
+    if (locked && curStep) {
+      const t = progress.tiersOf(curStep);
+      const top = t[t.length - 1];
+      lockHint = `先通过第 ${curNo} 式（${curStep.name}）—— 达标标准【${top.tier}】${progress.formatTier(top)}`;
+    }
+
     // 这一式的历史记录（持久化在本地，重进页面必须能看到）
     const historyAll = store.sessionsOf(step.artId)
       .filter(s => s.no === step.no)
@@ -92,11 +116,12 @@ Page({
 
     // 顶部状态横幅：让用户一眼知道"这一式现在是什么状态"
     const banner = progress.stepBanner(art, step, {
-      currentNo: store.currentNo(art.id),
-      isPassed: store.isStepPassed(step.id),
-      completed: store.isCompleted(art.id),
+      isPassed,
+      isCurrent,
+      completed,
       times: historyAll.length,
-      lastTier: historyAll.length ? historyAll[0].tier : null
+      lastTier: historyAll.length ? historyAll[0].tier : null,
+      unlockHint: lockHint
     });
 
     this.setData({
@@ -109,14 +134,22 @@ Page({
       historyCount: historyAll.length,
       historyMore: Math.max(historyAll.length - history.length, 0),
       banner,
-      isPassed: banner.kind === 'passed',
-      completed: store.isCompleted(art.id)
+      isPassed,
+      isCurrent,
+      locked,
+      lockHint,
+      currentNo: curNo || art.steps.length,
+      completed
     });
   },
 
   onInput(e) { this.setData({ input: e.detail.value }); },
 
   addSet() {
+    if (this.data.locked) {
+      wx.showToast({ title: `先通过第 ${this.data.currentNo} 式`, icon: 'none' });
+      return;
+    }
     const v = Number(this.data.input);
     if (!v || v <= 0) {
       wx.showToast({ title: `先填入${this.data.unitLabel}数`, icon: 'none' });
@@ -126,6 +159,25 @@ Page({
     this.setData({ values, input: '', restored: false });
     store.saveDraft(this.data.step.id, values);   // 立刻落盘
     this.refresh();
+  },
+
+  /**
+   * 按某一档标准一键填入（访谈里的头号诉求：不想逐组手输）
+   * 覆盖当前未提交的组 —— "点中级"的意思就是"我这次做到中级标准"
+   */
+  applyTier(e) {
+    if (this.data.locked) {
+      wx.showToast({ title: `先通过第 ${this.data.currentNo} 式`, icon: 'none' });
+      return;
+    }
+    const t = this.data.tiers[Number(e.currentTarget.dataset.i)];
+    if (!t) return;
+    const values = [];
+    for (let i = 0; i < t.sets; i++) values.push(t.value);
+    this.setData({ values, input: '', restored: false });
+    store.saveDraft(this.data.step.id, values);
+    this.refresh();
+    wx.showToast({ title: `已按【${t.tier}】填入 ${t.sets} 组`, icon: 'none' });
   },
 
   removeSet(e) {
@@ -150,6 +202,10 @@ Page({
 
   finish() {
     const { art, step, values, result } = this.data;
+    if (this.data.locked) {
+      wx.showToast({ title: `先通过第 ${this.data.currentNo} 式`, icon: 'none' });
+      return;
+    }
     if (!values.length) {
       wx.showToast({ title: '先记至少一组', icon: 'none' });
       return;
@@ -165,7 +221,8 @@ Page({
       tier: result.tier
     });
     store.clearDraft(step.id);                  // 已转成正式记录
-    store.setCurrentNo(art.id, step.no);        // 练了哪一式，当前就跟到哪一式
+    // 注意：这里不再需要"推进当前式"——当前式 = 第一个未通过的式，是推导出来的。
+    // 达标写入 steps 之后，下一式自动变成进行中（不管用户点不点弹窗按钮）。
 
     const info = store.storageInfo();
     const savedLine = info.error
@@ -187,7 +244,7 @@ Page({
     });
     this.refresh();
 
-    // ① 没达标：说清结果 + 下一步（练过就算数，列表上会显示"已练 N 次"）
+    // ① 没达标：说清结果 + 下一步（记录已保存，当前式不变，继续练这一式）
     if (!result.canAdvance) {
       wx.showModal({
         title: info.error ? '保存可能失败' : '本次已记录',
@@ -200,7 +257,7 @@ Page({
       return;
     }
 
-    // ② 达标：记为"已通过"
+    // ② 达标：记为"已通过"→ 下一式自动成为进行中
     store.setStepPassed(step.id, true);
     const allPassed = getArt(art.id).steps.every(s => store.isStepPassed(s.id));
 
@@ -211,13 +268,12 @@ Page({
         title: allPassed ? '全部完成' : '达标了',
         content: allPassed
           ? `「${art.name}」十式已全部达标，可以换下一艺了。`
-          : `已达成【升级】标准，已记为「已通过」。进入第 ${step.no + 1} 式？`,
-        confirmText: allPassed ? '看进度' : '进入下一式',
+          : `已达成【升级】标准，已记为「已通过」。第 ${step.no + 1} 式已解锁，现在去练？`,
+        confirmText: allPassed ? '看进度' : '去练下一式',
         cancelText: allPassed ? '再练一次' : '留在本式',
         success: r => {
           if (allPassed) { if (r.confirm) wx.navigateBack(); return; }
           if (r.confirm) {
-            store.advance(art.id, art.total);
             wx.redirectTo({ url: `/pages/step/step?artId=${art.id}&no=${step.no + 1}` });
           } else {
             this.refresh();
@@ -240,17 +296,23 @@ Page({
     });
   },
 
+  /**
+   * 上一式 / 下一式：**纯浏览**，不改任何进度
+   * （锁定式推进下，"当前式"是推导的，用户点谁都不会改变它；
+   *   想解锁更靠后的式，只有把当前式练到达标）
+   */
   goPrev() {
     if (!this.data.canPrev) return;
-    const no = this.no - 1;
-    store.setCurrentNo(this.artId, no);   // 用户主动选式 → 当前式跟过去
-    wx.redirectTo({ url: `/pages/step/step?artId=${this.artId}&no=${no}` });
+    wx.redirectTo({ url: `/pages/step/step?artId=${this.artId}&no=${this.no - 1}` });
   },
 
   goNext() {
     if (!this.data.canNext) return;
-    const no = this.no + 1;
-    store.setCurrentNo(this.artId, no);
-    wx.redirectTo({ url: `/pages/step/step?artId=${this.artId}&no=${no}` });
+    wx.redirectTo({ url: `/pages/step/step?artId=${this.artId}&no=${this.no + 1}` });
+  },
+
+  /** 从"未解锁"的页面一键回到当前该练的那一式 */
+  goCurrent() {
+    wx.redirectTo({ url: `/pages/step/step?artId=${this.artId}&no=${this.data.currentNo}` });
   }
 });

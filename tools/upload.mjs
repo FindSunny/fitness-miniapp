@@ -21,7 +21,7 @@ const pkgSrc = fs.readFileSync(path.join(root, 'package.json'), 'utf8').replace(
 const pkg = JSON.parse(pkgSrc);
 
 const version = (process.argv[2] || pkg.version || '').trim();
-const desc = (process.argv[3] || `六艺十式 v${version}：俯卧撑十式完整（含通关流程）+ 进度记录 + 六艺数据层`).trim();
+const desc = (process.argv[3] || `六艺十式 v${version} · 六艺 × 十式徒手训练晋级记录`).trim();
 
 if (!/^\d+\.\d+\.\d+$/.test(version)) {
   console.error(`版本号格式应为 x.y.z，当前是 ${JSON.stringify(version)}`);

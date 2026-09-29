@@ -4,13 +4,14 @@
   <view class="sub">六个动作 · 每个十式 · 达到标准才进下一式</view>
 
   <!-- 存储诊断（放最上面，一眼可见；排查完可移除） -->
-  <view class="store-diag" wx:if="{{storeInfo}}">
+  <view class="store-diag" wx:if="{{storeInfo}}" bindlongpress="onBuildLongPress">
     <text class="build">build {{build.stamp}}</text>
     <text>存储：{{storeInfo.backend}}</text>
     <text>记录 {{storeInfo.sessions}} 条</text>
     <text wx:if="{{storeInfo.pending > 0}}">未提交 {{storeInfo.pending}} 组</text>
     <text wx:if="{{storeInfo.sizeKB !== undefined}}">已用 {{storeInfo.sizeKB}} KB</text>
     <text class="err" wx:if="{{storeInfo.error}}">⚠ {{storeInfo.error}}</text>
+    <text class="dbg" wx:if="{{debugEnabled}}">· 长按可调试{{hasDebugSnapshot ? '（有备份）' : ''}}</text>
   </view>
 
   <!-- 有已记录但未提交的组 -->
@@ -69,11 +70,14 @@
       <view class="light" style="font-size:20rpx;">{{item.en}} · {{item.focus}}</view>
       <view class="muted" style="font-size:22rpx;margin-top:8rpx;">{{item.tagline}}</view>
       <view class="bar"><view class="bar-in" style="width:{{item.percent}}%;"></view></view>
-      <view class="row-between" style="margin-top:8rpx;">
-        <text wx:if="{{item.completed}}" class="done-text">已通关 ✓</text>
-        <text wx:else class="accent" style="font-size:22rpx;">{{item.label}}</text>
-        <text class="light" style="font-size:20rpx;">通过 {{item.passedCount}}/10 · 图 {{item.drawn}}/10</text>
+      <!-- 一行放下：左边状态、右边进度数字。以前写成"进行中 · 第 1 式 + 通过 0/10 · 图 10/10"，
+           半个卡片宽根本放不下 → 折成三行（真机验收发现） -->
+      <view class="art-state">
+        <text class="art-state-text {{item.stateClass}}">{{item.stateText}}</text>
+        <text class="art-state-num">{{item.passedCount}}/{{item.total}}</text>
       </view>
+      <!-- 示意图没画全时才提一句；画全了就安静（不再显示"图 10/10"占地方） -->
+      <view class="fig-tag" wx:if="{{item.drawn < item.total}}">部分示意图待补</view>
     </view>
   </view>
 

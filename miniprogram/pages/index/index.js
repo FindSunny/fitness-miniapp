@@ -1,6 +1,7 @@
 const { ARTS, getArt } = require('../../data/arts.js');
 const progress = require('../../utils/progress.js');
 const store = require('../../utils/store.js');
+const env = require('../../utils/env.js');
 const build = require('../../build-info.js');
 
 Page({
@@ -12,17 +13,24 @@ Page({
     weeklyCount: 0,
     totalSessions: 0,
     storeInfo: null,
+    debugEnabled: false,
+    hasDebugSnapshot: false,
     build
   },
 
   onShow() {
     const sessions = store.getState().sessions;
 
+    // 当前式是推导的：第一个还没通过的式
+    const passed = store.passedMap();
+    const curOf = {};
+    ARTS.forEach(a => { curOf[a.id] = progress.currentNo(a, { passed, completed: store.isCompleted(a.id) }); });
+
     const arts = ARTS.map(a => {
-      const cur = store.currentNo(a.id);
       const completed = store.isCompleted(a.id);
-      const passedCount = a.steps.filter(s => store.isStepPassed(s.id)).length;
-      const st = progress.artStatus(a, { currentNo: cur, passedCount, completed });
+      const artSessions = sessions.filter(s => s.artId === a.id);
+      const st = progress.artStatus(a, { passed, completed, sessions: artSessions });
+      const cur = curOf[a.id];
       return {
         id: a.id,
         name: a.name,
@@ -30,12 +38,16 @@ Page({
         focus: a.focus,
         tagline: a.tagline,
         cover: `/assets/movements/art-${a.id}.png`,
-        currentNo: cur,
+        currentNo: cur === null ? a.steps.length : cur,
         total: st.total,
         percent: st.percent,
         completed: st.completed,
+        // label 太长的时代已经过去：卡片窄，只显示短状态 + 数字
+        stateText: st.stateText,
+        stateClass: st.completed ? 'done' : (st.started ? 'doing' : 'todo'),
         label: st.label,
-        passedCount,
+        started: st.started,
+        passedCount: st.passed,
         // 该艺有几式的示意图已经画好（mov-* 是逐式图；art-* 是六艺共用封面，不算）
         drawn: a.steps.filter(s => s.art && s.art.indexOf('mov-') === 0).length
       };
@@ -44,7 +56,7 @@ Page({
     // 推荐：跳过已通关的艺，通关一个就自动顺延到下一个
     const rec = progress.recommend(ARTS, {
       sessions,
-      currentNoOf: id => store.currentNo(id),
+      currentNoOf: id => curOf[id],
       isCompleted: id => store.isCompleted(id)
     });
 
@@ -55,7 +67,9 @@ Page({
       stepName: rec.step.name,
       stdLine: progress.formatStdLine(rec.step),
       mode: rec.mode,
-      title: rec.mode === 'continue' ? '继续训练' : '接着练',
+      // 一个字的问题也别糊弄：一次都没练过的人，看到"接着练"是错的
+      // （同一类 bug：文案按"推荐算法的分支"写，而不是按用户的状态写）
+      title: rec.mode === 'continue' ? '继续训练' : (sessions.length ? '接着练' : '开始训练'),
       reason: rec.reason
     };
 
@@ -68,6 +82,8 @@ Page({
       totalSessions: sessions.length,
       // 诊断用：真机上看不清"数据为什么没了"时，这行能直接给出答案
       storeInfo: store.storageInfo(),
+      debugEnabled: env.debugEnabled(),
+      hasDebugSnapshot: store.hasDebugSnapshot(),
       // 已记录但还没提交的组（每组都即时落盘，这里提示用户去提交）
       pendingSets: store.pendingSets(),
       pendingList: store.pendingList()
@@ -89,5 +105,26 @@ Page({
     const m = this.data.main;
     if (!m) return;
     wx.navigateTo({ url: `/pages/step/step?artId=${m.artId}&no=${m.no}` });
+  },
+
+  /* ---- 调试/验收入口（仅开发版、体验版可见）：长按 build 信息行 ---- */
+  onBuildLongPress() {
+    if (!env.debugEnabled()) return;
+    const items = this.data.hasDebugSnapshot
+      ? ['调试：六艺全部通关', '调试：还原成真实进度']
+      : ['调试：六艺全部通关'];
+    wx.showActionSheet({
+      itemList: items,
+      success: r => {
+        if (r.tapIndex === 0) {
+          store.debugUnlockAll(ARTS);
+          wx.showToast({ title: '已造出全通关态', icon: 'none' });
+        } else {
+          store.debugRestore();
+          wx.showToast({ title: '已还原成真实进度', icon: 'none' });
+        }
+        this.onShow();
+      }
+    });
   }
 });
