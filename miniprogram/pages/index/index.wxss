@@ -98,7 +98,7 @@
   background: #f1f5f9;
   border-radius: 12rpx;
   font-size: 20rpx;
-  color: #64748b;
+  color: #475569;
 }
 .store-diag .build {
   color: #2563eb;
@@ -110,7 +110,7 @@
   width: 100%;
 }
 .store-diag .dbg {
-  color: #94a3b8;
+  color: #64748b;
 }
 .art-card.is-done .bar-in { background: #16a34a; }
 .done-text {
@@ -133,16 +133,16 @@
 }
 .art-state-text.doing { color: #1d4ed8; }
 .art-state-text.done { color: #15803d; }
-.art-state-text.todo { color: #94a3b8; font-weight: 400; }
+.art-state-text.todo { color: #64748b; font-weight: 400; }
 .art-state-num {
   font-size: 22rpx;
-  color: #94a3b8;
+  color: #64748b;
   white-space: nowrap;
 }
 .fig-tag {
   margin-top: 6rpx;
-  font-size: 19rpx;
-  color: #cbd5e1;
+  font-size: 20rpx;
+  color: #64748b;
 }
 
 /* 六艺全部通关 */

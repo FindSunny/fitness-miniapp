@@ -65,19 +65,19 @@ const HTML = `<!doctype html>
   .h1 { font-size: 23px; font-weight: 700; letter-spacing: .5px; }
   .sub { font-size: 12px; color: #64748b; margin-top: 4px; }
   .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-top: 12px; }
-  .card-title { font-size: 13px; color: #94a3b8; margin-bottom: 6px; }
+  .card-title { font-size: 13px; color: #64748b; margin-bottom: 6px; }
   .badge { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px; background: #eff6ff; color: #2563eb; }
-  .badge.gray { background: #f1f5f9; color: #64748b; }
-  .accent { color: #2563eb; } .muted { color: #64748b; } .light { color: #94a3b8; } .danger { color: #dc2626; }
+  .badge.gray { background: #f1f5f9; color: #475569; }
+  .accent { color: #2563eb; } .muted { color: #64748b; } .light { color: #64748b; } .danger { color: #dc2626; }
   .hr { height: 1px; background: #e2e8f0; margin: 12px 0; }
   .row-between { display: flex; align-items: flex-start; justify-content: space-between; }
   .btn { margin-top: 12px; background: #111827; color: #fff; border-radius: 8px; font-size: 15px; line-height: 44px; text-align: center; cursor: pointer; }
   .btn.primary { background: #2563eb; }
   .btn.ghost { background: #fff; color: #111827; border: 1px solid #cbd5e1; }
   .btn[disabled] { opacity: .45; cursor: default; }
-  .chip { display: inline-block; padding: 3px 10px; border-radius: 999px; border: 1px solid #e2e8f0; font-size: 12px; color: #334155; margin: 4px 6px 0 0; cursor: pointer; }
+  .chip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid #e2e8f0; font-size: 12px; color: #334155; margin: 4px 6px 0 0; cursor: pointer; }
   .chip.on { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
-  .disclaimer { margin-top: 20px; font-size: 11px; color: #94a3b8; line-height: 1.7; }
+  .disclaimer { margin-top: 20px; font-size: 11px; color: #64748b; line-height: 1.7; }
 
   .stat-row { display: flex; margin-top: 12px; }
   .stat { flex: 1; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; text-align: center; }
@@ -107,22 +107,22 @@ const HTML = `<!doctype html>
   .step-item.passed { border-left-color: #16a34a; background: #fbfefc; }
   .step-item.current { border-left-color: #2563eb; border-color: #bfdbfe; background: #f8fbff; }
   .step-item.locked { border-left-color: #e2e8f0; background: #fcfcfd; }
-  .step-no { width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 50%; background: #f1f5f9; color: #94a3b8; font-size: 12px; font-weight: 700; flex: none; }
+  .step-no { width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 50%; background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 700; flex: none; }
   .step-item.passed .step-no { background: #16a34a; color: #fff; }
   .step-item.current .step-no { background: #2563eb; color: #fff; }
-  .step-item.locked .step-no { background: #f1f5f9; color: #cbd5e1; font-size: 11px; }
+  .step-item.locked .step-no { background: #f1f5f9; color: #475569; font-size: 11px; }
   .step-body { flex: 1; margin-left: 10px; min-width: 0; }
   .step-name { font-size: 15px; font-weight: 700; }
-  .step-item.locked .step-name { color: #94a3b8; }
+  .step-item.locked .step-name { color: #64748b; }
   .step-state { flex: none; margin-left: 6px; font-size: 11px; padding: 2px 7px; border-radius: 999px; white-space: nowrap; text-align: center; display: flex; flex-direction: column; }
   .step-state .state-sub { font-size: 9px; opacity: .75; margin-top: 1px; }
   .step-state.passed { color: #15803d; background: #dcfce7; }
   .step-state.current { color: #1d4ed8; background: #dbeafe; font-weight: 700; }
-  .step-state.locked { color: #94a3b8; background: #f1f5f9; }
-  .list-legend { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-top: 12px; font-size: 10px; color: #94a3b8; }
+  .step-state.locked { color: #475569; background: #f1f5f9; }
+  .list-legend { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-top: 12px; font-size:  11px; color: #64748b; }
   .list-legend .lg.passed { color: #15803d; }
   .list-legend .lg.current { color: #1d4ed8; }
-  .list-legend .lg.locked { color: #94a3b8; }
+  .list-legend .lg.locked { color: #64748b; }
 
   .final-tip { margin-top: 8px; padding: 9px 11px; background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c; border-radius: 7px; font-size: 12px; line-height: 1.6; }
   .art-card.is-done { border-color: #86efac; background: #f7fef9; }
@@ -141,14 +141,14 @@ const HTML = `<!doctype html>
 
   .quick-label { font-size: 12px; color: #334155; margin-bottom: 5px; }
   .quick-row { display: flex; }
-  .quick-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 0; background: #fff; border: 1px solid #cbd5e1; border-radius: 7px; font-size: 11px; color: #111827; text-align: center; cursor: pointer; }
+  .quick-btn { min-height: 44px; flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 0; background: #fff; border: 1px solid #cbd5e1; border-radius: 7px; font-size: 11px; color: #111827; text-align: center; cursor: pointer; }
   .quick-btn + .quick-btn { margin-left: 7px; }
   .quick-btn.on { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; font-weight: 700; }
 
   .locked-box { padding: 12px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; }
   .locked-title { font-size: 14px; font-weight: 700; color: #475569; }
   .locked-sub { font-size: 12px; color: #64748b; margin-top: 5px; line-height: 1.6; }
-  .locked-note { font-size: 11px; color: #94a3b8; margin-top: 5px; }
+  .locked-note { font-size: 11px; color: #64748b; margin-top: 5px; }
 
   .restored-tip { margin-bottom: 8px; padding: 8px 10px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; border-radius: 6px; font-size: 12px; }
   .last-result { margin-bottom: 10px; padding: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 7px; }
@@ -156,10 +156,10 @@ const HTML = `<!doctype html>
 
   .hist-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
   .hist-row:last-child { border-bottom: none; }
-  .hist-time { width: 95px; color: #94a3b8; font-size: 11px; }
+  .hist-time { width: 95px; color: #64748b; font-size: 11px; }
   .hist-sets { flex: 1; color: #334155; }
   .hist-tier { color: #2563eb; font-size: 11px; }
-  .hist-toggle { margin-top: 8px; text-align: center; font-size: 11px; color: #2563eb; cursor: pointer; }
+  .hist-toggle { margin-top: 8px; text-align: center; font-size: 11px; line-height: 44px; color: #2563eb; cursor: pointer; }
 
   .pose-box { position: relative; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; }
   .pose { width: 100%; height: 190px; object-fit: contain; }

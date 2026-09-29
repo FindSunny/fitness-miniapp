@@ -18,6 +18,7 @@
 }
 .quick-row { display: flex; }
 .quick-btn {
+  min-height: 88rpx;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -42,7 +43,7 @@
 }
 .locked-title { font-size: 28rpx; font-weight: 700; color: #475569; }
 .locked-sub { font-size: 24rpx; color: #64748b; margin-top: 10rpx; line-height: 1.6; }
-.locked-note { font-size: 22rpx; color: #94a3b8; margin-top: 10rpx; }
+.locked-note { font-size: 22rpx; color: #64748b; margin-top: 10rpx; }
 
 /* 顶部切换式 */
 .nav-top {
@@ -52,6 +53,7 @@
   margin-bottom: 16rpx;
 }
 .nav-btn {
+  min-height: 88rpx;
   flex: 1;
   text-align: center;
   padding: 16rpx 0;
@@ -62,13 +64,14 @@
   color: #111827;
 }
 .nav-btn.off { opacity: .35; }
-.nav-mid { width: 120rpx; text-align: center; font-size: 24rpx; color: #94a3b8; }
+.nav-mid { width: 120rpx; text-align: center; font-size: 24rpx; color: #64748b; }
 
-/* 历史记录的展开/收起 */
+/* 历史记录的展开/收起（可点区域要够大） */
 .hist-toggle {
   margin-top: 16rpx;
   text-align: center;
   font-size: 22rpx;
+  line-height: 88rpx;
   color: #2563eb;
 }
 
@@ -102,7 +105,7 @@
 
 .card-title {
   font-size: 26rpx;
-  color: #94a3b8;
+  color: #64748b;
   margin-bottom: 12rpx;
 }
 
@@ -122,7 +125,7 @@
 .input-row { display: flex; align-items: center; }
 .num-input {
   flex: 1;
-  height: 84rpx;
+  height: 88rpx;
   background: #f8fafc;
   border: 2rpx solid #e2e8f0;
   border-radius: 14rpx;
@@ -132,8 +135,8 @@
 .add-btn {
   flex: none;
   margin-left: 20rpx;
-  height: 84rpx;
-  line-height: 84rpx;
+  height: 88rpx;
+  line-height: 88rpx;
   padding: 0 34rpx;
   background: #111827;
   color: #fff;
@@ -160,7 +163,7 @@
   font-size: 24rpx;
 }
 .hist-row:last-child { border-bottom: none; }
-.hist-time { width: 190rpx; color: #94a3b8; font-size: 22rpx; }
+.hist-time { width: 190rpx; color: #64748b; font-size: 22rpx; }
 .hist-sets { flex: 1; color: #334155; }
 .hist-tier { color: #2563eb; font-size: 22rpx; }
 
