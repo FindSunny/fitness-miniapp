@@ -128,6 +128,12 @@ const STATES = [
       drafts: { 'pushup-01': { values: [25, 25], ts: now } }, steps: {}
     },
     url: '/pages/step/step?artId=pushup&no=1',
+  },
+  {
+    name: '13-step-pose-big', desc: '详情页 · 点示意图看全屏大图（tap 触发）',
+    state: empty(),
+    url: '/pages/step/step?artId=pushup&no=1',
+    tap: 'openPose'
   }
 ];
 
@@ -146,6 +152,17 @@ const STATES = [
       await seed(mp, s.state);
       await retry(() => mp.reLaunch(s.url), 3, 800);
       await sleep(1200);                                 // 留足渲染时间
+      // 有的状态需要先"点一下"才有（比如全屏大图）：直接调页面的真实处理函数
+      if (s.tap) {
+        try {
+          await mp.evaluate(function (m) {
+            const pages = getCurrentPages();
+            const cur = pages[pages.length - 1];
+            if (cur && typeof cur[m] === 'function') cur[m]();
+          }, s.tap);
+          await sleep(800);
+        } catch (e) { /* 点不开就按原状态截，不影响其他张 */ }
+      }
       // 说明：不要试图在截图前滚动页面。试过 page.scrollTop()（只对 scroll-view 有效）和
       // wx.pageScrollTo（会把页面滚成空白，截出来是一张空图），结果都是坏证据 ——
       // 详情页关键区域的视觉证据交给真机验收，截图只做"首屏"的稳定证据。

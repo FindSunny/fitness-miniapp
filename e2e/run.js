@@ -18,7 +18,7 @@ const SHOTS = path.join(__dirname, 'shots');
 const STORAGE_KEY = 'cf_state_v1';
 // 期望的断言条数：用来发现"中途崩了但显示全部通过"
 // （每次增删断言都要改这个数——它是这道保险的代价，值得）
-const EXPECTED_CHECKS = 80;
+const EXPECTED_CHECKS = 85;
 const results = [];
 let shotIndex = 0;
 let scenario = '(启动)';
@@ -190,6 +190,20 @@ async function recordSet(mp, value) {
     const pose = await query(mp, '.pose');
     check('示意图已渲染', !!pose);
     check('图指向 mov-pushup-01', pose ? /mov-pushup-01\.png$/.test(await pose.attribute('src')) : false);
+    check('示意图按比例占满宽度（mode=widthFix，不再被固定高度压小）',
+      pose ? (await pose.attribute('mode')) === 'widthFix' : false,
+      pose ? await pose.attribute('mode') : 'no .pose');
+    check('示意图上有"点击看大图"提示', /点击看大图/.test((await textOf(mp, '.zoom-tag')) || ''));
+
+    // 点示意图 → 全屏大图（新交互，必须有真机断言）
+    await fire(mp, 'openPose', {}, 'step/step');
+    await sleep(800);
+    check('点示意图打开全屏大图', !!(await query(mp, '.lightbox')));
+    check('大图里真的渲染了图片', !!(await query(mp, '.lightbox-img')));
+    await shot(mp, 'step-pose-big');
+    await fire(mp, 'closePose', {}, 'step/step');
+    await sleep(600);
+    check('再点一下关闭大图（遮罩消失）', !(await query(mp, '.lightbox')));
     await shot(mp, 'step-wall');
 
     // ============================================================ 4. 记录 + 判定

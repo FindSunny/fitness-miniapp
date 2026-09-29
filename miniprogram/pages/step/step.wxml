@@ -12,15 +12,20 @@
     <view class="nav-btn {{canNext ? '' : 'off'}}" bindtap="goNext">下一式 →</view>
   </view>
 
-  <!-- 动作图 -->
-  <view class="pose-box">
-    <image wx:if="{{step.art}}" class="pose" src="/assets/movements/{{step.art}}.png" mode="aspectFit" />
-    <view wx:else class="pose-empty">
+  <!-- 动作图：占满卡片宽度（按原图比例 840×520 自适应高度，比之前 260rpx 大不少） -->
+  <view class="pose-box" wx:if="{{step.art}}" bindtap="openPose">
+    <image class="pose" src="/assets/movements/{{step.art}}.png" mode="widthFix" />
+    <view class="view-tag">{{viewText}}</view>
+    <view class="zoom-tag">点击看大图</view>
+  </view>
+  <view class="pose-box" wx:else>
+    <view class="pose-empty">
       <view class="light">示意图待补</view>
       <view class="light" style="font-size:20rpx;margin-top:8rpx;">已有名称与标准，图后续补齐</view>
     </view>
     <view class="view-tag">{{viewText}}</view>
   </view>
+
 
   <!-- 标题 -->
   <view class="h1" style="margin-top:20rpx;">{{step.name}}</view>
@@ -147,4 +152,13 @@
     训练前请热身；动作中出现疼痛请立即停止。本工具不提供医疗建议。
   </view>
 
+</view>
+
+<!-- 大图查看：全屏遮罩 + aspectFit，点任意处关闭
+     为什么不用 wx.previewImage：它要的是 http 链接或临时文件路径，
+     而我们的是代码包内资源（/assets/...），用自绘遮罩最稳且可测 -->
+<view class="lightbox" wx:if="{{bigPose}}" bindtap="closePose" catchtouchmove="noop">
+  <image class="lightbox-img" src="/assets/movements/{{step.art}}.png" mode="aspectFit" />
+  <view class="lightbox-title">{{step.name}} · {{viewText}}</view>
+  <view class="lightbox-hint">点击任意处关闭</view>
 </view>

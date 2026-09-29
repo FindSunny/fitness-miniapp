@@ -32,7 +32,8 @@ Page({
     historyAll: [],
     historyCount: 0,
     historyExpanded: false,
-    banner: null
+    banner: null,
+    bigPose: false
   },
 
   onLoad(options) {
@@ -60,6 +61,7 @@ Page({
       input: '',
       restored: values.length > 0,
       historyExpanded: false,
+      bigPose: false,
       unitLabel: progress.unitLabel(step.unit),
       canPrev: this.no > 1,
       canNext: this.no < art.steps.length,
@@ -144,6 +146,17 @@ Page({
   },
 
   onInput(e) { this.setData({ input: e.detail.value }); },
+
+  /** 点示意图 → 全屏看大图 */
+  openPose() {
+    if (!this.data.step || !this.data.step.art) return;
+    this.setData({ bigPose: true });
+  },
+
+  closePose() { this.setData({ bigPose: false }); },
+
+  /** 遮罩上拦一下滑动，避免大图后面跟着滚（catchtouchmove 要求有个处理函数） */
+  noop() {},
 
   addSet() {
     if (this.data.locked) {

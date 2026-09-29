@@ -53,7 +53,9 @@
   margin-bottom: 16rpx;
 }
 .nav-btn {
-  min-height: 88rpx;
+  /* 视觉保持紧凑：'上一式/下一式'做大了很笨重（真机反馈）
+     点按区不靠"把按钮做大"，靠 ::after 隐形外扩（见下）—— 视觉和点按区是两件事 */
+  position: relative;
   flex: 1;
   text-align: center;
   padding: 16rpx 0;
@@ -62,6 +64,15 @@
   border-radius: 14rpx;
   font-size: 26rpx;
   color: #111827;
+}
+/* 隐形点按区：上下各外扩 8rpx（视觉不变，有效高度 ≈ 41+16 = 89rpx） */
+.nav-btn::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8rpx;
+  bottom: -8rpx;
 }
 .nav-btn.off { opacity: .35; }
 .nav-mid { width: 120rpx; text-align: center; font-size: 24rpx; color: #64748b; }
@@ -82,7 +93,7 @@
   border-radius: 20rpx;
   padding: 20rpx;
 }
-.pose { width: 100%; height: 260rpx; }
+.pose { width: 100%; }
 .pose-empty {
   height: 260rpx;
   display: flex;
@@ -101,6 +112,54 @@
   background: #f1f5f9;
   padding: 4rpx 14rpx;
   border-radius: 999rpx;
+}
+/* "点击看大图" 提示：放在右下角，不挡图 */
+.zoom-tag {
+  position: absolute;
+  right: 28rpx;
+  bottom: 28rpx;
+  font-size: 22rpx;
+  color: #1d4ed8;
+  background: #eff6ff;
+  border: 2rpx solid #bfdbfe;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+}
+
+/* ---- 大图查看（自绘遮罩，不用 wx.previewImage：它不支持代码包内资源路径）---- */
+.lightbox {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgba(8, 15, 30, .93);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+}
+.lightbox-img {
+  width: 100%;
+  height: 62vh;
+  /* 必须有浅色底：我们的示意图是黑色线稿 + 透明底，
+     直接放在深色遮罩上几乎看不见（只有浅色"墙"露出来）—— 这是看截图才发现的 */
+  background: #fff;
+  border-radius: 20rpx;
+}
+.lightbox-title {
+  margin-top: 28rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #f1f5f9;
+  text-align: center;
+}
+.lightbox-hint {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #cbd5e1;
 }
 
 .card-title {

@@ -12,26 +12,26 @@
 
 ```bash
 npm run preview   # ① 生成网页版交互预览（最快看到效果）
-npm test          # ② 跑测试（88 项，0 依赖，用 Node 内置测试器）
+npm test          # ② 跑测试（90 项，0 依赖，用 Node 内置测试器）
 npm run qr        # ③ 编译 + 出真机预览码（手机扫码就能用）
 npm run upload    # ④ 上传开发版（之后去后台「选为体验版」发给别人）
 npm run e2e:serve # ⑤ 起自动化服务（跑 E2E 前先执行一次）
-npm run e2e       # ⑥ 真机 E2E：80 条断言
-npm run e2e:shots # ⑦ 真机 E2E 截图：12 张状态图 → e2e/shots/
+npm run e2e       # ⑥ 真机 E2E：85 条断言
+npm run e2e:shots # ⑦ 真机 E2E 截图：13 张状态图 → e2e/shots/
 npm run fix:config      # 配置被工具改坏时，一条命令补回 miniprogramRoot
 npm run export:figures  # 重新生成动作图（已生成过）
 npm run cards           # 重新生成可打印训练卡 → design/cards/
 npm run size      # 看包体积
 ```
 
-### 测试分层（88 项，`npm test`）
+### 测试分层（90 项，`npm test`）
 
 | 层 | 文件 | 数量 | 管什么 |
 |---|---|---|---|
 | 数据 | `tests/data.test.js` | 14 | 60 式完整性、id 唯一、标准单调、单位/每侧标记、**引用的图片必须存在**、**存疑数据必须写 note**、**禁用医疗表述** |
 | 逻辑 | `tests/progress.test.js` | 29 | 晋级判定边界（组数够数值不够 / 数值够组数不够 / 超量 / 乱序 / 非法值 / 计时型 / 每侧 / 组数不单调）、**当前式推导**、**解锁判定**、进度换算、首页推荐规则 |
 | 存储 | `tests/store.test.js` | 8 | 进度与通关状态、首次/最近通关时间、记录上限、重置语义（含清草稿）、草稿落盘、调试备份/还原 |
-| **页面** | `tests/page-flow.test.js` | 33 | **直接驱动真实页面代码**（`tests/helpers/miniapp-stub.js` 给 wx/Page 打桩），覆盖首页推荐、第十式通关流程、复习不回退、列表三态、**锁定不可记录**、**一键档位**、达标后下一式自动进行中、离开再返回 |
+| **页面** | `tests/page-flow.test.js` | 35 | **直接驱动真实页面代码**（`tests/helpers/miniapp-stub.js` 给 wx/Page 打桩），覆盖首页推荐、第十式通关流程、复习不回退、列表三态、**锁定不可记录**、**一键档位**、达标后下一式自动进行中、离开再返回 |
 | **界面质量** | `tests/ui-quality.test.js` | 4 | **从真实 WXSS 读色值/字号算 WCAG 对比度**（33 组文字×背景配对）、字号下限、点按区 ≥88rpx、禁用纯黑纯灰 —— 颜色改浅了测试直接红，见 `ACCEPTANCE.md` 第五节 |
 
 > **为什么要有页面层**：曾有两个 bug 逃过了纯函数单测 —— ①第十式达标后无法通关、进度条卡在 90%；②俯卧撑通关后首页仍推荐它。两个都是"页面把数据拼错了"，不是算法错。加了页面层后，这两条都变成了回归测试（用例名里直接写了"回归：曾经仍推荐俯卧撑第 10 式"）。
@@ -271,7 +271,7 @@ git commit -m "feat(progress): 锁定式推进 + 一键按标准记录"
 
 **为什么第一个 tag 可以信**：打 tag 之前，在**同一棵代码树**上重跑了三层验证，全绿才冻结 ——
 `npm test` 69/69 ｜ `npm run e2e` 63/63 ｜ `npm run e2e:shots` 10/10（详见 `TESTING.md`）。
-本轮（v0.1.5）的对应数字是 **88 / 80 / 12**，同样全绿，但它要等你真机验收完才算数。
+本轮（v0.1.5）的对应数字是 **90 / 85 / 13**，同样全绿，但它要等你真机验收完才算数。
 
 不进库的东西（`.gitignore`）：`node_modules/`（依赖）、`.chrome-tmp/`（渲染临时目录）、
 `preview/preview-qr.jpg`（含临时 token）、`preview/index.html`（一条命令可再生）、`e2e/shots/`（每次跑都会变）。

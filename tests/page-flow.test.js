@@ -213,6 +213,40 @@ test('详情页：提交后草稿清掉，转成正式记录', () => {
   assert.strictEqual(page.data.lastSummary.count, 3);
 });
 
+test('详情页：点示意图能看大图，再点一下关掉（示意图太小看不见细节）', () => {
+  fresh();
+  const page = env.load(STEP);
+  page.onLoad({ artId: 'pushup', no: '1' });
+  assert.strictEqual(page.data.bigPose, false, '默认不显示大图');
+  assert.strictEqual(page.data.step.art, 'mov-pushup-01', '这一式有示意图');
+
+  page.openPose();
+  assert.strictEqual(page.data.bigPose, true, '点一下应打开全屏大图');
+
+  page.closePose();
+  assert.strictEqual(page.data.bigPose, false, '点任意处应关掉');
+
+  // 没有示意图的式子点了不该报错，也不该弹出空的大图
+  // （注意：深蹲第 1 式**有**图 —— 是六艺代表图 art-squat；真没图的是第 5 式）
+  const noArt = env.load(STEP);
+  noArt.onLoad({ artId: 'squat', no: '5' });
+  assert.ok(!noArt.data.step.art, '深蹲第 5 式没有示意图');
+  noArt.openPose();
+  assert.strictEqual(noArt.data.bigPose, false, '没图就不该开大图');
+});
+
+test('详情页：换式之后大图状态要复位（不能带着上一个式子的遮罩）', () => {
+  fresh();
+  const page = env.load(STEP);
+  page.onLoad({ artId: 'pushup', no: '1' });
+  page.openPose();
+  assert.strictEqual(page.data.bigPose, true);
+
+  // 模拟 redirectTo 到第 2 式（页面重新 onLoad）
+  page.onLoad({ artId: 'pushup', no: '2' });
+  assert.strictEqual(page.data.bigPose, false, '换式后遮罩必须关掉');
+});
+
 test('详情页：删除某组 / 清空 会同步更新草稿', () => {
   fresh();
   const page = env.load(STEP);

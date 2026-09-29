@@ -59,17 +59,26 @@ page {
 .btn.primary { background: #2563eb; }
 .btn[disabled] { opacity: .45; }
 
-/* 小按钮：标签本身可点（点一下删掉这一组），所以也要 ≥88rpx 好点 */
+/* 小按钮：标签本身可点（点一下删掉这一组）。
+   视觉保持标签的紧凑感，点按区靠 ::after 隐形外扩到 ≈88rpx —— 不把标签做成大胶囊 */
 .chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 88rpx;
-  padding: 0 24rpx;
+  position: relative;
+  display: inline-block;
+  padding: 14rpx 24rpx;
   border-radius: 999rpx;
   border: 2rpx solid #e2e8f0;
   font-size: 24rpx;
   color: #334155;
   margin: 8rpx 12rpx 0 0;
+}
+/* 隐形点按区：上下各外扩 11rpx（视觉 ≈66rpx，有效 ≈88rpx） */
+.chip::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -11rpx;
+  bottom: -11rpx;
 }
 .chip.on { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
 

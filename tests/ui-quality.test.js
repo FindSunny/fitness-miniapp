@@ -185,7 +185,43 @@ test('Q3 字号：关键信息 ≥22rpx、装饰性提示 ≥20rpx', () => {
 
 /* ---------------- Q4：主操作点按区 ---------------- */
 
-test('Q4 点按区：主操作高度 ≥88rpx', () => {
+/** 纵向 padding 合计（padding 简写的第一个值永远是垂直方向，不能取最大值） */
+function paddingY(file, selector) {
+  const t = rpxOf(decl(file, selector, 'padding-top'));
+  const b = rpxOf(decl(file, selector, 'padding-bottom'));
+  if (t !== null || b !== null) return (t || 0) + (b || 0);
+  const sh = decl(file, selector, 'padding');
+  if (!sh) return 0;
+  // 按空格切第一个值（不能只抓带 rpx 的数字：`padding: 0 34rpx` 里的 0 没有单位，
+  // 会被漏掉，于是把横向的 34 当成纵向 —— 这个 bug 让 .add-btn 被算成 156rpx）
+  const first = sh.trim().split(/\s+/)[0];
+  const num = parseFloat(first);
+  return isNaN(num) ? 0 : num * 2;
+}
+
+/**
+ * 有效点按高度 = 视觉盒高 + ::after 隐形外扩。
+ * 为什么要这么算：**视觉大小和点按区是两件事**。
+ * 把"上一式/下一式"这类按钮硬撑到 88rpx 会很笨重（真机反馈"太大不好看"），
+ * 正确做法是视觉保持紧凑、用 ::after 上下外扩把可点区域补到 88rpx。
+ * 注意：这是**静态估算**（字号 ×1.6 行高 + 纵向 padding），不是真实渲染尺寸 —— 只做下限守卫用。
+ */
+function hitArea(file, selector) {
+  const box = Math.max(
+    rpxOf(decl(file, selector, 'min-height')) || 0,
+    rpxOf(decl(file, selector, 'height')) || 0,
+    rpxOf(decl(file, selector, 'line-height')) || 0
+  );
+  const fontPx = rpxOf(decl(file, selector, 'font-size'));
+  const content = box || (fontPx ? fontPx * 1.6 : 28 * 1.6);
+  const visual = content + paddingY(file, selector);
+
+  const ext = (Math.abs(rpxOf(decl(file, selector + '::after', 'top')) || 0) +
+               Math.abs(rpxOf(decl(file, selector + '::after', 'bottom')) || 0));
+  return { visual: Math.round(visual), ext, total: Math.round(visual + ext) };
+}
+
+test('Q4 点按区：主操作有效点按高度 ≥88rpx（视觉可小，靠隐形外扩补）', () => {
   const CASES = [
     ['主按钮 .btn',        'app',  '.btn'],
     ['记一组 .add-btn',    'step', '.add-btn'],
@@ -197,16 +233,12 @@ test('Q4 点按区：主操作高度 ≥88rpx', () => {
   const bad = [];
   const lines = [];
   CASES.forEach(([name, fk, sel]) => {
-    const h = Math.max(
-      rpxOf(decl(FILES[fk], sel, 'min-height')) || 0,
-      rpxOf(decl(FILES[fk], sel, 'height')) || 0,
-      rpxOf(decl(FILES[fk], sel, 'line-height')) || 0
-    );
-    const ok = h >= 88;
-    lines.push(`  ${ok ? '✅' : '❌'} ${String(h).padStart(3)}rpx (需 88) ${name}`);
-    if (!ok) bad.push(`${name}：${h}rpx（需 ≥88rpx ≈ 44pt）`);
+    const a = hitArea(FILES[fk], sel);
+    const ok = a.total >= 88;
+    lines.push(`  ${ok ? '✅' : '❌'} 有效 ${String(a.total).padStart(3)}rpx (需 88) = 视觉 ${String(a.visual).padStart(3)} + 外扩 ${String(a.ext).padStart(2)}   ${name}`);
+    if (!ok) bad.push(`${name}：有效 ${a.total}rpx（需 ≥88rpx）`);
   });
-  console.log('\n  ── Q4 主操作点按区 ──\n' + lines.join('\n'));
+  console.log('\n  ── Q4 点按区（视觉 + 隐形外扩）──\n' + lines.join('\n'));
   assert.deepStrictEqual(bad, [], '点按区过小：\n    ' + bad.join('\n    '));
 });
 
