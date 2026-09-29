@@ -1,0 +1,18 @@
+# 依赖
+node_modules/
+
+# 工具临时目录
+.chrome-tmp/
+
+# 真机预览码（含临时 token，且有时效，不入库）
+preview/preview-qr.jpg
+
+# 网页版预览（由 npm run preview 从 miniprogram 源码注入生成，一条命令可再生）
+preview/index.html
+
+# E2E 截图产物（由 npm run e2e:shots 再生，每次跑都会变）
+e2e/shots/
+
+# 系统文件
+.DS_Store
+Thumbs.db

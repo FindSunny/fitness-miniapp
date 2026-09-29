@@ -1,0 +1,126 @@
+<view class="wrap" wx:if="{{step}}">
+
+  <!-- 顶部：状态横幅 + 切换式（放最上面，不用滚到底才能操作） -->
+  <view class="banner {{banner.kind}}" wx:if="{{banner}}">
+    <view class="banner-title">{{banner.title}}</view>
+    <view class="banner-sub">{{banner.sub}}</view>
+  </view>
+
+  <view class="nav-top">
+    <view class="nav-btn {{canPrev ? '' : 'off'}}" bindtap="goPrev">← 上一式</view>
+    <view class="nav-mid">{{no}} / 10</view>
+    <view class="nav-btn {{canNext ? '' : 'off'}}" bindtap="goNext">下一式 →</view>
+  </view>
+
+  <!-- 动作图 -->
+  <view class="pose-box">
+    <image wx:if="{{step.art}}" class="pose" src="/assets/movements/{{step.art}}.png" mode="aspectFit" />
+    <view wx:else class="pose-empty">
+      <view class="light">示意图待补</view>
+      <view class="light" style="font-size:20rpx;margin-top:8rpx;">已有名称与标准，图后续补齐</view>
+    </view>
+    <view class="view-tag">{{viewText}}</view>
+  </view>
+
+  <!-- 标题 -->
+  <view class="h1" style="margin-top:20rpx;">{{step.name}}</view>
+  <view class="sub">{{art.name}} · 第 {{step.no}} / 10 式 · {{step.en}}</view>
+  <view style="margin-top:12rpx;">
+    <text class="badge" wx:if="{{step.perSide}}">每侧计数</text>
+    <text class="badge gray" wx:if="{{step.unit === 'sec'}}" style="margin-left:10rpx;">按秒计时</text>
+    <text class="badge" wx:if="{{isLast}}" style="margin-left:10rpx;">最后一式</text>
+    <text class="badge dark" wx:if="{{completed}}" style="margin-left:10rpx;">本艺已通关</text>
+  </view>
+
+  <!-- 最后一式的特殊提示 -->
+  <view class="final-tip" wx:if="{{isLast && !completed && !isPassed}}">
+    这是本艺的最后一式：达成「升级」标准即视为通关，进度条会走满。
+  </view>
+
+  <!-- 要点 -->
+  <view class="card">
+    <view class="card-title">动作要点</view>
+    <view wx:if="{{step.cue}}" class="muted">{{step.cue}}</view>
+    <view wx:else class="light">这一式的技术要点待补（当前只有俯卧撑十式写全）</view>
+    <view class="danger" style="font-size:22rpx;margin-top:12rpx;" wx:if="{{step.note}}">
+      ⚠ {{step.note}}
+    </view>
+  </view>
+
+  <!-- 标准 -->
+  <view class="card">
+    <view class="card-title">三档标准</view>
+    <view class="tier-row {{item.reached ? 'hit' : ''}}" wx:for="{{tiers}}" wx:key="tier">
+      <text class="tier-name">{{item.tier}}</text>
+      <text class="tier-val">{{item.text}}</text>
+      <text class="tier-flag">{{item.done ? '已达成' : ''}}</text>
+    </view>
+    <view class="light" style="font-size:22rpx;margin-top:12rpx;">
+      {{isLast ? '达成「升级」标准即通关本艺' : '达成「升级」标准后，这一式会记为「已通过」'}}
+    </view>
+  </view>
+
+  <!-- 本次训练 -->
+  <view class="card">
+    <view class="card-title">记录这一式（每记一组立即保存到本机）</view>
+
+    <view class="restored-tip" wx:if="{{restored}}">
+      已恢复上次未提交的 {{values.length}} 组记录，可以接着记
+    </view>
+
+    <view class="last-result" wx:if="{{lastSummary}}">
+      <view class="last-title">上一次记录已保存</view>
+      <view class="muted" style="font-size:24rpx;">{{lastSummary.count}} 组（{{lastSummary.setsText}}）{{lastSummary.unitLabel}}｜{{lastSummary.tierText}}</view>
+      <view class="accent" style="font-size:24rpx;margin-top:6rpx;">{{lastSummary.gapText}}</view>
+      <view class="{{lastSummary.savedOk ? 'light' : 'danger'}}" style="font-size:20rpx;margin-top:6rpx;">{{lastSummary.savedLine}}</view>
+    </view>
+
+    <view class="input-row">
+      <input class="num-input" type="number" placeholder="这次做了多少{{unitLabel}}"
+             value="{{input}}" bindinput="onInput" confirm-type="done" bindconfirm="addSet" />
+      <view class="add-btn" bindtap="addSet">记一组</view>
+    </view>
+
+    <view class="sets" wx:if="{{values.length}}">
+      <view class="chip on" wx:for="{{values}}" wx:key="index" data-i="{{index}}" bindtap="removeSet">
+        第 {{index + 1}} 组 {{item}}{{unitLabel}} ×
+      </view>
+      <view class="chip" bindtap="clearSets">清空</view>
+    </view>
+    <view class="light" style="font-size:22rpx;margin-top:12rpx;" wx:else>
+      点上方"记一组"逐组记录；点标签可删除。每组都会立即保存，离开页面也不会丢
+    </view>
+
+    <view class="verdict" wx:if="{{values.length}}">
+      <view class="accent">{{tierText}}</view>
+      <view class="muted" style="margin-top:6rpx;">{{gapText}}</view>
+    </view>
+
+    <view class="btn primary" bindtap="finish">完成本次训练</view>
+  </view>
+
+  <!-- 历史记录：默认只显示最近几条 -->
+  <view class="card" wx:if="{{historyCount > 0}}">
+    <view class="card-title">这一式的记录（{{historyCount}} 次）</view>
+    <view class="hist-row" wx:for="{{history}}" wx:key="ts">
+      <text class="hist-time">{{item.tsText}}</text>
+      <text class="hist-sets">{{item.count}} 组（{{item.setsText}}）{{item.unitLabel}}</text>
+      <text class="hist-tier">{{item.tier}}</text>
+    </view>
+    <view class="hist-toggle" wx:if="{{historyMore > 0}}" bindtap="toggleHistory">
+      展开剩余 {{historyMore}} 条 ↓
+    </view>
+    <view class="hist-toggle" wx:elif="{{historyExpanded && historyCount > 3}}" bindtap="toggleHistory">
+      收起 ↑
+    </view>
+  </view>
+  <view class="card" wx:else>
+    <view class="card-title">这一式的记录</view>
+    <view class="light">还没有提交过记录。记完组后点「完成本次训练」就会出现在这里。</view>
+  </view>
+
+  <view class="disclaimer">
+    训练前请热身；动作中出现疼痛请立即停止。本工具不提供医疗建议。
+  </view>
+
+</view>

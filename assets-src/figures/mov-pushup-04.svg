@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="520" viewBox="0 0 840 520"
+ font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+<defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#b9c6d6" stroke-width="1.7"/>
+    </pattern>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker>
+<marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#111827"/></marker>
+  </defs>
+<line x1="75.71" y1="323.84" x2="712.95" y2="205.73" stroke="#111827" stroke-width="39.95" stroke-linecap="round"/>
+<line x1="673.67" y1="213.01" x2="633.01" y2="339.82" stroke="#111827" stroke-width="31.07" stroke-linecap="round"/>
+<line x1="633.01" y1="339.82" x2="750.44" y2="363.79" stroke="#111827" stroke-width="31.07" stroke-linecap="round"/>
+<circle cx="673.67" cy="213.01" r="15.09" fill="#111827" stroke-width="0"/>
+<circle cx="633.01" cy="339.82" r="13.32" fill="#111827" stroke-width="0"/>
+<circle cx="750.44" cy="363.79" r="20.42" fill="#111827" stroke-width="0"/>
+<line x1="673.67" y1="213.01" x2="712.95" y2="205.73" stroke="#111827" stroke-width="35.51" stroke-linecap="round"/>
+<circle cx="760.96" cy="196.83" r="48.83" fill="#ffffff" stroke="#111827" stroke-width="24.41"/>
+<path d="M40.2,337.15 L89.02,337.15 L133.41,363.79 L35.76,363.79 Z" fill="#111827" stroke="none" stroke-width="35.51" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="-17.51" y1="363.79" x2="857.51" y2="363.79" stroke="#94a3b8" stroke-width="7.99" stroke-linecap="round"/>
+<line x1="572.88" y1="212.86" x2="572.88" y2="354.91" stroke="#dc2626" stroke-width="7.1" stroke-linecap="butt" marker-start="url(#ah-red)" marker-end="url(#ah-red)"/>
+<text x="537.37" y="275.01" font-size="39.95" fill="#dc2626" text-anchor="end" font-weight="400">半程</text>
+</svg>

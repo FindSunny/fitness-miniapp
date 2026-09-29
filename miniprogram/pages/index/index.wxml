@@ -1,0 +1,85 @@
+<view class="wrap">
+
+  <view class="h1">六艺十式</view>
+  <view class="sub">六个动作 · 每个十式 · 达到标准才进下一式</view>
+
+  <!-- 存储诊断（放最上面，一眼可见；排查完可移除） -->
+  <view class="store-diag" wx:if="{{storeInfo}}">
+    <text class="build">build {{build.stamp}}</text>
+    <text>存储：{{storeInfo.backend}}</text>
+    <text>记录 {{storeInfo.sessions}} 条</text>
+    <text wx:if="{{storeInfo.pending > 0}}">未提交 {{storeInfo.pending}} 组</text>
+    <text wx:if="{{storeInfo.sizeKB !== undefined}}">已用 {{storeInfo.sizeKB}} KB</text>
+    <text class="err" wx:if="{{storeInfo.error}}">⚠ {{storeInfo.error}}</text>
+  </view>
+
+  <!-- 有已记录但未提交的组 -->
+  <view class="pending-tip" wx:if="{{pendingSets > 0}}" data-id="{{pendingList[0].stepId}}" bindtap="goStepById">
+    <text class="pending-title">有 {{pendingSets}} 组已记录，还没提交</text>
+    <text>点这里继续（或到该动作点"完成本次训练"提交）</text>
+  </view>
+
+  <!-- 继续训练 -->
+  <view class="card" wx:if="{{main}}">
+    <view class="row-between">
+      <view>
+        <view class="light" style="font-size:22rpx;">{{main.title}}</view>
+        <view style="font-size:36rpx;font-weight:700;margin-top:6rpx;">
+          {{main.artName}} · 第 {{main.no}} 式
+        </view>
+        <view class="muted" style="font-size:24rpx;">{{main.stepName}}</view>
+      </view>
+      <view class="badge">≤ 10 分钟</view>
+    </view>
+    <view class="muted" style="font-size:24rpx;margin-top:14rpx;">{{main.stdLine}}</view>
+    <view class="btn primary" bindtap="goMain">开始这一式</view>
+    <view class="light" style="font-size:22rpx;margin-top:12rpx;">{{main.reason}}</view>
+  </view>
+
+  <!-- 六艺全部通关 -->
+  <view class="card all-done" wx:if="{{allDone}}">
+    <view class="all-done-title">六艺十式 · 全部通关</view>
+    <view class="muted" style="font-size:24rpx;margin-top:8rpx;">
+      60 式全部达标。想继续可以任选一艺复习，或重置某个艺重新走一遍。
+    </view>
+    <view class="row-between" style="margin-top:20rpx;">
+      <text class="done-text" style="font-size:26rpx;">已通关 {{completedCount}} / 6 艺</text>
+      <text class="light" style="font-size:22rpx;">点下方任意一艺即可复习</text>
+    </view>
+  </view>
+
+  <!-- 概览 -->
+  <view class="stat-row">
+    <view class="stat">
+      <view class="stat-num">{{weeklyCount}}</view>
+      <view class="light" style="font-size:22rpx;">近 7 天训练天数</view>
+    </view>
+    <view class="stat">
+      <view class="stat-num">{{totalSessions}}</view>
+      <view class="light" style="font-size:22rpx;">累计记录组次</view>
+    </view>
+  </view>
+
+  <!-- 六艺 -->
+  <view class="sec-title">六艺</view>
+  <view class="grid">
+    <view class="art-card {{item.completed ? 'is-done' : ''}}" wx:for="{{arts}}" wx:key="id" data-id="{{item.id}}" bindtap="goArt">
+      <image class="art-img" src="{{item.cover}}" mode="aspectFit" />
+      <view class="art-name">{{item.name}}</view>
+      <view class="light" style="font-size:20rpx;">{{item.en}} · {{item.focus}}</view>
+      <view class="muted" style="font-size:22rpx;margin-top:8rpx;">{{item.tagline}}</view>
+      <view class="bar"><view class="bar-in" style="width:{{item.percent}}%;"></view></view>
+      <view class="row-between" style="margin-top:8rpx;">
+        <text wx:if="{{item.completed}}" class="done-text">已通关 ✓</text>
+        <text wx:else class="accent" style="font-size:22rpx;">{{item.label}}</text>
+        <text class="light" style="font-size:20rpx;">通过 {{item.passedCount}}/10 · 图 {{item.drawn}}/10</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="disclaimer">
+    本小程序是训练记录工具，提供的动作标准与要点仅供健身参考，不构成医疗或康复建议；如有伤病请先咨询医生。
+    动作示意图为自绘，书籍文字与插图版权归原作者及出版方所有。
+  </view>
+
+</view>

@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="2340" viewBox="0 0 1080 2340" font-family="'Segoe UI','Microsoft YaHei','PingFang SC',sans-serif">
+<defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#3b5480" stroke-width="1.7"/>
+    </pattern>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker>
+<marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#111827"/></marker>
+  <linearGradient id="tgrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#101d33"/><stop offset="0.5" stop-color="#0d1626"/><stop offset="1" stop-color="#0a1220"/></linearGradient></defs>
+<rect width="1080" height="2340" fill="#0d1626"/>
+<rect x="0" y="0" width="1080" height="2340" fill="url(#tgrad)"/>
+<text x="70" y="300" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="400" letter-spacing="3">CONVICT CONDITIONING</text>
+<text x="70" y="366" font-size="54" fill="#e8eefb" text-anchor="start" font-weight="700">六艺十式 · 速查</text>
+<text x="70" y="412" font-size="22" fill="#93a7c6" text-anchor="start" font-weight="400">俯卧撑 · 深蹲 · 引体向上 · 举腿 · 桥 · 倒立撑</text>
+<rect x="70" y="460" width="940" height="278.33" rx="22" fill="#152238" stroke="#27395a" stroke-width="1.5" opacity="0.96"/>
+<rect x="70" y="486" width="7" height="226.33" rx="3.5" fill="#7cc4ff" opacity="0.85"/>
+<text x="112" y="522" font-size="36" fill="#e8eefb" text-anchor="start" font-weight="700">俯卧撑</text>
+<text x="238" y="522" font-size="18" fill="#5f7a9e" text-anchor="start" font-weight="400">Push-Up</text>
+<text x="112" y="556" font-size="19" fill="#93a7c6" text-anchor="start" font-weight="400">手比肩略宽 · 肘贴身 · 全身一条直线</text>
+<text x="112" y="600" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">1</text>
+<text x="142" y="600" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">墙壁俯卧撑</text>
+<text x="112" y="627" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">2</text>
+<text x="142" y="627" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">上斜俯卧撑</text>
+<text x="112" y="654" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">3</text>
+<text x="142" y="654" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">膝盖俯卧撑</text>
+<text x="112" y="681" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">4</text>
+<text x="142" y="681" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">半俯卧撑</text>
+<text x="112" y="708" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">5</text>
+<text x="142" y="708" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">标准俯卧撑</text>
+<text x="562" y="600" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">6</text>
+<text x="592" y="600" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">窄距俯卧撑</text>
+<text x="562" y="627" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">7</text>
+<text x="592" y="627" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">偏重俯卧撑</text>
+<text x="562" y="654" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">8</text>
+<text x="592" y="654" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单臂半俯卧撑</text>
+<text x="562" y="681" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">9</text>
+<text x="592" y="681" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">杠杆俯卧撑</text>
+<text x="562" y="708" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">10</text>
+<text x="592" y="708" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单臂俯卧撑</text>
+<rect x="70" y="754.33" width="940" height="278.33" rx="22" fill="#152238" stroke="#27395a" stroke-width="1.5" opacity="0.96"/>
+<rect x="70" y="780.33" width="7" height="226.33" rx="3.5" fill="#7cc4ff" opacity="0.85"/>
+<text x="112" y="816.33" font-size="36" fill="#e8eefb" text-anchor="start" font-weight="700">深蹲</text>
+<text x="202" y="816.33" font-size="18" fill="#5f7a9e" text-anchor="start" font-weight="400">Squat</text>
+<text x="112" y="850.33" font-size="19" fill="#93a7c6" text-anchor="start" font-weight="400">脚跟不离地 · 膝随脚尖 · 髋坐到最低</text>
+<text x="112" y="894.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">1</text>
+<text x="142" y="894.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">肩倒立深蹲</text>
+<text x="112" y="921.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">2</text>
+<text x="142" y="921.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">折刀深蹲</text>
+<text x="112" y="948.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">3</text>
+<text x="142" y="948.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">支撑深蹲</text>
+<text x="112" y="975.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">4</text>
+<text x="142" y="975.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">半深蹲</text>
+<text x="112" y="1002.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">5</text>
+<text x="142" y="1002.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">标准深蹲</text>
+<text x="562" y="894.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">6</text>
+<text x="592" y="894.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">窄距深蹲</text>
+<text x="562" y="921.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">7</text>
+<text x="592" y="921.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">偏重深蹲</text>
+<text x="562" y="948.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">8</text>
+<text x="592" y="948.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单腿半深蹲</text>
+<text x="562" y="975.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">9</text>
+<text x="592" y="975.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单腿辅助深蹲</text>
+<text x="562" y="1002.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">10</text>
+<text x="592" y="1002.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单腿深蹲</text>
+<rect x="70" y="1048.67" width="940" height="278.33" rx="22" fill="#152238" stroke="#27395a" stroke-width="1.5" opacity="0.96"/>
+<rect x="70" y="1074.67" width="7" height="226.33" rx="3.5" fill="#7cc4ff" opacity="0.85"/>
+<text x="112" y="1110.67" font-size="36" fill="#e8eefb" text-anchor="start" font-weight="700">引体向上</text>
+<text x="274" y="1110.67" font-size="18" fill="#5f7a9e" text-anchor="start" font-weight="400">Pull-Up</text>
+<text x="112" y="1144.67" font-size="19" fill="#93a7c6" text-anchor="start" font-weight="400">沉肩挺胸 · 下巴过杠 · 不摆荡</text>
+<text x="112" y="1188.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">1</text>
+<text x="142" y="1188.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">垂直引体</text>
+<text x="112" y="1215.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">2</text>
+<text x="142" y="1215.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">水平引体</text>
+<text x="112" y="1242.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">3</text>
+<text x="142" y="1242.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">折刀引体</text>
+<text x="112" y="1269.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">4</text>
+<text x="142" y="1269.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">半引体</text>
+<text x="112" y="1296.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">5</text>
+<text x="142" y="1296.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">标准引体</text>
+<text x="562" y="1188.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">6</text>
+<text x="592" y="1188.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">窄距引体</text>
+<text x="562" y="1215.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">7</text>
+<text x="592" y="1215.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">偏重引体</text>
+<text x="562" y="1242.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">8</text>
+<text x="592" y="1242.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单臂半引体</text>
+<text x="562" y="1269.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">9</text>
+<text x="592" y="1269.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单臂辅助引体</text>
+<text x="562" y="1296.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">10</text>
+<text x="592" y="1296.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单臂引体</text>
+<rect x="70" y="1343" width="940" height="278.33" rx="22" fill="#152238" stroke="#27395a" stroke-width="1.5" opacity="0.96"/>
+<rect x="70" y="1369" width="7" height="226.33" rx="3.5" fill="#7cc4ff" opacity="0.85"/>
+<text x="112" y="1405" font-size="36" fill="#e8eefb" text-anchor="start" font-weight="700">举腿</text>
+<text x="202" y="1405" font-size="18" fill="#5f7a9e" text-anchor="start" font-weight="400">Leg Raise</text>
+<text x="112" y="1439" font-size="19" fill="#93a7c6" text-anchor="start" font-weight="400">腹部发力 · 不借摆 · 腰背贴紧</text>
+<text x="112" y="1483" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">1</text>
+<text x="142" y="1483" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">坐姿屈膝</text>
+<text x="112" y="1510" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">2</text>
+<text x="142" y="1510" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">平卧抬膝</text>
+<text x="112" y="1537" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">3</text>
+<text x="142" y="1537" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">平卧屈举腿</text>
+<text x="112" y="1564" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">4</text>
+<text x="142" y="1564" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">平卧蛙举腿</text>
+<text x="112" y="1591" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">5</text>
+<text x="142" y="1591" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">平卧直举腿</text>
+<text x="562" y="1483" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">6</text>
+<text x="592" y="1483" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">悬垂屈膝</text>
+<text x="562" y="1510" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">7</text>
+<text x="592" y="1510" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">悬垂屈举腿</text>
+<text x="562" y="1537" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">8</text>
+<text x="592" y="1537" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">悬垂蛙举腿</text>
+<text x="562" y="1564" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">9</text>
+<text x="592" y="1564" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">悬垂半举腿</text>
+<text x="562" y="1591" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">10</text>
+<text x="592" y="1591" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">悬垂直举腿</text>
+<rect x="70" y="1637.33" width="940" height="278.33" rx="22" fill="#152238" stroke="#27395a" stroke-width="1.5" opacity="0.96"/>
+<rect x="70" y="1663.33" width="7" height="226.33" rx="3.5" fill="#7cc4ff" opacity="0.85"/>
+<text x="112" y="1699.33" font-size="36" fill="#e8eefb" text-anchor="start" font-weight="700">桥</text>
+<text x="166" y="1699.33" font-size="18" fill="#5f7a9e" text-anchor="start" font-weight="400">Bridge</text>
+<text x="112" y="1733.33" font-size="19" fill="#93a7c6" text-anchor="start" font-weight="400">肩背先落 · 臀部顶起 · 脊柱逐节展开</text>
+<text x="112" y="1777.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">1</text>
+<text x="142" y="1777.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">短桥</text>
+<text x="112" y="1804.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">2</text>
+<text x="142" y="1804.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">直桥</text>
+<text x="112" y="1831.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">3</text>
+<text x="142" y="1831.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">高低桥</text>
+<text x="112" y="1858.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">4</text>
+<text x="142" y="1858.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">顶桥</text>
+<text x="112" y="1885.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">5</text>
+<text x="142" y="1885.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">半桥</text>
+<text x="562" y="1777.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">6</text>
+<text x="592" y="1777.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">标准桥</text>
+<text x="562" y="1804.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">7</text>
+<text x="592" y="1804.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">下行桥</text>
+<text x="562" y="1831.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">8</text>
+<text x="592" y="1831.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">上行桥</text>
+<text x="562" y="1858.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">9</text>
+<text x="592" y="1858.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">合桥</text>
+<text x="562" y="1885.33" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">10</text>
+<text x="592" y="1885.33" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">铁板桥</text>
+<rect x="70" y="1931.67" width="940" height="278.33" rx="22" fill="#152238" stroke="#27395a" stroke-width="1.5" opacity="0.96"/>
+<rect x="70" y="1957.67" width="7" height="226.33" rx="3.5" fill="#7cc4ff" opacity="0.85"/>
+<text x="112" y="1993.67" font-size="36" fill="#e8eefb" text-anchor="start" font-weight="700">倒立撑</text>
+<text x="238" y="1993.67" font-size="18" fill="#5f7a9e" text-anchor="start" font-weight="400">Handstand Push-Up</text>
+<text x="112" y="2027.67" font-size="19" fill="#93a7c6" text-anchor="start" font-weight="400">从靠墙开始 · 肘贴身 · 头顶成三角</text>
+<text x="112" y="2071.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">1</text>
+<text x="142" y="2071.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">顶墙倒立</text>
+<text x="112" y="2098.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">2</text>
+<text x="142" y="2098.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">乌鸦式</text>
+<text x="112" y="2125.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">3</text>
+<text x="142" y="2125.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">靠墙倒立</text>
+<text x="112" y="2152.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">4</text>
+<text x="142" y="2152.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">半倒立撑</text>
+<text x="112" y="2179.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">5</text>
+<text x="142" y="2179.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">标准倒立撑</text>
+<text x="562" y="2071.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">6</text>
+<text x="592" y="2071.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">窄距倒立撑</text>
+<text x="562" y="2098.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">7</text>
+<text x="592" y="2098.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">偏重倒立撑</text>
+<text x="562" y="2125.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">8</text>
+<text x="592" y="2125.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单臂半倒立撑</text>
+<text x="562" y="2152.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">9</text>
+<text x="592" y="2152.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">杠杆倒立撑</text>
+<text x="562" y="2179.67" font-size="20" fill="#7cc4ff" text-anchor="start" font-weight="700">10</text>
+<text x="592" y="2179.67" font-size="22" fill="#e8eefb" text-anchor="start" font-weight="400">单臂倒立撑</text>
+<text x="540" y="2290" font-size="21" fill="#93a7c6" text-anchor="middle" font-weight="400">每周 2–3 次 · 每次 3 艺轮换 · 组间 1–2 分钟 · 节奏 2-1-2</text>
+</svg>

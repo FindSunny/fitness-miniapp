@@ -1,0 +1,124 @@
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tagline {
+  margin-top: 16rpx;
+  padding: 16rpx 20rpx;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+}
+
+/* ---- 进度卡 ---- */
+.progress-card {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  background: #fff;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 20rpx;
+}
+.progress-card.is-done {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+.progress-label { font-size: 30rpx; font-weight: 700; }
+.done-tag { color: #15803d; }
+.bar {
+  height: 12rpx;
+  background: #eef2f7;
+  border-radius: 999rpx;
+  margin-top: 18rpx;
+  overflow: hidden;
+}
+.bar-in {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 999rpx;
+  transition: width .3s;
+}
+.is-done .bar-in { background: #16a34a; }
+
+/* ---- 十式列表 ---- */
+.step-list { margin-top: 24rpx; }
+
+.step-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 2rpx solid #e2e8f0;
+  border-left: 8rpx solid #e2e8f0;
+  border-radius: 18rpx;
+  padding: 22rpx;
+  margin-top: 16rpx;
+}
+.step-item.passed {
+  border-left-color: #16a34a;
+  background: #fbfefc;
+}
+.step-item.practiced {
+  border-left-color: #38bdf8;
+  background: #f8fdff;
+}
+.step-item.current {
+  border-left-color: #2563eb;
+  border-color: #bfdbfe;
+  background: #f8fbff;
+}
+
+.step-no {
+  width: 56rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #94a3b8;
+  font-size: 24rpx;
+  font-weight: 700;
+  flex: none;
+}
+.step-item.passed .step-no { background: #16a34a; color: #fff; }
+.step-item.current .step-no { background: #2563eb; color: #fff; }
+.step-item.practiced .step-no { background: #e0f2fe; color: #0369a1; }
+
+.step-body { flex: 1; margin-left: 20rpx; min-width: 0; }
+.step-name { font-size: 30rpx; font-weight: 700; }
+.step-item.todo .step-name { color: #334155; }
+
+/* 右侧状态：主行 + 次行（练过几次/最近成绩） */
+.step-state {
+  flex: none;
+  margin-left: 12rpx;
+  font-size: 22rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 12rpx;
+  white-space: nowrap;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+.step-state .state-sub {
+  font-size: 18rpx;
+  opacity: .75;
+  margin-top: 2rpx;
+}
+.step-state.passed { color: #15803d; background: #dcfce7; }
+.step-state.current { color: #1d4ed8; background: #dbeafe; font-weight: 700; }
+.step-state.practiced { color: #0369a1; background: #e0f2fe; }
+.step-state.todo { color: #94a3b8; background: #f1f5f9; }
+
+/* 列表图例：说清楚左右两边分别是什么意思 */
+.list-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx 16rpx;
+  margin-top: 24rpx;
+  font-size: 20rpx;
+  color: #94a3b8;
+}
+.list-legend .lg.passed { color: #15803d; }
+.list-legend .lg.current { color: #1d4ed8; }

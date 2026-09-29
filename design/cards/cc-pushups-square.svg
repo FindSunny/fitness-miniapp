@@ -1,0 +1,310 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'Segoe UI','Microsoft YaHei','PingFang SC',sans-serif">
+<defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#b9c6d6" stroke-width="1.7"/>
+    </pattern>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker>
+<marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#111827"/></marker>
+  </defs>
+<rect width="1080" height="1080" fill="#ffffff"/>
+<text x="40" y="56" font-size="32" fill="#111827" text-anchor="start" font-weight="700">囚徒健身 · 俯卧撑十式</text>
+<text x="40" y="82" font-size="15" fill="#64748b" text-anchor="start" font-weight="400">达到升级标准再进下一式　｜　节奏 2-1-2</text>
+[object Object]
+<rect x="40" y="108" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="199.47" y="123.99" width="33.74" height="144.83" fill="#f1f5f9" stroke-width="0"/>
+<rect x="199.47" y="123.99" width="33.74" height="144.83" fill="url(#hatch)" stroke-width="0"/>
+<line x1="199.47" y1="268.81" x2="199.47" y2="123.99" stroke="#334155" stroke-width="1.97" stroke-linecap="round"/>
+<line x1="110.6" y1="254" x2="172.48" y2="151.02" stroke="#111827" stroke-width="7.41" stroke-linecap="round"/>
+<line x1="168.67" y1="157.37" x2="182.94" y2="177.51" stroke="#111827" stroke-width="5.76" stroke-linecap="round"/>
+<line x1="182.94" y1="177.51" x2="199.47" y2="162.66" stroke="#111827" stroke-width="5.76" stroke-linecap="round"/>
+<circle cx="168.67" cy="157.37" r="2.8" fill="#111827" stroke-width="0"/>
+<circle cx="182.94" cy="177.51" r="2.47" fill="#111827" stroke-width="0"/>
+<circle cx="199.47" cy="162.66" r="3.79" fill="#111827" stroke-width="0"/>
+<line x1="168.67" y1="157.37" x2="172.48" y2="151.02" stroke="#111827" stroke-width="6.58" stroke-linecap="round"/>
+<circle cx="177.14" cy="143.26" r="9.05" fill="#ffffff" stroke="#111827" stroke-width="4.53"/>
+<path d="M104.02,256.47 L113.07,256.47 L121.3,260.58 L103.2,260.58 Z" fill="#111827" stroke="none" stroke-width="6.58" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="93.32" y1="260.58" x2="239.8" y2="260.58" stroke="#94a3b8" stroke-width="1.48" stroke-linecap="round"/>
+<text x="293.12" y="132" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 1 式</text>
+<text x="345.12" y="132" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">侧视</text>
+<text x="293.12" y="152" font-size="17" fill="#111827" text-anchor="start" font-weight="700">墙壁俯卧撑</text>
+<text x="293.12" y="170" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">手与肩同高、略宽于肩；头—肩—髋—踝一条</text>
+<text x="293.12" y="185" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">直线，不塌腰不翘臀。</text>
+<text x="293.12" y="204" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="329.12" y="204" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">1 组 × 10</text>
+<text x="293.12" y="220" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="329.12" y="220" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 25</text>
+<text x="293.12" y="236" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="329.12" y="236" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">3 组 × 50</text>
+<rect x="546" y="108" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="708.3" y="183.75" width="77.12" height="5.93" fill="#eef2f7" stroke="#334155" stroke-width="1.58"/>
+<line x1="716.21" y1="252.96" x2="716.21" y2="189.68" stroke="#334155" stroke-width="3.36" stroke-linecap="round"/>
+<line x1="777.52" y1="252.96" x2="777.52" y2="189.68" stroke="#334155" stroke-width="3.36" stroke-linecap="round"/>
+<line x1="708.3" y1="252.96" x2="708.3" y2="189.68" stroke="#94a3b8" stroke-width="1.38" stroke-linecap="round"/>
+<line x1="785.43" y1="252.96" x2="785.43" y2="189.68" stroke="#94a3b8" stroke-width="1.38" stroke-linecap="round"/>
+<line x1="571.85" y1="245.05" x2="685.61" y2="156.17" stroke="#111827" stroke-width="8.9" stroke-linecap="round"/>
+<line x1="678.6" y1="161.65" x2="684.51" y2="190.72" stroke="#111827" stroke-width="6.92" stroke-linecap="round"/>
+<line x1="684.51" y1="190.72" x2="710.28" y2="183.75" stroke="#111827" stroke-width="6.92" stroke-linecap="round"/>
+<circle cx="678.6" cy="161.65" r="3.36" fill="#111827" stroke-width="0"/>
+<circle cx="684.51" cy="190.72" r="2.97" fill="#111827" stroke-width="0"/>
+<circle cx="710.28" cy="183.75" r="4.55" fill="#111827" stroke-width="0"/>
+<line x1="678.6" y1="161.65" x2="685.61" y2="156.17" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<circle cx="694.18" cy="149.48" r="10.88" fill="#ffffff" stroke="#111827" stroke-width="5.44"/>
+<path d="M563.94,248.02 L574.82,248.02 L584.71,252.96 L562.96,252.96 Z" fill="#111827" stroke="none" stroke-width="7.91" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="551.09" y1="252.96" x2="794.03" y2="252.96" stroke="#94a3b8" stroke-width="1.78" stroke-linecap="round"/>
+<text x="799.12" y="132" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 2 式</text>
+<text x="851.12" y="132" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">侧视</text>
+<text x="799.12" y="152" font-size="17" fill="#111827" text-anchor="start" font-weight="700">上斜俯卧撑</text>
+<text x="799.12" y="170" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">手撑桌沿或台阶，撑点越低越难；身体越平越</text>
+<text x="799.12" y="185" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">吃力。</text>
+<text x="799.12" y="204" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="835.12" y="204" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">1 组 × 10</text>
+<text x="799.12" y="220" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="835.12" y="220" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 20</text>
+<text x="799.12" y="236" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="835.12" y="236" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">3 组 × 40</text>
+<rect x="40" y="296.8" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="123.33" y1="406.93" x2="249.51" y2="373.12" stroke="#111827" stroke-width="11.3" stroke-linecap="round"/>
+<line x1="238.59" y1="376.05" x2="238.32" y2="413.73" stroke="#111827" stroke-width="8.79" stroke-linecap="round"/>
+<line x1="238.32" y1="413.73" x2="271.54" y2="406.93" stroke="#111827" stroke-width="8.79" stroke-linecap="round"/>
+<circle cx="238.59" cy="376.05" r="4.27" fill="#111827" stroke-width="0"/>
+<circle cx="238.32" cy="413.73" r="3.77" fill="#111827" stroke-width="0"/>
+<circle cx="271.54" cy="406.93" r="5.78" fill="#111827" stroke-width="0"/>
+<line x1="238.59" y1="376.05" x2="249.51" y2="373.12" stroke="#111827" stroke-width="10.05" stroke-linecap="round"/>
+<circle cx="262.85" cy="369.55" r="13.82" fill="#ffffff" stroke="#111827" stroke-width="6.91"/>
+<line x1="123.33" y1="406.93" x2="70.58" y2="403.16" stroke="#111827" stroke-width="11.3" stroke-linecap="round"/>
+<path d="M70.58,403.16 L58.02,393.11 L60.54,405.67 L75.61,408.19 Z" fill="#111827" stroke="none" stroke-width="10.05" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="42.95" y1="406.93" x2="290.17" y2="406.93" stroke="#94a3b8" stroke-width="2.26" stroke-linecap="round"/>
+<text x="293.12" y="320.8" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 3 式</text>
+<text x="345.12" y="320.8" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">侧视</text>
+<text x="293.12" y="340.8" font-size="17" fill="#111827" text-anchor="start" font-weight="700">膝盖俯卧撑</text>
+<text x="293.12" y="358.8" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">膝着地，从膝到头顶一条直线；小腿贴地，别</text>
+<text x="293.12" y="373.8" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">撅屁股。</text>
+<text x="293.12" y="392.8" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="329.12" y="392.8" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">1 组 × 10</text>
+<text x="293.12" y="408.8" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="329.12" y="408.8" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 15</text>
+<text x="293.12" y="424.8" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="329.12" y="424.8" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">3 组 × 30</text>
+<rect x="546" y="296.8" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="575.3" y1="403.23" x2="755.32" y2="369.87" stroke="#111827" stroke-width="11.29" stroke-linecap="round"/>
+<line x1="744.22" y1="371.93" x2="732.73" y2="407.75" stroke="#111827" stroke-width="8.78" stroke-linecap="round"/>
+<line x1="732.73" y1="407.75" x2="765.9" y2="414.52" stroke="#111827" stroke-width="8.78" stroke-linecap="round"/>
+<circle cx="744.22" cy="371.93" r="4.26" fill="#111827" stroke-width="0"/>
+<circle cx="732.73" cy="407.75" r="3.76" fill="#111827" stroke-width="0"/>
+<circle cx="765.9" cy="414.52" r="5.77" fill="#111827" stroke-width="0"/>
+<line x1="744.22" y1="371.93" x2="755.32" y2="369.87" stroke="#111827" stroke-width="10.03" stroke-linecap="round"/>
+<circle cx="768.88" cy="367.36" r="13.79" fill="#ffffff" stroke="#111827" stroke-width="6.9"/>
+<path d="M565.27,406.99 L579.06,406.99 L591.6,414.52 L564.02,414.52 Z" fill="#111827" stroke="none" stroke-width="10.03" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="548.97" y1="414.52" x2="796.15" y2="414.52" stroke="#94a3b8" stroke-width="2.26" stroke-linecap="round"/>
+<line x1="715.75" y1="371.88" x2="715.75" y2="412.01" stroke="#dc2626" stroke-width="2.01" stroke-linecap="butt" marker-start="url(#ah-red)" marker-end="url(#ah-red)"/>
+<text x="705.71" y="389.44" font-size="11.29" fill="#dc2626" text-anchor="end" font-weight="400">半程</text>
+<text x="799.12" y="320.8" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 4 式</text>
+<text x="851.12" y="320.8" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">侧视</text>
+<text x="799.12" y="340.8" font-size="17" fill="#111827" text-anchor="start" font-weight="700">半俯卧撑</text>
+<text x="799.12" y="358.8" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">撑地平板姿势，只下到一半（约一拳高），肘</text>
+<text x="799.12" y="373.8" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">约 90°。</text>
+<text x="799.12" y="392.8" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="835.12" y="392.8" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">1 组 × 8</text>
+<text x="799.12" y="408.8" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="835.12" y="408.8" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 12</text>
+<text x="799.12" y="424.8" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="835.12" y="424.8" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 25</text>
+<rect x="40" y="485.6" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="69.14" y1="583.76" x2="249.46" y2="564.81" stroke="#111827" stroke-width="11.18" stroke-linecap="round"/>
+<line x1="238.34" y1="565.98" x2="230.7" y2="597.35" stroke="#111827" stroke-width="8.69" stroke-linecap="round"/>
+<line x1="230.7" y1="597.35" x2="255.42" y2="594.94" stroke="#111827" stroke-width="8.69" stroke-linecap="round"/>
+<circle cx="238.34" cy="565.98" r="4.22" fill="#111827" stroke-width="0"/>
+<circle cx="230.7" cy="597.35" r="3.73" fill="#111827" stroke-width="0"/>
+<circle cx="255.42" cy="594.94" r="5.71" fill="#111827" stroke-width="0"/>
+<line x1="238.34" y1="565.98" x2="249.46" y2="564.81" stroke="#111827" stroke-width="9.93" stroke-linecap="round"/>
+<circle cx="263.04" cy="563.38" r="13.66" fill="#ffffff" stroke="#111827" stroke-width="6.83"/>
+<path d="M59.21,587.49 L72.87,587.49 L85.29,594.94 L57.97,594.94 Z" fill="#111827" stroke="none" stroke-width="9.93" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="43.07" y1="594.94" x2="290.05" y2="594.94" stroke="#94a3b8" stroke-width="2.24" stroke-linecap="round"/>
+<text x="293.12" y="509.6" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 5 式</text>
+<text x="345.12" y="509.6" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">侧视</text>
+<text x="293.12" y="529.6" font-size="17" fill="#111827" text-anchor="start" font-weight="700">标准俯卧撑</text>
+<text x="293.12" y="547.6" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">手在肩下、略宽于肩；胸口轻触地面，全身绷</text>
+<text x="293.12" y="562.6" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">紧如一块板。</text>
+<text x="293.12" y="581.6" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="329.12" y="581.6" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">1 组 × 5</text>
+<text x="293.12" y="597.6" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="329.12" y="597.6" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 10</text>
+<text x="293.12" y="613.6" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="329.12" y="613.6" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 20</text>
+<rect x="546" y="485.6" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<path d="M654.1,538.4 L691.02,538.4 L686.62,575.32 L658.5,575.32 Z" fill="#eef2f7" stroke="#111827" stroke-width="3.52" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="658.5" y1="575.32" x2="656.74" y2="629.82" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="686.62" y1="575.32" x2="688.38" y2="629.82" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="650.58" y1="629.82" x2="662.89" y2="629.82" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="682.23" y1="629.82" x2="694.54" y2="629.82" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="654.1" y1="538.4" x2="655.86" y2="547.19" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<line x1="655.86" y1="547.19" x2="669.04" y2="554.22" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<circle cx="655.86" cy="547.19" r="2.64" fill="#111827" stroke-width="0"/>
+<circle cx="669.04" cy="554.22" r="2.99" fill="#ffffff" stroke="#111827" stroke-width="1.93"/>
+<line x1="670.74" y1="552.13" x2="673.97" y2="548.14" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="669.65" y1="551.6" x2="670.8" y2="546.6" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="668.44" y1="551.6" x2="667.28" y2="546.6" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="667.35" y1="552.13" x2="664.12" y2="548.14" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="691.02" y1="538.4" x2="689.26" y2="547.19" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<line x1="689.26" y1="547.19" x2="676.08" y2="554.22" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<circle cx="689.26" cy="547.19" r="2.64" fill="#111827" stroke-width="0"/>
+<circle cx="676.08" cy="554.22" r="2.99" fill="#ffffff" stroke="#111827" stroke-width="1.93"/>
+<line x1="677.77" y1="552.13" x2="681" y2="548.14" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="676.68" y1="551.6" x2="677.84" y2="546.6" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="675.47" y1="551.6" x2="674.32" y2="546.6" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="674.38" y1="552.13" x2="671.15" y2="548.14" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="672.56" y1="538.4" x2="672.56" y2="534.88" stroke="#111827" stroke-width="7.03" stroke-linecap="round"/>
+<circle cx="672.56" cy="524.33" r="10.55" fill="#ffffff" stroke="#111827" stroke-width="4.83"/>
+<text x="672.56" y="507.63" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">头</text>
+<text x="672.56" y="640.37" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">脚</text>
+<path d="M668.16,554.22 L672.56,550.71 L676.96,554.22 L672.56,557.74 Z" fill="none" stroke="#2563eb" stroke-width="1.93" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3"/>
+<text x="799.12" y="509.6" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 6 式</text>
+<text x="851.12" y="509.6" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">俯视（从上往下看）</text>
+<text x="799.12" y="529.6" font-size="17" fill="#111827" text-anchor="start" font-weight="700">窄距俯卧撑</text>
+<text x="799.12" y="547.6" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">双手并拢成菱形，肘贴身向后，不要外张。</text>
+<text x="799.12" y="566.6" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="835.12" y="566.6" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">1 组 × 5</text>
+<text x="799.12" y="582.6" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="835.12" y="582.6" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 10</text>
+<text x="799.12" y="598.6" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="835.12" y="598.6" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 20</text>
+<rect x="40" y="674.4" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<path d="M146.47,727.2 L183.39,727.2 L179,764.12 L150.87,764.12 Z" fill="#eef2f7" stroke="#111827" stroke-width="3.52" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="150.87" y1="764.12" x2="149.11" y2="818.62" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="179" y1="764.12" x2="180.76" y2="818.62" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="142.96" y1="818.62" x2="155.26" y2="818.62" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="174.6" y1="818.62" x2="186.91" y2="818.62" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="146.47" y1="727.2" x2="135.93" y2="734.23" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<line x1="135.93" y1="734.23" x2="143.84" y2="744.78" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<circle cx="135.93" cy="734.23" r="2.64" fill="#111827" stroke-width="0"/>
+<circle cx="143.84" cy="744.78" r="2.99" fill="#ffffff" stroke="#111827" stroke-width="1.93"/>
+<line x1="145.53" y1="742.69" x2="148.76" y2="738.7" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="144.44" y1="742.16" x2="145.6" y2="737.16" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="143.23" y1="742.16" x2="142.08" y2="737.16" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="142.14" y1="742.69" x2="138.91" y2="738.7" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="183.39" y1="727.2" x2="193.94" y2="734.23" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<line x1="193.94" y1="734.23" x2="186.03" y2="737.75" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<circle cx="193.94" cy="734.23" r="2.64" fill="#111827" stroke-width="0"/>
+<circle cx="186.03" cy="737.75" r="2.99" fill="#ffffff" stroke="#111827" stroke-width="1.93"/>
+<line x1="187.72" y1="735.66" x2="190.95" y2="731.67" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="186.64" y1="735.13" x2="187.79" y2="730.12" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="185.43" y1="735.13" x2="184.27" y2="730.12" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="184.34" y1="735.66" x2="181.11" y2="731.67" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<circle cx="188.67" cy="737.75" r="10.55" fill="#ffffff" stroke="#2563eb" stroke-width="2.11" stroke-dasharray="6 5"/>
+<line x1="160.54" y1="727.2" x2="160.54" y2="723.68" stroke="#111827" stroke-width="7.03" stroke-linecap="round"/>
+<circle cx="160.54" cy="713.13" r="10.55" fill="#ffffff" stroke="#111827" stroke-width="4.83"/>
+<text x="160.54" y="696.43" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">头</text>
+<text x="164.93" y="829.17" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">脚</text>
+<text x="293.12" y="698.4" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 7 式</text>
+<text x="345.12" y="698.4" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">俯视（从上往下看）</text>
+<text x="293.12" y="718.4" font-size="17" fill="#111827" text-anchor="start" font-weight="700">偏重俯卧撑</text>
+<text x="293.12" y="736.4" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">一手撑球、一手撑地，重心压向地面那只手。</text>
+<text x="293.12" y="755.4" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="329.12" y="755.4" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">1 组 × 5</text>
+<text x="293.12" y="771.4" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="329.12" y="771.4" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 10</text>
+<text x="293.12" y="787.4" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="329.12" y="787.4" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 20 ★</text>
+<rect x="546" y="674.4" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<path d="M654.1,727.2 L691.02,727.2 L686.62,764.12 L658.5,764.12 Z" fill="#eef2f7" stroke="#111827" stroke-width="3.52" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="658.5" y1="764.12" x2="644.43" y2="818.62" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="686.62" y1="764.12" x2="700.69" y2="818.62" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="638.28" y1="818.62" x2="650.58" y2="818.62" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="694.54" y1="818.62" x2="706.84" y2="818.62" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="654.1" y1="727.2" x2="658.5" y2="750.05" stroke="#111827" stroke-width="5.71" stroke-linecap="round" stroke-dasharray="5 4"/>
+<circle cx="658.5" cy="751.81" r="3.69" fill="#111827" stroke-width="0"/>
+<line x1="691.02" y1="727.2" x2="696.29" y2="734.23" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<line x1="696.29" y1="734.23" x2="674.32" y2="743.02" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<circle cx="696.29" cy="734.23" r="2.64" fill="#111827" stroke-width="0"/>
+<circle cx="674.32" cy="743.02" r="2.99" fill="#ffffff" stroke="#111827" stroke-width="1.93"/>
+<line x1="676.01" y1="740.93" x2="679.24" y2="736.94" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="674.92" y1="740.4" x2="676.08" y2="735.4" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="673.71" y1="740.4" x2="672.56" y2="735.4" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="672.63" y1="740.93" x2="669.39" y2="736.94" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="674.32" y1="727.2" x2="674.32" y2="723.68" stroke="#111827" stroke-width="7.03" stroke-linecap="round"/>
+<circle cx="674.32" cy="713.13" r="10.55" fill="#ffffff" stroke="#111827" stroke-width="4.83"/>
+<text x="674.32" y="696.43" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">头</text>
+<text x="672.56" y="829.17" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">脚</text>
+<text x="799.12" y="698.4" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 8 式</text>
+<text x="851.12" y="698.4" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">俯视（从上往下看）</text>
+<text x="799.12" y="718.4" font-size="17" fill="#111827" text-anchor="start" font-weight="700">单臂半俯卧撑</text>
+<text x="799.12" y="736.4" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">单臂半程，另一只手背后；双脚放宽保持稳定</text>
+<text x="799.12" y="751.4" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">。</text>
+<text x="799.12" y="770.4" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="835.12" y="770.4" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">1 组 × 5</text>
+<text x="799.12" y="786.4" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="835.12" y="786.4" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 10</text>
+<text x="799.12" y="802.4" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="835.12" y="802.4" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 20 ★</text>
+<rect x="40" y="863.2" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<path d="M163.57,916 L200.49,916 L196.1,952.92 L167.97,952.92 Z" fill="#eef2f7" stroke="#111827" stroke-width="3.52" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="167.97" y1="952.92" x2="157.42" y2="1007.42" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="196.1" y1="952.92" x2="206.64" y2="1007.42" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="151.26" y1="1007.42" x2="163.57" y2="1007.42" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="200.49" y1="1007.42" x2="212.8" y2="1007.42" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="200.49" y1="916" x2="205.77" y2="923.03" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<line x1="205.77" y1="923.03" x2="183.79" y2="931.82" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<circle cx="205.77" cy="923.03" r="2.64" fill="#111827" stroke-width="0"/>
+<circle cx="183.79" cy="931.82" r="2.99" fill="#ffffff" stroke="#111827" stroke-width="1.93"/>
+<line x1="185.48" y1="929.73" x2="188.71" y2="925.74" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="184.39" y1="929.2" x2="185.55" y2="924.2" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="183.18" y1="929.2" x2="182.03" y2="924.2" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="182.1" y1="929.73" x2="178.87" y2="925.74" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="163.57" y1="916" x2="146.87" y2="921.27" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<line x1="146.87" y1="921.27" x2="131.93" y2="924.79" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<circle cx="146.87" cy="921.27" r="2.64" fill="#111827" stroke-width="0"/>
+<circle cx="131.93" cy="924.79" r="2.99" fill="#ffffff" stroke="#111827" stroke-width="1.93"/>
+<line x1="133.62" y1="922.7" x2="136.85" y2="918.71" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="132.53" y1="922.17" x2="133.69" y2="917.17" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="131.32" y1="922.17" x2="130.17" y2="917.17" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="130.23" y1="922.7" x2="127" y2="918.71" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<circle cx="129.29" cy="924.79" r="10.55" fill="#ffffff" stroke="#2563eb" stroke-width="2.11" stroke-dasharray="6 5"/>
+<line x1="182.91" y1="916" x2="182.91" y2="912.48" stroke="#111827" stroke-width="7.03" stroke-linecap="round"/>
+<circle cx="182.91" cy="901.93" r="10.55" fill="#ffffff" stroke="#111827" stroke-width="4.83"/>
+<text x="182.91" y="885.23" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">头</text>
+<text x="182.03" y="1017.97" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">脚</text>
+<text x="293.12" y="887.2" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 9 式</text>
+<text x="345.12" y="887.2" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">俯视（从上往下看）</text>
+<text x="293.12" y="907.2" font-size="17" fill="#111827" text-anchor="start" font-weight="700">杠杆俯卧撑</text>
+<text x="293.12" y="925.2" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">单臂为主，另一手伸直撑球做杠杆借力，逐步</text>
+<text x="293.12" y="940.2" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">减力。</text>
+<text x="293.12" y="959.2" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="329.12" y="959.2" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">1 组 × 5</text>
+<text x="293.12" y="975.2" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="329.12" y="975.2" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 10</text>
+<text x="293.12" y="991.2" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="329.12" y="991.2" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">2 组 × 20 ★</text>
+<rect x="546" y="863.2" width="494" height="176.8" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<path d="M654.1,916 L691.02,916 L686.62,952.92 L658.5,952.92 Z" fill="#eef2f7" stroke="#111827" stroke-width="3.52" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="658.5" y1="952.92" x2="637.4" y2="1007.42" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="686.62" y1="952.92" x2="707.72" y2="1007.42" stroke="#111827" stroke-width="7.91" stroke-linecap="round"/>
+<line x1="631.25" y1="1007.42" x2="643.55" y2="1007.42" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="701.57" y1="1007.42" x2="713.87" y2="1007.42" stroke="#111827" stroke-width="5.27" stroke-linecap="round"/>
+<line x1="654.1" y1="916" x2="658.5" y2="938.85" stroke="#111827" stroke-width="5.71" stroke-linecap="round" stroke-dasharray="5 4"/>
+<circle cx="658.5" cy="940.61" r="3.69" fill="#111827" stroke-width="0"/>
+<line x1="691.02" y1="916" x2="698.05" y2="922.15" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<line x1="698.05" y1="922.15" x2="672.56" y2="931.82" stroke="#111827" stroke-width="6.15" stroke-linecap="round"/>
+<circle cx="698.05" cy="922.15" r="2.64" fill="#111827" stroke-width="0"/>
+<circle cx="672.56" cy="931.82" r="2.99" fill="#ffffff" stroke="#111827" stroke-width="1.93"/>
+<line x1="674.25" y1="929.73" x2="677.48" y2="925.74" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="673.17" y1="929.2" x2="674.32" y2="924.2" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="671.95" y1="929.2" x2="670.8" y2="924.2" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="670.87" y1="929.73" x2="667.64" y2="925.74" stroke="#111827" stroke-width="1.93" stroke-linecap="round"/>
+<line x1="672.56" y1="916" x2="672.56" y2="912.48" stroke="#111827" stroke-width="7.03" stroke-linecap="round"/>
+<circle cx="672.56" cy="901.93" r="10.55" fill="#ffffff" stroke="#111827" stroke-width="4.83"/>
+<text x="672.56" y="885.23" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">头</text>
+<text x="672.56" y="1017.97" font-size="7.03" fill="#94a3b8" text-anchor="middle" font-weight="400">脚</text>
+<text x="799.12" y="887.2" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">第 10 式</text>
+<text x="851.12" y="887.2" font-size="10" fill="#2563eb" text-anchor="start" font-weight="400">俯视（从上往下看）</text>
+<text x="799.12" y="907.2" font-size="17" fill="#111827" text-anchor="start" font-weight="700">单臂俯卧撑</text>
+<text x="799.12" y="925.2" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">单臂全幅度，另一手背后，双脚最宽；宁慢勿</text>
+<text x="799.12" y="940.2" font-size="11" fill="#64748b" text-anchor="start" font-weight="400">假。</text>
+<text x="799.12" y="959.2" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">初级</text>
+<text x="835.12" y="959.2" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">每侧 1 组 × 5</text>
+<text x="799.12" y="975.2" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">中级</text>
+<text x="835.12" y="975.2" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">每侧 2 组 × 5</text>
+<text x="799.12" y="991.2" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="400">升级</text>
+<text x="835.12" y="991.2" font-size="11.5" fill="#111827" text-anchor="start" font-weight="600">每侧 2 组 × 10 ★</text>
+<text x="40" y="1066" font-size="12" fill="#94a3b8" text-anchor="start" font-weight="400">数字按中译本常见标准整理，★ 为每侧计数；示意图自绘，非书中原图。</text>
+</svg>

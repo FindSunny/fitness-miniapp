@@ -1,0 +1,58 @@
+<view class="wrap" wx:if="{{art}}">
+
+  <view class="h1">{{art.name}}</view>
+  <view class="sub">{{art.en}} · 主练 {{art.focus}}</view>
+  <view class="tagline">{{art.tagline}}</view>
+
+  <!-- 进度卡：区分"通过到第几式"和"总共练过多少" -->
+  <view class="progress-card {{completed ? 'is-done' : ''}}">
+    <view class="row-between">
+      <view class="progress-label">
+        <text wx:if="{{completed}}" class="done-tag">已通关</text>
+        <text wx:else>{{status.label}}</text>
+      </view>
+      <view class="muted" style="font-size:24rpx;">已通过 {{status.done}} / {{status.total}} 式</view>
+    </view>
+    <view class="bar"><view class="bar-in" style="width:{{status.percent}}%;"></view></view>
+    <view class="row-between" style="margin-top:16rpx;">
+      <text class="light" style="font-size:22rpx;">
+        已通过 {{passedCount}} 式 · 练过 {{practicedCount}} 式 · 共 {{sessionsTotal}} 次训练
+      </text>
+      <text class="chip" bindtap="resetProgress">重置</text>
+    </view>
+  </view>
+
+  <!-- 十式列表：左边是"是否通过"，右边是"练过几次" -->
+  <view class="list-legend">
+    <text class="lg passed">✓ 已通过</text>
+    <text class="lg current">当前在练</text>
+    <text class="lg">已练 N 次 = 练过但还没达到升级标准</text>
+  </view>
+
+  <view class="step-list">
+    <view class="step-item {{item.state}} {{item.isCurrent ? 'is-current' : ''}}" wx:for="{{steps}}" wx:key="id"
+          data-no="{{item.no}}" bindtap="goStep">
+      <view class="step-no">{{item.state === 'passed' ? '✓' : item.no}}</view>
+      <view class="step-body">
+        <view class="step-name">
+          {{item.name}}
+          <text class="badge gray" wx:if="{{item.perSide}}" style="margin-left:10rpx;">每侧</text>
+          <text class="badge gray" wx:if="{{item.unit === 'sec'}}" style="margin-left:10rpx;">按秒</text>
+          <text class="badge" wx:if="{{item.isCurrent}}" style="margin-left:10rpx;">当前</text>
+        </view>
+        <view class="muted" style="font-size:22rpx;margin-top:6rpx;">{{item.stdLine}}</view>
+        <view class="light" style="font-size:20rpx;margin-top:4rpx;" wx:if="{{!item.hasArt}}">示意图待补</view>
+        <view class="danger" style="font-size:20rpx;margin-top:4rpx;" wx:if="{{item.note}}">数据待校对：{{item.note}}</view>
+      </view>
+      <view class="step-state {{item.state}}">
+        <text>{{item.stateText}}</text>
+        <text class="state-sub" wx:if="{{item.note2}}">{{item.note2}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="disclaimer">
+    标准整理自公开中文资料（{{art.source}}），各版本记载略有差异，仅供参考。
+  </view>
+
+</view>

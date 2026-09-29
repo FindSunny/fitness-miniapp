@@ -1,0 +1,128 @@
+.row-between {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.stat-row {
+  display: flex;
+  margin-top: 24rpx;
+}
+.stat {
+  flex: 1;
+  background: #fff;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  text-align: center;
+}
+.stat + .stat { margin-left: 20rpx; }
+.stat-num { font-size: 44rpx; font-weight: 700; }
+
+.sec-title {
+  margin: 40rpx 0 8rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.art-card {
+  width: 48.5%;
+  box-sizing: border-box;
+  background: #fff;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-top: 20rpx;
+}
+.art-img {
+  width: 100%;
+  height: 160rpx;
+  background: #f8fafc;
+  border-radius: 12rpx;
+}
+.art-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-top: 12rpx;
+}
+
+.bar {
+  height: 8rpx;
+  background: #eef2f7;
+  border-radius: 999rpx;
+  margin-top: 16rpx;
+  overflow: hidden;
+}
+.bar-in {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 999rpx;
+}
+
+/* 已通关的艺 */
+.art-card.is-done {
+  border-color: #86efac;
+  background: #f7fef9;
+}
+
+/* 有未提交的组 */
+.pending-tip {
+  margin-top: 20rpx;
+  padding: 20rpx 24rpx;
+  background: #fffbeb;
+  border: 2rpx solid #fde68a;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  color: #92400e;
+  display: flex;
+  flex-direction: column;
+}
+.pending-tip .pending-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  margin-bottom: 4rpx;
+}
+
+/* 存储诊断行（顶部，一眼可见） */
+.store-diag {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx 20rpx;
+  margin-top: 20rpx;
+  padding: 14rpx 18rpx;
+  background: #f1f5f9;
+  border-radius: 12rpx;
+  font-size: 20rpx;
+  color: #64748b;
+}
+.store-diag .build {
+  color: #2563eb;
+  font-weight: 700;
+}
+.store-diag .err {
+  color: #dc2626;
+  font-weight: 700;
+  width: 100%;
+}
+.art-card.is-done .bar-in { background: #16a34a; }
+.done-text {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #15803d;
+}
+
+/* 六艺全部通关 */
+.card.all-done {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+.all-done-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #15803d;
+}

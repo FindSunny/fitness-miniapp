@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="520" viewBox="0 0 840 520"
+ font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+<defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#b9c6d6" stroke-width="1.7"/>
+    </pattern>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker>
+<marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#111827"/></marker>
+  </defs>
+<line x1="219.17" y1="64.19" x2="588.7" y2="64.19" stroke="#334155" stroke-width="24.1" stroke-linecap="round"/>
+<line x1="243.27" y1="64.19" x2="243.27" y2="28.04" stroke="#334155" stroke-width="20.08" stroke-linecap="round"/>
+<line x1="564.6" y1="64.19" x2="564.6" y2="28.04" stroke="#334155" stroke-width="20.08" stroke-linecap="round"/>
+<line x1="403.93" y1="289.12" x2="371.8" y2="64.19" stroke="#111827" stroke-width="28.12" stroke-linecap="round"/>
+<circle cx="371.8" cy="64.19" r="18.07" fill="#111827" stroke-width="0"/>
+<line x1="403.93" y1="289.12" x2="395.9" y2="481.92" stroke="#111827" stroke-width="40.17" stroke-linecap="round"/>
+<line x1="395.9" y1="481.92" x2="472.22" y2="321.25" stroke="#111827" stroke-width="36.15" stroke-linecap="round"/>
+<line x1="472.22" y1="321.25" x2="576.65" y2="172.64" stroke="#111827" stroke-width="36.15" stroke-linecap="round"/>
+<path d="M552.55,168.62 L604.76,144.52 L616.81,176.66 L564.6,188.71 Z" fill="#111827" stroke="none" stroke-width="32.13" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="395.9" cy="481.92" r="12.85" fill="#111827" stroke-width="0"/>
+<circle cx="472.22" cy="321.25" r="12.85" fill="#111827" stroke-width="0"/>
+<line x1="403.93" y1="289.12" x2="421.95" y2="249.08" stroke="#111827" stroke-width="32.13" stroke-linecap="round"/>
+<circle cx="440.08" cy="208.79" r="44.18" fill="#ffffff" stroke="#111827" stroke-width="22.09"/>
+</svg>

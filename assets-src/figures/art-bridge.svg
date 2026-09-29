@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="520" viewBox="0 0 840 520"
+ font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+<defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#b9c6d6" stroke-width="1.7"/>
+    </pattern>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker>
+<marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#111827"/></marker>
+  </defs>
+<path d="M478.46,447.62 L538.28,447.62 L592.66,480.25 L473.02,480.25 Z" fill="#111827" stroke="none" stroke-width="43.51" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="521.97" y1="431.3" x2="663.36" y2="208.34" stroke="#111827" stroke-width="48.94" stroke-linecap="round"/>
+<line x1="663.36" y1="208.34" x2="554.6" y2="45.19" stroke="#111827" stroke-width="54.38" stroke-linecap="round"/>
+<path d="M554.6,45.19 C478.46,132.2 358.82,251.84 326.19,371.48" fill="none" stroke="#111827" stroke-width="54.38" stroke-linecap="round"/>
+<line x1="326.19" y1="371.48" x2="250.06" y2="262.72" stroke="#111827" stroke-width="38.07" stroke-linecap="round"/>
+<line x1="250.06" y1="262.72" x2="173.92" y2="436.74" stroke="#111827" stroke-width="38.07" stroke-linecap="round"/>
+<circle cx="173.92" cy="436.74" r="24.47" fill="#111827" stroke-width="0"/>
+<circle cx="250.06" cy="262.72" r="16.31" fill="#111827" stroke-width="0"/>
+<line x1="326.19" y1="371.48" x2="280.6" y2="346.15" stroke="#111827" stroke-width="43.51" stroke-linecap="round"/>
+<circle cx="228.3" cy="317.1" r="59.82" fill="#ffffff" stroke="#111827" stroke-width="29.91"/>
+<line x1="105.94" y1="480.25" x2="734.06" y2="480.25" stroke="#94a3b8" stroke-width="9.79" stroke-linecap="round"/>
+</svg>

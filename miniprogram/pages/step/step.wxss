@@ -1,0 +1,173 @@
+/* 顶部状态横幅：一眼看清"这一式现在是什么状态" */
+.banner {
+  padding: 20rpx 24rpx;
+  border-radius: 16rpx;
+  margin-bottom: 16rpx;
+}
+.banner-title { font-size: 28rpx; font-weight: 700; }
+.banner-sub { font-size: 22rpx; margin-top: 4rpx; opacity: .85; }
+.banner.passed { background: #f0fdf4; border: 2rpx solid #86efac; color: #15803d; }
+.banner.current { background: #eff6ff; border: 2rpx solid #bfdbfe; color: #1d4ed8; }
+.banner.ahead { background: #f8fafc; border: 2rpx solid #e2e8f0; color: #475569; }
+.banner.behind { background: #fffbeb; border: 2rpx solid #fde68a; color: #92400e; }
+
+/* 顶部切换式 */
+.nav-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+.nav-btn {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  background: #fff;
+  border: 2rpx solid #cbd5e1;
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  color: #111827;
+}
+.nav-btn.off { opacity: .35; }
+.nav-mid { width: 120rpx; text-align: center; font-size: 24rpx; color: #94a3b8; }
+
+/* 历史记录的展开/收起 */
+.hist-toggle {
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #2563eb;
+}
+
+.pose-box {
+  position: relative;
+  background: #fff;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 20rpx;
+  padding: 20rpx;
+}
+.pose { width: 100%; height: 260rpx; }
+.pose-empty {
+  height: 260rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-radius: 12rpx;
+}
+.view-tag {
+  position: absolute;
+  right: 28rpx;
+  top: 28rpx;
+  font-size: 20rpx;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+}
+
+.card-title {
+  font-size: 26rpx;
+  color: #94a3b8;
+  margin-bottom: 12rpx;
+}
+
+.tier-row {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 2rpx solid #f1f5f9;
+  font-size: 28rpx;
+}
+.tier-row:last-child { border-bottom: none; }
+.tier-row.hit .tier-name { color: #2563eb; font-weight: 700; }
+.tier-name { width: 120rpx; color: #334155; }
+.tier-val { flex: 1; color: #111827; }
+.tier-flag { font-size: 22rpx; color: #2563eb; }
+
+.input-row { display: flex; align-items: center; }
+.num-input {
+  flex: 1;
+  height: 84rpx;
+  background: #f8fafc;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 14rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+}
+.add-btn {
+  flex: none;
+  margin-left: 20rpx;
+  height: 84rpx;
+  line-height: 84rpx;
+  padding: 0 34rpx;
+  background: #111827;
+  color: #fff;
+  border-radius: 14rpx;
+  font-size: 28rpx;
+}
+
+.sets { margin-top: 16rpx; }
+
+.verdict {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  background: #f8fafc;
+  border-radius: 14rpx;
+  font-size: 26rpx;
+}
+
+/* 历史记录 */
+.hist-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 2rpx solid #f1f5f9;
+  font-size: 24rpx;
+}
+.hist-row:last-child { border-bottom: none; }
+.hist-time { width: 190rpx; color: #94a3b8; font-size: 22rpx; }
+.hist-sets { flex: 1; color: #334155; }
+.hist-tier { color: #2563eb; font-size: 22rpx; }
+
+/* 恢复未提交记录时的提示 */
+.restored-tip {
+  margin-bottom: 16rpx;
+  padding: 16rpx 20rpx;
+  background: #eff6ff;
+  border: 2rpx solid #bfdbfe;
+  color: #1d4ed8;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+}
+
+/* 上一次记录的结果（完成后的持久反馈） */
+.last-result {
+  margin-bottom: 20rpx;
+  padding: 20rpx;
+  background: #f0fdf4;
+  border: 2rpx solid #bbf7d0;
+  border-radius: 14rpx;
+}
+.last-title {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #15803d;
+  margin-bottom: 6rpx;
+}
+
+.nav-row { display: flex; margin-top: 24rpx; }
+.half { flex: 1; }
+.half + .half { margin-left: 20rpx; }
+
+.final-tip {
+  margin-top: 16rpx;
+  padding: 18rpx 22rpx;
+  background: #fff7ed;
+  border: 2rpx solid #fed7aa;
+  color: #c2410c;
+  border-radius: 14rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+}

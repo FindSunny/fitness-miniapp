@@ -1,0 +1,75 @@
+/* 全局样式 —— 沿用已定稿的卡片视觉语言（浅色卡 / 深色字 / 单一强调色）
+   注意：这是可运行的骨架样式，正式视觉在 R2 访谈结论后再设计 */
+
+page {
+  background: #f8fafc;
+  color: #111827;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.wrap { padding: 32rpx 32rpx 64rpx; }
+
+/* 标题 */
+.h1 { font-size: 46rpx; font-weight: 700; letter-spacing: 1rpx; }
+.sub { font-size: 24rpx; color: #64748b; margin-top: 8rpx; }
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-top: 24rpx;
+}
+
+/* 徽标 */
+.badge {
+  display: inline-block;
+  font-size: 22rpx;
+  padding: 2rpx 14rpx;
+  border-radius: 999rpx;
+  background: #eff6ff;
+  color: #2563eb;
+}
+.badge.gray { background: #f1f5f9; color: #64748b; }
+.badge.dark { background: #111827; color: #fff; }
+
+/* 强调色文字 */
+.accent { color: #2563eb; }
+.muted { color: #64748b; }
+.light { color: #94a3b8; }
+.danger { color: #dc2626; }
+
+/* 分隔线 */
+.hr { height: 2rpx; background: #e2e8f0; margin: 24rpx 0; }
+
+/* 主按钮 */
+.btn {
+  margin-top: 24rpx;
+  background: #111827;
+  color: #fff;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  line-height: 88rpx;
+  text-align: center;
+}
+.btn.ghost { background: #fff; color: #111827; border: 2rpx solid #cbd5e1; }
+.btn.primary { background: #2563eb; }
+.btn[disabled] { opacity: .45; }
+
+/* 小按钮 */
+.chip {
+  display: inline-block;
+  padding: 6rpx 20rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid #e2e8f0;
+  font-size: 24rpx;
+  color: #334155;
+  margin: 8rpx 12rpx 0 0;
+}
+.chip.on { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+
+/* 免责声明 */
+.disclaimer { margin-top: 40rpx; font-size: 22rpx; color: #94a3b8; line-height: 1.7; }

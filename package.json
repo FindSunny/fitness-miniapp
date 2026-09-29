@@ -1,0 +1,25 @@
+{
+  "name": "convict-fitness-miniapp",
+  "version": "0.1.4",
+  "private": true,
+  "description": "囚徒健身风格的徒手训练小程序 · 六艺十式数据层 + 可运行骨架",
+  "scripts": {
+    "set-appid": "node tools/set-appid.mjs",
+    "fix:config": "node tools/fix-project-config.mjs",
+    "qr": "node tools/preview-qr.mjs",
+    "upload": "node tools/upload.mjs",
+    "preview": "node tools/build-preview.mjs",
+    "test": "node --test",
+    "e2e": "node e2e/run.js",
+    "e2e:serve": "node tools/e2e-serve.mjs",
+    "stamp": "node tools/stamp.mjs",
+    "test:watch": "node --test --watch",
+    "export:figures": "node tools/export-figures.mjs --render",
+    "cards": "node tools/vendor/build-cards.mjs",
+    "size": "node tools/size-report.mjs",
+    "e2e:shots": "node e2e/shots.js"
+  },
+  "devDependencies": {
+    "miniprogram-automator": "^0.12.1"
+  }
+}
