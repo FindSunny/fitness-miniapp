@@ -165,14 +165,14 @@ test('首页：全部通关后重置一个艺 → 推荐回到该艺（而不是
   assert.strictEqual(page.data.completedCount, 5);
 });
 
-test('首页：图 x/10 计数正确（回归：曾经把俯卧撑显示成 9/10）', () => {
+test('首页：六艺十式图已全部画全（60 张；回归：曾经只有俯卧撑有逐式图）', () => {
   fresh();
   const page = env.load(INDEX);
   page.onShow();
-  const by = id => page.data.arts.find(a => a.id === id);
-  assert.strictEqual(by('pushup').drawn, 10, '俯卧撑十式图已画全');
-  assert.strictEqual(by('squat').drawn, 0, '深蹲只有封面图，逐式图应为 0');
-  assert.strictEqual(by('bridge').drawn, 0);
+  page.data.arts.forEach(a => {
+    assert.strictEqual(a.drawn, 10, `${a.name} 应画全 10 式，实际 ${a.drawn}`);
+    assert.strictEqual(a.drawn, a.total);
+  });
 });
 
 // ---------------------------------------------------------------- 记录与持久化
@@ -226,11 +226,12 @@ test('详情页：点示意图能看大图，再点一下关掉（示意图太�
   page.closePose();
   assert.strictEqual(page.data.bigPose, false, '点任意处应关掉');
 
-  // 没有示意图的式子点了不该报错，也不该弹出空的大图
-  // （注意：深蹲第 1 式**有**图 —— 是六艺代表图 art-squat；真没图的是第 5 式）
+  // 没有示意图的式子点了不该报错，也不该弹出空的大图。
+  // 注意：六艺 60 式现在**全都有图**了，所以这条分支在真实数据里已经走不到 ——
+  // 用注入的方式测它，防止以后新增动作时忘了画图还静默弹出空面板。
   const noArt = env.load(STEP);
   noArt.onLoad({ artId: 'squat', no: '5' });
-  assert.ok(!noArt.data.step.art, '深蹲第 5 式没有示意图');
+  noArt.setData({ step: Object.assign({}, noArt.data.step, { art: null }) });
   noArt.openPose();
   assert.strictEqual(noArt.data.bigPose, false, '没图就不该开大图');
 });

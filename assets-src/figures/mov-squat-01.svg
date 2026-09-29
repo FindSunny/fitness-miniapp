@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="520" viewBox="0 0 840 520"
+ font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+<defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#b9c6d6" stroke-width="1.7"/>
+    </pattern>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker>
+<marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#111827"/></marker>
+  </defs>
+<line x1="448.83" y1="425.13" x2="527.12" y2="313.24" stroke="#111827" stroke-width="28.47" stroke-linecap="round"/>
+<circle cx="527.12" cy="313.24" r="9.68" fill="#111827" stroke-width="0"/>
+<line x1="527.12" y1="313.24" x2="448.83" y2="203.06" stroke="#111827" stroke-width="25.62" stroke-linecap="round"/>
+<line x1="448.83" y1="203.06" x2="337.79" y2="274.24" stroke="#111827" stroke-width="25.62" stroke-linecap="round"/>
+<path d="M354.87,271.39 L317.86,254.31 L309.32,277.08 L346.33,285.62 Z" fill="#111827" stroke="none" stroke-width="22.78" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="448.83" cy="203.06" r="9.11" fill="#111827" stroke-width="0"/>
+<line x1="448.83" y1="425.13" x2="531.39" y2="433.67" stroke="#111827" stroke-width="21.35" stroke-linecap="round"/>
+<line x1="531.39" y1="433.67" x2="517.16" y2="365.34" stroke="#111827" stroke-width="21.35" stroke-linecap="round"/>
+<circle cx="531.39" cy="433.67" r="8.54" fill="#111827" stroke-width="0"/>
+<circle cx="517.16" cy="365.34" r="13.1" fill="#111827" stroke-width="0"/>
+<line x1="448.83" y1="425.13" x2="417" y2="419.34" stroke="#111827" stroke-width="22.78" stroke-linecap="round"/>
+<circle cx="386.19" cy="413.74" r="31.32" fill="#ffffff" stroke="#111827" stroke-width="15.66"/>
+<line x1="465.91" y1="502" x2="465.91" y2="18" stroke="#111827" stroke-width="0" stroke-linecap="round" opacity="0"/>
+<line x1="275.16" y1="445.06" x2="564.84" y2="445.06" stroke="#94a3b8" stroke-width="5.12" stroke-linecap="round"/>
+<text x="420" y="464.99" font-size="25.62" fill="#64748b" text-anchor="middle" font-weight="400">肩背撑地 · 双手撑腰 · 回滚式</text>
+</svg>

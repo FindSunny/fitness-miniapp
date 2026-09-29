@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="520" viewBox="0 0 840 520"
+ font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+<defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#b9c6d6" stroke-width="1.7"/>
+    </pattern>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker>
+<marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#111827"/></marker>
+  </defs>
+<path d="M629.69,374.77 L697.93,374.77 L759.96,411.99 L623.48,411.99 Z" fill="#111827" stroke="none" stroke-width="49.63" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="679.31" y1="356.16" x2="790.98" y2="114.21" stroke="#111827" stroke-width="55.83" stroke-linecap="round"/>
+<line x1="790.98" y1="114.21" x2="530.43" y2="145.23" stroke="#111827" stroke-width="62.04" stroke-linecap="round"/>
+<circle cx="790.98" cy="114.21" r="19.85" fill="#111827" stroke-width="0"/>
+<circle cx="530.43" cy="145.23" r="19.85" fill="#111827" stroke-width="0"/>
+<path d="M530.43,145.23 C418.76,275.51 319.5,343.75 251.26,349.95" fill="none" stroke="#111827" stroke-width="62.04" stroke-linecap="round"/>
+<line x1="251.26" y1="349.95" x2="111.8" y2="226.71" stroke="#111827" stroke-width="43.43" stroke-linecap="round"/>
+<line x1="111.8" y1="226.71" x2="46.54" y2="380.97" stroke="#111827" stroke-width="43.43" stroke-linecap="round"/>
+<circle cx="111.8" cy="226.71" r="18.61" fill="#111827" stroke-width="0"/>
+<circle cx="46.54" cy="380.97" r="28.54" fill="#111827" stroke-width="0"/>
+<line x1="251.26" y1="349.95" x2="213.92" y2="347.76" stroke="#111827" stroke-width="49.63" stroke-linecap="round"/>
+<circle cx="145.8" cy="343.75" r="68.24" fill="#ffffff" stroke="#111827" stroke-width="34.12"/>
+<line x1="-31.63" y1="411.99" x2="871.63" y2="411.99" stroke="#94a3b8" stroke-width="11.17" stroke-linecap="round"/>
+<line x1="555.24" y1="399.58" x2="555.24" y2="165.7" stroke="#dc2626" stroke-width="13.65" stroke-linecap="butt"/>
+<path d="M555.24,145.23 L527.94,196.41 L582.54,196.41 Z" fill="#dc2626" stroke="none" stroke-width="49.63" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="518.02" y="275.51" font-size="49.63" fill="#dc2626" text-anchor="end" font-weight="400">半程</text>
+</svg>

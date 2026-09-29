@@ -504,4 +504,10 @@ if (RUN_AS_MAIN) {
 }
 
 // 供其它脚本复用（例如 fitness-miniapp 导出小程序用的动作图）
-export { defs, place, figPushup, figSix, emit, bbox, T, C, L, Ci, Pa, Rc };
+// 供其它脚本复用（例如 fitness-miniapp 导出小程序用的动作图 / 各艺的示意图模块）
+// Bz / Tx 是贝塞尔与文字；elbowPt / headAt / footAt / floorLine / plank / topFig / handTop
+// 是画人体用的零件与姿势生成器 —— 新增"其它五艺"的示意图时直接复用这些，别重画一遍
+export {
+  defs, place, figPushup, figSix, emit, bbox, T, C, K, L, Ci, Pa, Rc, Bz, Tx,
+  elbowPt, headAt, footAt, floorLine, plank, topFig, handTop, rad, n
+};

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="520" viewBox="0 0 840 520"
+ font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+<defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#b9c6d6" stroke-width="1.7"/>
+    </pattern>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker>
+<marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#111827"/></marker>
+  </defs>
+<line x1="176.15" y1="492.15" x2="176.15" y2="24.16" stroke="#334155" stroke-width="12.32" stroke-linecap="round"/>
+<line x1="663.85" y1="492.15" x2="663.85" y2="24.16" stroke="#334155" stroke-width="12.32" stroke-linecap="round"/>
+<line x1="176.15" y1="270.47" x2="663.85" y2="270.47" stroke="#334155" stroke-width="14.78" stroke-linecap="round"/>
+<line x1="205.71" y1="469.98" x2="582.98" y2="332.66" stroke="#111827" stroke-width="22.17" stroke-linecap="round"/>
+<line x1="525.12" y1="353.72" x2="463.77" y2="317.15" stroke="#111827" stroke-width="17.24" stroke-linecap="round"/>
+<line x1="463.77" y1="317.15" x2="511.13" y2="270.47" stroke="#111827" stroke-width="17.24" stroke-linecap="round"/>
+<circle cx="525.12" cy="353.72" r="8.37" fill="#111827" stroke-width="0"/>
+<circle cx="463.77" cy="317.15" r="7.39" fill="#111827" stroke-width="0"/>
+<circle cx="511.13" cy="270.47" r="11.33" fill="#111827" stroke-width="0"/>
+<line x1="525.12" y1="353.72" x2="582.98" y2="332.66" stroke="#111827" stroke-width="19.7" stroke-linecap="round"/>
+<circle cx="608.44" cy="323.4" r="27.09" fill="#ffffff" stroke="#111827" stroke-width="13.55"/>
+<path d="M186.01,477.37 L213.1,477.37 L237.73,492.15 L183.54,492.15 Z" fill="#111827" stroke="none" stroke-width="19.7" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="149.06" y1="492.15" x2="690.94" y2="492.15" stroke="#94a3b8" stroke-width="4.43" stroke-linecap="round"/>
+</svg>

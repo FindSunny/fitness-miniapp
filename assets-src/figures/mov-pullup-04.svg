@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="520" viewBox="0 0 840 520"
+ font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+<defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#b9c6d6" stroke-width="1.7"/>
+    </pattern>
+    <marker id="ah-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker>
+<marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#111827"/></marker>
+  </defs>
+<line x1="291.92" y1="53.72" x2="548.08" y2="53.72" stroke="#334155" stroke-width="14.78" stroke-linecap="round"/>
+<line x1="309.16" y1="53.72" x2="309.16" y2="24.16" stroke="#334155" stroke-width="12.32" stroke-linecap="round"/>
+<line x1="530.84" y1="53.72" x2="530.84" y2="24.16" stroke="#334155" stroke-width="12.32" stroke-linecap="round"/>
+<path d="M373.2,142.39 L466.8,142.39 L452.02,280.32 L387.98,280.32 Z" fill="#eef2f7" stroke="#111827" stroke-width="9.85" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="373.2" y1="142.39" x2="466.8" y2="142.39" stroke="#111827" stroke-width="19.7" stroke-linecap="round"/>
+<line x1="387.98" y1="280.32" x2="386.75" y2="376.38" stroke="#111827" stroke-width="22.17" stroke-linecap="round"/>
+<line x1="386.75" y1="376.38" x2="385.52" y2="472.44" stroke="#111827" stroke-width="22.17" stroke-linecap="round"/>
+<circle cx="386.75" cy="376.38" r="7.39" fill="#111827" stroke-width="0"/>
+<path d="M405.22,479.83 L378.13,479.83 L353.5,492.15 L407.68,492.15 Z" fill="#111827" stroke="none" stroke-width="19.7" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="452.02" y1="280.32" x2="453.25" y2="376.38" stroke="#111827" stroke-width="22.17" stroke-linecap="round"/>
+<line x1="453.25" y1="376.38" x2="454.48" y2="472.44" stroke="#111827" stroke-width="22.17" stroke-linecap="round"/>
+<circle cx="453.25" cy="376.38" r="7.39" fill="#111827" stroke-width="0"/>
+<path d="M434.78,479.83 L461.87,479.83 L486.5,492.15 L432.32,492.15 Z" fill="#111827" stroke="none" stroke-width="19.7" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="420" y1="142.39" x2="420" y2="112.83" stroke="#111827" stroke-width="19.7" stroke-linecap="round"/>
+<circle cx="420" cy="85.74" r="27.09" fill="#ffffff" stroke="#111827" stroke-width="13.55"/>
+<line x1="466.8" y1="142.39" x2="530.18" y2="109.45" stroke="#111827" stroke-width="17.24" stroke-linecap="round"/>
+<line x1="530.18" y1="109.45" x2="493.89" y2="53.72" stroke="#111827" stroke-width="17.24" stroke-linecap="round"/>
+<circle cx="530.18" cy="109.45" r="7.39" fill="#111827" stroke-width="0"/>
+<circle cx="493.89" cy="53.72" r="11.33" fill="#111827" stroke-width="0"/>
+<line x1="373.2" y1="142.39" x2="309.82" y2="109.45" stroke="#111827" stroke-width="17.24" stroke-linecap="round"/>
+<line x1="309.82" y1="109.45" x2="346.11" y2="53.72" stroke="#111827" stroke-width="17.24" stroke-linecap="round"/>
+<circle cx="309.82" cy="109.45" r="7.39" fill="#111827" stroke-width="0"/>
+<circle cx="346.11" cy="53.72" r="11.33" fill="#111827" stroke-width="0"/>
+<line x1="264.82" y1="492.15" x2="575.18" y2="492.15" stroke="#94a3b8" stroke-width="4.43" stroke-linecap="round"/>
+<line x1="277.14" y1="117.76" x2="277.14" y2="43.86" stroke="#dc2626" stroke-width="3.94" stroke-linecap="butt" marker-start="url(#ah-red)" marker-end="url(#ah-red)"/>
+<text x="262.36" y="73.42" font-size="22.17" fill="#dc2626" text-anchor="end" font-weight="400">半程</text>
+</svg>

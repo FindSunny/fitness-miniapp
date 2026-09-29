@@ -12,9 +12,19 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { defs, place, figPushup, figSix } from './vendor/build-cards.mjs';
+// 其余五艺的逐式示意图：每艺一个模块（图多了别都挤进 build-cards.mjs）
+import { figSquat } from './vendor/figures/squat.mjs';
+import { figPullup } from './vendor/figures/pullup.mjs';
+import { figLegraise } from './vendor/figures/legraise.mjs';
+import { figBridge } from './vendor/figures/bridge.mjs';
+import { figHandstand } from './vendor/figures/handstand.mjs';
 
 const W = 840, H = 520, PAD = 18;
 const ART_IDS = ['pushup', 'squat', 'pullup', 'legraise', 'bridge', 'handstand'];
+const STEP_FIG = {
+  pushup: figPushup, squat: figSquat, pullup: figPullup,
+  legraise: figLegraise, bridge: figBridge, handstand: figHandstand
+};
 
 const root = fileURLToPath(new URL('..', import.meta.url));            // fitness-miniapp/
 const srcDir = path.join(root, 'assets-src', 'figures');
@@ -24,12 +34,15 @@ fs.mkdirSync(outDir, { recursive: true });
 
 const jobs = [];
 
-// 俯卧撑十式（侧视 1-5、俯视 6-10）
-for (let no = 1; no <= 10; no++) {
-  jobs.push({ name: `mov-pushup-${String(no).padStart(2, '0')}`, fig: figPushup(no) });
-}
-// 六艺代表动作图（首页卡片封面）
-ART_IDS.forEach((id, i) => jobs.push({ name: `art-${id}`, fig: figSix(i) }));
+// 六艺各十式（逐式示意图）+ 六艺各一张代表图（首页卡片封面）
+ART_IDS.forEach((id, i) => {
+  const fig = STEP_FIG[id];
+  if (typeof fig !== 'function') throw new Error(`没有 ${id} 的逐式图生成器`);
+  for (let no = 1; no <= 10; no++) {
+    jobs.push({ name: `mov-${id}-${String(no).padStart(2, '0')}`, fig: fig(no) });
+  }
+  jobs.push({ name: `art-${id}`, fig: figSix(i) });
+});
 
 for (const job of jobs) {
   const body = place(job.fig.parts, { x: 0, y: 0, w: W, h: H }, PAD, job.fig.extra);

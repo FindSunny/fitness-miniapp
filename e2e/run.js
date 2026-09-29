@@ -151,9 +151,9 @@ async function recordSet(mp, value) {
     check('卡片状态文案够短（半个卡片宽不折行）',
       data.arts.every(a => a.stateText.length <= 5),
       data.arts.map(a => a.stateText).join(','));
-    check('没画全示意图的艺才提示"图待补"',
-      data.arts.filter(a => a.drawn < a.total).length === 5 && data.arts[0].drawn === 10,
-      data.arts.map(a => a.id + ':' + a.drawn).join(' '));
+    check('六艺十式图已全部画全（60 张）',
+      data.arts.every(a => a.drawn === a.total),
+      data.arts.map(a => a.id + ':' + a.drawn + '/' + a.total).join(' '));
     check('存储走的是真 storage（非内存降级）',
       data.storeInfo && data.storeInfo.backend === 'wx.storage', JSON.stringify(data.storeInfo));
     await shot(mp, 'home-fresh');

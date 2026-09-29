@@ -53,16 +53,16 @@ const ARTS = [
     focus: '腿 · 臀', tagline: '脚跟不离地 · 膝随脚尖 · 髋坐到最低',
     source: 'https://fitness.39.net/qtjs/141028/4504262_1.html',
     steps: [
-      { no: 1, name: '肩倒立深蹲', en: 'Shoulderstand Squat', art: 'art-squat', view: 'side', std: [[1, 10], [2, 25], [3, 50]] },
-      { no: 2, name: '折刀深蹲', en: 'Jackknife Squat', art: null, view: 'side', std: [[1, 10], [2, 20], [3, 40]] },
-      { no: 3, name: '支撑深蹲', en: 'Supported Squat', art: null, view: 'side', std: [[1, 10], [2, 15], [3, 30]] },
-      { no: 4, name: '半深蹲', en: 'Half Squat', art: null, view: 'side', std: [[1, 8], [2, 35], [3, 50]] },
-      { no: 5, name: '标准深蹲', en: 'Full Squat', art: null, view: 'side', std: [[1, 5], [2, 10], [3, 30]] },
-      { no: 6, name: '窄距深蹲', en: 'Close Squat', art: null, view: 'side', std: [[1, 5], [2, 10], [3, 20]] },
-      { no: 7, name: '偏重深蹲', en: 'Uneven Squat', art: null, view: 'side', perSide: true, std: [[1, 5], [2, 10], [3, 20]] },
-      { no: 8, name: '单腿半深蹲', en: '1/2 One-Leg Squat', art: null, view: 'side', perSide: true, std: [[1, 5], [2, 10], [3, 20]] },
-      { no: 9, name: '单腿辅助深蹲', en: 'Assisted One-Leg Squat', art: null, view: 'side', perSide: true, std: [[1, 5], [2, 10], [3, 20]] },
-      { no: 10, name: '单腿深蹲', en: 'One-Leg Squat', art: 'art-squat', view: 'side', perSide: true, std: [[1, 5], [2, 10], [2, 50]] }
+      { no: 1, name: '肩倒立深蹲', en: 'Shoulderstand Squat', art: 'mov-squat-01', view: 'side', std: [[1, 10], [2, 25], [3, 50]] },
+      { no: 2, name: '折刀深蹲', en: 'Jackknife Squat', art: 'mov-squat-02', view: 'side', std: [[1, 10], [2, 20], [3, 40]] },
+      { no: 3, name: '支撑深蹲', en: 'Supported Squat', art: 'mov-squat-03', view: 'side', std: [[1, 10], [2, 15], [3, 30]] },
+      { no: 4, name: '半深蹲', en: 'Half Squat', art: 'mov-squat-04', view: 'side', std: [[1, 8], [2, 35], [3, 50]] },
+      { no: 5, name: '标准深蹲', en: 'Full Squat', art: 'mov-squat-05', view: 'side', std: [[1, 5], [2, 10], [3, 30]] },
+      { no: 6, name: '窄距深蹲', en: 'Close Squat', art: 'mov-squat-06', view: 'side', std: [[1, 5], [2, 10], [3, 20]] },
+      { no: 7, name: '偏重深蹲', en: 'Uneven Squat', art: 'mov-squat-07', view: 'side', perSide: true, std: [[1, 5], [2, 10], [3, 20]] },
+      { no: 8, name: '单腿半深蹲', en: '1/2 One-Leg Squat', art: 'mov-squat-08', view: 'side', perSide: true, std: [[1, 5], [2, 10], [3, 20]] },
+      { no: 9, name: '单腿辅助深蹲', en: 'Assisted One-Leg Squat', art: 'mov-squat-09', view: 'side', perSide: true, std: [[1, 5], [2, 10], [3, 20]] },
+      { no: 10, name: '单腿深蹲', en: 'One-Leg Squat', art: 'mov-squat-10', view: 'side', perSide: true, std: [[1, 5], [2, 10], [2, 50]] }
     ]
   },
   {
@@ -70,17 +70,17 @@ const ARTS = [
     focus: '背 · 二头', tagline: '沉肩挺胸 · 下巴过杠 · 不摆荡',
     source: 'https://fitness.39.net/qtjs/141028/4504262_2.html',
     steps: [
-      { no: 1, name: '垂直引体', en: 'Vertical Pull', art: 'art-pullup', view: 'front', std: [[1, 10], [2, 20], [3, 40]] },
-      { no: 2, name: '水平引体向上', en: 'Horizontal Pull', art: null, view: 'front', std: [[1, 10], [2, 20], [3, 30]] },
-      { no: 3, name: '折刀引体向上', en: 'Jackknife Pull-Up', art: null, view: 'front', std: [[1, 10], [2, 15], [3, 20]] },
-      { no: 4, name: '半引体向上', en: 'Half Pull-Up', art: null, view: 'front', std: [[1, 8], [2, 11], [3, 15]] },
-      { no: 5, name: '标准引体向上', en: 'Full Pull-Up', art: 'art-pullup', view: 'front', std: [[1, 5], [2, 8], [3, 10]] },
-      { no: 6, name: '窄距引体向上', en: 'Close Pull-Up', art: null, view: 'front', std: [[1, 5], [2, 8], [3, 10]] },
-      { no: 7, name: '偏重引体向上', en: 'Uneven Pull-Up', art: null, view: 'front', perSide: true, std: [[1, 5], [2, 7], [3, 8]] },
-      { no: 8, name: '单臂半引体向上', en: '1/2 One-Arm Pull-Up', art: null, view: 'front', perSide: true, std: [[1, 4], [2, 6], [2, 8]],
+      { no: 1, name: '垂直引体', en: 'Vertical Pull', art: 'mov-pullup-01', view: 'front', std: [[1, 10], [2, 20], [3, 40]] },
+      { no: 2, name: '水平引体向上', en: 'Horizontal Pull', art: 'mov-pullup-02', view: 'front', std: [[1, 10], [2, 20], [3, 30]] },
+      { no: 3, name: '折刀引体向上', en: 'Jackknife Pull-Up', art: 'mov-pullup-03', view: 'front', std: [[1, 10], [2, 15], [3, 20]] },
+      { no: 4, name: '半引体向上', en: 'Half Pull-Up', art: 'mov-pullup-04', view: 'front', std: [[1, 8], [2, 11], [3, 15]] },
+      { no: 5, name: '标准引体向上', en: 'Full Pull-Up', art: 'mov-pullup-05', view: 'front', std: [[1, 5], [2, 8], [3, 10]] },
+      { no: 6, name: '窄距引体向上', en: 'Close Pull-Up', art: 'mov-pullup-06', view: 'front', std: [[1, 5], [2, 8], [3, 10]] },
+      { no: 7, name: '偏重引体向上', en: 'Uneven Pull-Up', art: 'mov-pullup-07', view: 'front', perSide: true, std: [[1, 5], [2, 7], [3, 8]] },
+      { no: 8, name: '单臂半引体向上', en: '1/2 One-Arm Pull-Up', art: 'mov-pullup-08', view: 'front', perSide: true, std: [[1, 4], [2, 6], [2, 8]],
         note: '源数据中级(2×11)高于升级(2×8)，此处按单调递增修正为 2×6，建议以原书核对。' },
-      { no: 9, name: '单臂辅助引体向上', en: 'Assisted One-Arm Pull-Up', art: null, view: 'front', perSide: true, std: [[1, 3], [2, 5], [2, 7]] },
-      { no: 10, name: '单臂引体向上', en: 'One-Arm Pull-Up', art: null, view: 'front', perSide: true, std: [[1, 1], [2, 3], [2, 6]] }
+      { no: 9, name: '单臂辅助引体向上', en: 'Assisted One-Arm Pull-Up', art: 'mov-pullup-09', view: 'front', perSide: true, std: [[1, 3], [2, 5], [2, 7]] },
+      { no: 10, name: '单臂引体向上', en: 'One-Arm Pull-Up', art: 'mov-pullup-10', view: 'front', perSide: true, std: [[1, 1], [2, 3], [2, 6]] }
     ]
   },
   {
@@ -88,16 +88,16 @@ const ARTS = [
     focus: '腹 · 髋屈肌', tagline: '腹部发力 · 不借摆 · 腰背贴紧',
     source: 'https://fitness.39.net/qtjs/141028/4504262_3.html',
     steps: [
-      { no: 1, name: '坐姿屈膝', en: 'Knee Tucks', art: null, view: 'side', std: [[1, 10], [2, 25], [3, 40]] },
-      { no: 2, name: '平卧抬膝', en: 'Flat Knee Raises', art: null, view: 'side', std: [[1, 10], [2, 20], [3, 35]] },
-      { no: 3, name: '平卧屈举腿', en: 'Flat Bent Leg Raises', art: null, view: 'side', std: [[1, 10], [2, 15], [3, 30]] },
-      { no: 4, name: '平卧蛙举腿', en: 'Flat Frog Raises', art: null, view: 'side', std: [[1, 8], [2, 15], [3, 25]] },
-      { no: 5, name: '平卧直举腿', en: 'Flat Straight Leg Raises', art: null, view: 'side', std: [[1, 5], [2, 10], [3, 20]] },
-      { no: 6, name: '悬垂屈膝', en: 'Hanging Knee Raises', art: null, view: 'side', std: [[1, 5], [2, 10], [2, 15]] },
-      { no: 7, name: '悬垂屈举腿', en: 'Hanging Bent Leg Raises', art: null, view: 'side', std: [[1, 5], [2, 10], [2, 15]] },
-      { no: 8, name: '悬垂蛙举腿', en: 'Hanging Frog Raises', art: null, view: 'side', std: [[1, 5], [2, 10], [2, 15]] },
-      { no: 9, name: '悬垂半举腿', en: 'Partial Straight Leg Raises', art: null, view: 'side', std: [[1, 5], [2, 10], [2, 15]] },
-      { no: 10, name: '悬垂直举腿', en: 'Hanging Straight Leg Raises', art: 'art-legraise', view: 'side', std: [[1, 5], [2, 10], [2, 30]] }
+      { no: 1, name: '坐姿屈膝', en: 'Knee Tucks', art: 'mov-legraise-01', view: 'side', std: [[1, 10], [2, 25], [3, 40]] },
+      { no: 2, name: '平卧抬膝', en: 'Flat Knee Raises', art: 'mov-legraise-02', view: 'side', std: [[1, 10], [2, 20], [3, 35]] },
+      { no: 3, name: '平卧屈举腿', en: 'Flat Bent Leg Raises', art: 'mov-legraise-03', view: 'side', std: [[1, 10], [2, 15], [3, 30]] },
+      { no: 4, name: '平卧蛙举腿', en: 'Flat Frog Raises', art: 'mov-legraise-04', view: 'side', std: [[1, 8], [2, 15], [3, 25]] },
+      { no: 5, name: '平卧直举腿', en: 'Flat Straight Leg Raises', art: 'mov-legraise-05', view: 'side', std: [[1, 5], [2, 10], [3, 20]] },
+      { no: 6, name: '悬垂屈膝', en: 'Hanging Knee Raises', art: 'mov-legraise-06', view: 'side', std: [[1, 5], [2, 10], [2, 15]] },
+      { no: 7, name: '悬垂屈举腿', en: 'Hanging Bent Leg Raises', art: 'mov-legraise-07', view: 'side', std: [[1, 5], [2, 10], [2, 15]] },
+      { no: 8, name: '悬垂蛙举腿', en: 'Hanging Frog Raises', art: 'mov-legraise-08', view: 'side', std: [[1, 5], [2, 10], [2, 15]] },
+      { no: 9, name: '悬垂半举腿', en: 'Partial Straight Leg Raises', art: 'mov-legraise-09', view: 'side', std: [[1, 5], [2, 10], [2, 15]] },
+      { no: 10, name: '悬垂直举腿', en: 'Hanging Straight Leg Raises', art: 'mov-legraise-10', view: 'side', std: [[1, 5], [2, 10], [2, 30]] }
     ]
   },
   {
@@ -105,16 +105,16 @@ const ARTS = [
     focus: '后链 · 脊柱', tagline: '肩背先落 · 臀部顶起 · 脊柱逐节展开',
     source: 'https://fitness.39.net/qtjs/141028/4504262_4.html',
     steps: [
-      { no: 1, name: '短桥', en: 'Short Bridge', art: 'art-bridge', view: 'side', std: [[1, 10], [2, 25], [3, 50]] },
-      { no: 2, name: '直桥', en: 'Straight Bridge', art: null, view: 'side', std: [[1, 10], [2, 20], [3, 40]] },
-      { no: 3, name: '高低桥', en: 'Angled Bridge', art: null, view: 'side', std: [[1, 8], [2, 15], [3, 30]] },
-      { no: 4, name: '顶桥', en: 'Head Bridge', art: null, view: 'side', std: [[1, 8], [2, 15], [3, 25]] },
-      { no: 5, name: '半桥', en: 'Half Bridge', art: null, view: 'side', std: [[1, 8], [2, 15], [3, 20]] },
-      { no: 6, name: '标准桥', en: 'Full Bridge', art: 'art-bridge', view: 'side', std: [[1, 6], [2, 10], [2, 15]] },
-      { no: 7, name: '下行桥', en: 'Downward Bridge', art: null, view: 'side', std: [[1, 3], [2, 6], [2, 10]] },
-      { no: 8, name: '上行桥', en: 'Upward Bridge', art: null, view: 'side', std: [[1, 2], [2, 4], [2, 8]] },
-      { no: 9, name: '合桥', en: 'Closing Bridge', art: null, view: 'side', std: [[1, 1], [2, 3], [2, 6]] },
-      { no: 10, name: '铁板桥', en: 'Stand-to-Stand Bridge', art: null, view: 'side', std: [[1, 1], [2, 3], [2, 30]] }
+      { no: 1, name: '短桥', en: 'Short Bridge', art: 'mov-bridge-01', view: 'side', std: [[1, 10], [2, 25], [3, 50]] },
+      { no: 2, name: '直桥', en: 'Straight Bridge', art: 'mov-bridge-02', view: 'side', std: [[1, 10], [2, 20], [3, 40]] },
+      { no: 3, name: '高低桥', en: 'Angled Bridge', art: 'mov-bridge-03', view: 'side', std: [[1, 8], [2, 15], [3, 30]] },
+      { no: 4, name: '顶桥', en: 'Head Bridge', art: 'mov-bridge-04', view: 'side', std: [[1, 8], [2, 15], [3, 25]] },
+      { no: 5, name: '半桥', en: 'Half Bridge', art: 'mov-bridge-05', view: 'side', std: [[1, 8], [2, 15], [3, 20]] },
+      { no: 6, name: '标准桥', en: 'Full Bridge', art: 'mov-bridge-06', view: 'side', std: [[1, 6], [2, 10], [2, 15]] },
+      { no: 7, name: '下行桥', en: 'Downward Bridge', art: 'mov-bridge-07', view: 'side', std: [[1, 3], [2, 6], [2, 10]] },
+      { no: 8, name: '上行桥', en: 'Upward Bridge', art: 'mov-bridge-08', view: 'side', std: [[1, 2], [2, 4], [2, 8]] },
+      { no: 9, name: '合桥', en: 'Closing Bridge', art: 'mov-bridge-09', view: 'side', std: [[1, 1], [2, 3], [2, 6]] },
+      { no: 10, name: '铁板桥', en: 'Stand-to-Stand Bridge', art: 'mov-bridge-10', view: 'side', std: [[1, 1], [2, 3], [2, 30]] }
     ]
   },
   {
@@ -122,16 +122,16 @@ const ARTS = [
     focus: '肩 · 三头 · 平衡', tagline: '从靠墙开始 · 肘贴身 · 头顶成三角',
     source: 'https://fitness.39.net/qtjs/141028/4504262_5.html',
     steps: [
-      { no: 1, name: '顶墙倒立', en: 'Wall Headstand', art: 'art-handstand', view: 'side', unit: 'sec', std: [[1, 30], [1, 60], [1, 120]] },
-      { no: 2, name: '乌鸦式', en: 'Crow Stand', art: null, view: 'side', unit: 'sec', std: [[1, 10], [1, 30], [1, 60]] },
-      { no: 3, name: '靠墙倒立', en: 'Wall Handstand', art: null, view: 'side', unit: 'sec', std: [[1, 30], [1, 60], [1, 120]] },
-      { no: 4, name: '半倒立撑', en: 'Half Handstand Push-Up', art: null, view: 'side', std: [[1, 5], [2, 10], [3, 20]] },
-      { no: 5, name: '标准倒立撑', en: 'Handstand Push-Up', art: null, view: 'side', std: [[1, 5], [2, 10], [3, 15]] },
-      { no: 6, name: '窄距倒立撑', en: 'Close Handstand Push-Up', art: null, view: 'side', std: [[1, 5], [2, 9], [2, 12]] },
-      { no: 7, name: '偏重倒立撑', en: 'Uneven Handstand Push-Up', art: null, view: 'side', perSide: true, std: [[1, 5], [2, 8], [2, 10]] },
-      { no: 8, name: '单臂半倒立撑', en: '1/2 One-Arm Handstand Push-Up', art: null, view: 'side', perSide: true, std: [[1, 4], [2, 6], [2, 8]] },
-      { no: 9, name: '杠杆倒立撑', en: 'Lever Handstand Push-Up', art: null, view: 'side', perSide: true, std: [[1, 3], [2, 4], [2, 6]] },
-      { no: 10, name: '单臂倒立撑', en: 'One-Arm Handstand Push-Up', art: null, view: 'side', perSide: true, std: [[1, 1], [2, 2], [1, 5]] }
+      { no: 1, name: '顶墙倒立', en: 'Wall Headstand', art: 'mov-handstand-01', view: 'side', unit: 'sec', std: [[1, 30], [1, 60], [1, 120]] },
+      { no: 2, name: '乌鸦式', en: 'Crow Stand', art: 'mov-handstand-02', view: 'side', unit: 'sec', std: [[1, 10], [1, 30], [1, 60]] },
+      { no: 3, name: '靠墙倒立', en: 'Wall Handstand', art: 'mov-handstand-03', view: 'side', unit: 'sec', std: [[1, 30], [1, 60], [1, 120]] },
+      { no: 4, name: '半倒立撑', en: 'Half Handstand Push-Up', art: 'mov-handstand-04', view: 'side', std: [[1, 5], [2, 10], [3, 20]] },
+      { no: 5, name: '标准倒立撑', en: 'Handstand Push-Up', art: 'mov-handstand-05', view: 'side', std: [[1, 5], [2, 10], [3, 15]] },
+      { no: 6, name: '窄距倒立撑', en: 'Close Handstand Push-Up', art: 'mov-handstand-06', view: 'side', std: [[1, 5], [2, 9], [2, 12]] },
+      { no: 7, name: '偏重倒立撑', en: 'Uneven Handstand Push-Up', art: 'mov-handstand-07', view: 'side', perSide: true, std: [[1, 5], [2, 8], [2, 10]] },
+      { no: 8, name: '单臂半倒立撑', en: '1/2 One-Arm Handstand Push-Up', art: 'mov-handstand-08', view: 'side', perSide: true, std: [[1, 4], [2, 6], [2, 8]] },
+      { no: 9, name: '杠杆倒立撑', en: 'Lever Handstand Push-Up', art: 'mov-handstand-09', view: 'side', perSide: true, std: [[1, 3], [2, 4], [2, 6]] },
+      { no: 10, name: '单臂倒立撑', en: 'One-Arm Handstand Push-Up', art: 'mov-handstand-10', view: 'side', perSide: true, std: [[1, 1], [2, 2], [1, 5]] }
     ]
   }
 ];

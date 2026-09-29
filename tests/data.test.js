@@ -106,6 +106,18 @@ test('俯卧撑十式图已画全（MVP 主线）', () => {
   }
 });
 
+test('六艺每一式都必须有自己的示意图（60 张，且每张的引用指向自己那一式）', () => {
+  const problems = [];
+  ARTS.forEach(a => a.steps.forEach(s => {
+    const want = `mov-${a.id}-${String(s.no).padStart(2, '0')}`;
+    if (s.art !== want) problems.push(`${s.id} 的 art 应为 ${want}，实际是 ${s.art}`);
+    if (!fs.existsSync(path.join(ASSETS, `${want}.png`))) problems.push(`缺文件 ${want}.png`);
+  }));
+  assert.deepStrictEqual(problems, [], problems.join('；'));
+  // 逐式图总数 = 60，加上 6 张封面 = 66
+  assert.strictEqual(ARTS.reduce((n, a) => n + a.steps.length, 0), 60);
+});
+
 test('六艺都有首页封面图', () => {
   ARTS.forEach(a => {
     const f = path.join(ASSETS, `art-${a.id}.png`);
