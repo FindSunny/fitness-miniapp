@@ -18,7 +18,7 @@ const SHOTS = path.join(__dirname, 'shots');
 const STORAGE_KEY = 'cf_state_v1';
 // 期望的断言条数：用来发现"中途崩了但显示全部通过"
 // （每次增删断言都要改这个数——它是这道保险的代价，值得）
-const EXPECTED_CHECKS = 100;
+const EXPECTED_CHECKS = 102;
 const results = [];
 let shotIndex = 0;
 let scenario = '(启动)';
@@ -477,6 +477,21 @@ async function recordSet(mp, value) {
     await artEnv.waitFor(900);
     check('列表页出现"长按造进度"提示行（只有开发版才有）', !!(await query(mp, '.debug-line')));
     await shot(mp, 'home-develop-diag');
+
+    // 渲染层证据：那行内部话术真的从列表上消失了（只看 wxml 不够 —— 数据里还留着 note）
+    const rows = await queryAll(mp, '.step-item');
+    const rowTexts = [];
+    for (const r of rows) rowTexts.push((await r.text()) || '');
+    check('十式列表 10 行里没有任何一行出现"待校对"',
+      rowTexts.length === 10 && !rowTexts.some(t => /待校/.test(t)),
+      rowTexts.filter(t => /待校/.test(t)).join(' | ') || `行数=${rowTexts.length}`);
+
+    // 备注现在只在详情页，而且要说人话
+    const notePage = await mp.reLaunch('/pages/step/step?artId=pushup&no=10');
+    await notePage.waitFor(900);
+    const noteText = await textOf(mp, '.note-line');
+    check('详情页备注用中性 note-line，写的是"不同资料…"而不是内部话术',
+      /不同资料/.test(noteText || '') && !/原书|待校|源数据/.test(noteText || ''), noteText);
 
     // ============================================================ 13. 收尾
     step('收尾：还原成"全新用户"（不污染手动测试数据）');
