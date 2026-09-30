@@ -13,6 +13,9 @@ preview/index.html
 # E2E 截图产物（由 npm run e2e:shots 再生，每次跑都会变）
 e2e/shots/
 
+# 发布归档（git archive 产物，一个 tag 一份，可再生）
+release/
+
 # 系统文件
 .DS_Store
 Thumbs.db
