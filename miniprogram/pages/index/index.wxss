@@ -112,6 +112,51 @@
 .store-diag .dbg {
   color: #64748b;
 }
+
+/* 价值主张（回应"没时间 / 没器械"；用词是"不用专业器械"而非"零器械"——
+   引体要单杠、倒立撑要一面墙，写"零器械"是不实claim） */
+.value-line {
+  margin-top: 16rpx;
+  padding: 14rpx 20rpx;
+  background: #eff6ff;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+/* 极简模式入口（虚线框，比主按钮弱一级，不抢"开始这一式"的注意力） */
+.quick-entry {
+  position: relative;
+  margin-top: 16rpx;
+  padding: 18rpx 20rpx;
+  background: #f8fafc;
+  border: 2rpx dashed #cbd5e1;
+  border-radius: 14rpx;
+  font-size: 24rpx;
+  color: #475569;
+  line-height: 1.5;
+}
+/* 视觉保持一行的高度，靠隐形外扩把有效点按高度补到 88rpx
+   （与"上一式/下一式"同一套做法：好看和好点不该二选一） */
+.quick-entry::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8rpx;
+  bottom: -8rpx;
+}
+
+/* 分享按钮：必须用 button 才能 open-type="share"，所以要去掉它自带的边框与内边距 */
+.share-btn {
+  width: 100%;
+  padding: 0;
+  font-size: 26rpx;
+  line-height: 88rpx;
+  color: #111827;
+}
+.share-btn::after { border: none; }
 .art-card.is-done .bar-in { background: #16a34a; }
 .done-text {
   font-size: 22rpx;

@@ -33,12 +33,14 @@ Page({
     historyCount: 0,
     historyExpanded: false,
     banner: null,
-    bigPose: false
+    bigPose: false,
+    quick: false          // 从首页"今天只有 10 分钟"进来时为 true（只是提示，不改判定标准）
   },
 
   onLoad(options) {
     this.artId = options.artId || 'pushup';
     this.no = Number(options.no || 1);
+    this.quick = options.quick === '1';          // 从首页"只有 10 分钟"入口进来
     const art = getArt(this.artId);
     if (art) wx.setNavigationBarTitle({ title: `${art.name} · 第 ${this.no} 式` });
     this.load();
@@ -62,6 +64,7 @@ Page({
       restored: values.length > 0,
       historyExpanded: false,
       bigPose: false,
+      quick: this.quick,
       unitLabel: progress.unitLabel(step.unit),
       canPrev: this.no > 1,
       canNext: this.no < art.steps.length,
@@ -157,6 +160,15 @@ Page({
 
   /** 遮罩上拦一下滑动，避免大图后面跟着滚（catchtouchmove 要求有个处理函数） */
   noop() {},
+
+  /** 详情页分享：把"我在练第几式"发出去 */
+  onShareAppMessage() {
+    const art = this.data.art;
+    return {
+      title: art ? `我在练「${art.name} · 第 ${this.data.no} 式」` : '六艺十式 · 在家徒手健身',
+      path: `/pages/step/step?artId=${this.artId}&no=${this.no}`
+    };
+  },
 
   addSet() {
     if (this.data.locked) {

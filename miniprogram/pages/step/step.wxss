@@ -45,6 +45,28 @@
 .locked-sub { font-size: 24rpx; color: #64748b; margin-top: 10rpx; line-height: 1.6; }
 .locked-note { font-size: 22rpx; color: #64748b; margin-top: 10rpx; }
 
+/* 极简模式提示（从首页"只有 10 分钟"进来时显示） */
+.quick-tip {
+  margin-bottom: 16rpx;
+  padding: 18rpx 22rpx;
+  background: #f8fafc;
+  border: 2rpx dashed #cbd5e1;
+  border-radius: 14rpx;
+  font-size: 24rpx;
+  color: #475569;
+  line-height: 1.6;
+}
+.quick-tip-title {
+  display: inline-block;
+  margin-right: 12rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 999rpx;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 21rpx;
+}
+
 /* 顶部切换式 */
 .nav-top {
   display: flex;

@@ -132,7 +132,16 @@ const CONTRAST_CASES = [
   ['未解锁说明',      'step',  '.locked-note',          PAGE, 4.5],
   ['档位数值',        'step',  '.quick-btn .q-val',     W,    4.5],
   ['历史时间',        'step',  '.hist-time',            W,    4.5],
-  ['历史成绩',        'step',  '.hist-sets',            W,    4.5]
+  ['历史成绩',        'step',  '.hist-sets',            W,    4.5],
+  // 第二批（价值主张 / 器械说明 / 极简模式 / 分享 / 大图提示）
+  ['价值主张',        'index', '.value-line',           null, 4.5],
+  ['极简入口',        'index', '.quick-entry',          null, 4.5],
+  ['分享按钮',        'index', '.share-btn',            W,    4.5],
+  ['器械说明行',      'art',   '.gear-line',            null, 4.5],
+  ['器械标签',        'art',   '.gear-key',             null, 4.5],
+  ['极简提示条',      'step',  '.quick-tip',            null, 4.5],
+  ['极简提示标签',    'step',  '.quick-tip-title',      null, 4.5],
+  ['点击看大图',      'step',  '.zoom-tag',             null, 4.5]
 ];
 
 test('Q1/Q2 对比度：所有文字/背景配对都达标（WCAG AA）', () => {
@@ -162,12 +171,16 @@ test('Q3 字号：关键信息 ≥22rpx、装饰性提示 ≥20rpx', () => {
     ['图例',          'art',   '.list-legend'],
     ['主按钮文字',    'app',   '.btn'],
     ['小标签',        'app',   '.chip'],
-    ['档位按钮',      'step',  '.quick-btn']
+    ['档位按钮',      'step',  '.quick-btn'],
+    ['器械说明',      'art',   '.gear-line']
   ];
   const DECOR = [
     ['状态副文案',    'art',   '.step-state .state-sub', 20],
     ['图待补提示',    'index', '.fig-tag', 20],
-    ['方案号',        'step',  '.nav-mid', 22]
+    ['方案号',        'step',  '.nav-mid', 22],
+    ['器械标签',      'art',   '.gear-key', 20],
+    ['极简提示标签',  'step',  '.quick-tip-title', 20],
+    ['点击看大图',    'step',  '.zoom-tag', 20]
   ];
   const bad = [];
   KEY.forEach(([name, fk, sel]) => {
@@ -228,7 +241,8 @@ test('Q4 点按区：主操作有效点按高度 ≥88rpx（视觉可小，靠�
     ['上一式/下一式',      'step', '.nav-btn'],
     ['档位按钮 .quick-btn', 'step', '.quick-btn'],
     ['删组标签 .chip',     'app',  '.chip'],
-    ['展开历史 .hist-toggle', 'step', '.hist-toggle']
+    ['展开历史 .hist-toggle', 'step', '.hist-toggle'],
+    ['极简入口 .quick-entry', 'index', '.quick-entry']
   ];
   const bad = [];
   const lines = [];

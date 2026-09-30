@@ -1,6 +1,6 @@
 {
   "name": "convict-fitness-miniapp",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "description": "囚徒健身风格的徒手训练小程序 · 六艺十式数据层 + 可运行骨架",
   "scripts": {

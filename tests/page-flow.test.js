@@ -718,3 +718,134 @@ test('往返：记一组就离开 → 重进恢复；提交后草稿转历史', 
   assert.strictEqual(page.data.history[0].count, 3);
   assert.strictEqual(store.pendingSets(), 0);
 });
+
+// ---------------------------------------------------------------- 第二批：器械 / 极简入口 / 分享
+
+test('列表页：顶部器械说明来自数据，不是页面里写死的文案', () => {
+  fresh();
+  const page = env.load(ART);
+  page.onLoad({ artId: 'pullup' });
+  page.onShow();
+  assert.strictEqual(page.data.art.gear, getArt('pullup').gear, '器械说明必须直接透出数据里的 gear');
+  assert.match(page.data.art.gear, /单杠/);
+  assert.strictEqual(page.data.art.tagline, getArt('pullup').tagline, '一句话定位同样来自数据');
+
+  // 六艺都要有，缺一个页面上就是一行空白（用户会以为"这页坏了"）
+  ARTS.forEach(a => {
+    const p = env.load(ART);
+    p.onLoad({ artId: a.id });
+    p.onShow();
+    assert.ok(p.data.art.gear && p.data.art.gear.length >= 3, `${a.name} 列表页器械说明为空`);
+  });
+});
+
+test('详情页：?quick=1 才是极简模式，普通进入不是', () => {
+  fresh();
+  let page = env.load(STEP);
+  page.onLoad({ artId: 'pushup', no: '1', quick: '1' });
+  assert.strictEqual(page.data.quick, true);
+
+  page = env.load(STEP);
+  page.onLoad({ artId: 'pushup', no: '1' });
+  assert.strictEqual(page.data.quick, false, '默认不该是极简模式');
+
+  page = env.load(STEP);
+  page.onLoad({ artId: 'pushup', no: '1', quick: '0' });
+  assert.strictEqual(page.data.quick, false, '只有 quick=1 才算极简模式');
+});
+
+test('详情页：极简模式只加一句提示，不降低达标标准、也不解锁后式', () => {
+  fresh();
+  const normal = env.load(STEP);
+  normal.onLoad({ artId: 'pushup', no: '1' });
+  const quick = env.load(STEP);
+  quick.onLoad({ artId: 'pushup', no: '1', quick: '1' });
+
+  assert.deepStrictEqual(quick.data.tiers.map(t => t.text), normal.data.tiers.map(t => t.text),
+    '三档标准必须一模一样（回归防线：别为了"省时间"偷偷降标准）');
+  assert.strictEqual(quick.data.locked, normal.data.locked);
+
+  // 极简模式下仍然不能记录未解锁的式
+  const lockedQuick = env.load(STEP);
+  lockedQuick.onLoad({ artId: 'pushup', no: '3', quick: '1' });
+  assert.strictEqual(lockedQuick.data.locked, true);
+  lockedQuick.setData({ input: '50' });
+  lockedQuick.addSet();
+  lockedQuick.finish();
+  assert.strictEqual(store.pendingSets(), 0, '未解锁的式在极简模式下也不能记录');
+  assert.strictEqual(store.sessionsOf('pushup').length, 0, '未解锁的式不该写入训练记录');
+});
+
+test('首页：极简入口带 quick=1，普通入口不带', () => {
+  fresh();
+  const page = env.load(INDEX);
+  page.onShow();
+  page.goMain();
+  page.goMainQuick();
+  const urls = env.calls.nav.map(n => n.url);
+  assert.strictEqual(urls[0], '/pages/step/step?artId=pushup&no=1');
+  assert.strictEqual(urls[1], '/pages/step/step?artId=pushup&no=1&quick=1');
+
+  // 全部通关时没有"当前式"，两个入口都不该跳（不能跳到不存在的式子）
+  env.resetCalls();
+  ARTS.forEach(a => { passSteps(a.id, 10); store.completeArt(a.id); });
+  page.onShow();
+  page.goMain();
+  page.goMainQuick();
+  assert.strictEqual(env.calls.nav.length, 0, '全部通关时不应还能跳进详情页');
+});
+
+test('首页：分享卡片带当前艺与式号，路径直达那一式', () => {
+  fresh();
+  passSteps('pushup', 10);
+  store.completeArt('pushup');
+  passSteps('squat', 2);
+  const page = env.load(INDEX);
+  page.onShow();
+  const share = page.onShareAppMessage();
+  assert.match(share.title, /深蹲 · 第 3 式/, share.title);
+  assert.strictEqual(share.path, '/pages/step/step?artId=squat&no=3');
+  assert.ok(share.title.length <= 40, `分享标题过长会被截断：${share.title}`);
+});
+
+test('首页：全部通关时分享回首页，标题里不出现"第 N 式"', () => {
+  fresh();
+  ARTS.forEach(a => { passSteps(a.id, 10); store.completeArt(a.id); });
+  const page = env.load(INDEX);
+  page.onShow();
+  assert.strictEqual(page.data.main, null);
+  const share = page.onShareAppMessage();
+  assert.strictEqual(share.path, '/pages/index/index');
+  assert.ok(!/第 \d+ 式/.test(share.title), `没有当前式还写"第 N 式"是假话：${share.title}`);
+});
+
+test('详情页：分享路径锁在这一式本身，不带极简/调试参数', () => {
+  fresh();
+  const page = env.load(STEP);
+  page.onLoad({ artId: 'bridge', no: '7', quick: '1' });
+  const share = page.onShareAppMessage();
+  assert.match(share.title, /桥 · 第 7 式/, share.title);
+  assert.strictEqual(share.path, '/pages/step/step?artId=bridge&no=7',
+    '分享出去的人应看到标准页，而不是我的极简模式');
+});
+
+/**
+ * 文案也当代码测：这两句都真写错过，而且**测试当时全绿**
+ * （断言只验"元素在不在"，验不了"这句话对不对" —— 所以把语义本身锁进断言）
+ */
+test('详情页文案：要点标明"自撰、非原书"，极简提示不许承诺"进度照样算"', () => {
+  const fs = require('node:fs');
+  const raw = fs.readFileSync(path.join(P, 'step', 'step.wxml'), 'utf8');
+  // 必须先去注释：反面例子里就写着"不是'进度照样算'"，不剥掉的话这条断言会误报
+  // （与 ui-quality 里 cssOf() 去注释同一个坑）
+  const wxml = raw.replace(/<!--[\s\S]*?-->/g, '');
+
+  assert.match(wxml, /动作要点/, '要点卡片必须还在');
+  assert.match(wxml, /不是原书原文/, '要点必须标明来源 —— 不能让人以为这是权威教材');
+  assert.ok(!/当前只有俯卧撑十式写全/.test(wxml),
+    '60 式要点都补齐了，不能再留着"只有俯卧撑写全"的旧兜底文案');
+
+  // 真踩过：极简提示曾写"进度照样算"，但**没达标的提交不会推进晋级进度**，这是假话
+  assert.ok(!/进度照样算/.test(wxml), '极简模式不能承诺"进度照样算"（只有记录会存，晋级进度不动）');
+  assert.match(wxml, /记录照样存/, '极简模式应说明"记录照样存"');
+});

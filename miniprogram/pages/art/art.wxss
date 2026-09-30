@@ -13,6 +13,28 @@
   font-size: 24rpx;
 }
 
+/* "需要什么"：比 tagline 弱一级的说明行 */
+.gear-line {
+  margin-top: 10rpx;
+  padding: 14rpx 20rpx;
+  background: #f8fafc;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 12rpx;
+  font-size: 23rpx;
+  color: #475569;
+  line-height: 1.55;
+}
+.gear-key {
+  display: inline-block;
+  margin-right: 12rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 999rpx;
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 700;
+  font-size: 21rpx;
+}
+
 /* ---- 进度卡 ---- */
 .progress-card {
   margin-top: 24rpx;

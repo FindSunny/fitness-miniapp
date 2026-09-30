@@ -141,6 +141,30 @@ test('数据里不能出现医疗类表述', () => {
   }));
 });
 
+test('每一式都有"要点"，且是一句话而不是半截话', () => {
+  // 要点是自撰的短句（不抄原书），所以必须逐式写全：宁可写得保守，也不能漏
+  ARTS.forEach(a => a.steps.forEach(s => {
+    assert.strictEqual(typeof s.cue, 'string', `${s.id} 缺 cue 要点`);
+    assert.ok(s.cue.length >= 18 && s.cue.length <= 45,
+      `${s.id} 的要点长度 ${s.cue.length} 不合适（应为 18–45 字）：${s.cue}`);
+    assert.ok(s.cue.endsWith('。'), `${s.id} 的要点应以句号收尾：${s.cue}`);
+    assert.ok(!/[\n\r]/.test(s.cue), `${s.id} 的要点不能换行，详情页是一行排版`);
+  }));
+});
+
+test('每一艺都写明器械条件，且不许说"零器械"', () => {
+  // 踩过：首页写"不需要专业器械"是对的，但"零器械"是假话
+  // （引体向上要单杠、倒立撑要墙、上斜俯卧撑要桌子/台阶）
+  ARTS.forEach(art => {
+    assert.strictEqual(typeof art.gear, 'string', `${art.name} 缺 gear 器械说明`);
+    assert.ok(art.gear.length >= 3, `${art.name} 的器械说明太短：${art.gear}`);
+    assert.ok(!art.gear.includes('零器械'), `${art.name} 不能声明"零器械"：${art.gear}`);
+  });
+  // 交叉检查：真的需要器械的艺，说明里必须点出来
+  assert.match(getArt('pullup').gear, /单杠/, '引体向上必须写明需要单杠');
+  assert.match(getArt('handstand').gear, /墙/, '倒立撑必须写明需要墙');
+});
+
 test('查询 API 正常', () => {
   assert.strictEqual(getArt('pushup').name, '俯卧撑');
   assert.strictEqual(getArt('nope'), null);

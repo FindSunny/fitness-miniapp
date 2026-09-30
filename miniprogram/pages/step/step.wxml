@@ -12,6 +12,13 @@
     <view class="nav-btn {{canNext ? '' : 'off'}}" bindtap="goNext">下一式 →</view>
   </view>
 
+  <!-- 极简模式提示：从首页"只有 10 分钟"进来时出现，降低开始门槛
+       注意用词：是"不求达标"（记录照样存），不是"进度照样算"—— 没达标时晋级进度并不会动 -->
+  <view class="quick-tip" wx:if="{{quick}}">
+    <text class="quick-tip-title">极简模式</text>
+    今天不求达标 —— 记几组就点「完成本次训练」，记录照样存，下次接着来。
+  </view>
+
   <!-- 动作图：占满卡片宽度（按原图比例 840×520 自适应高度，比之前 260rpx 大不少） -->
   <view class="pose-box" wx:if="{{step.art}}" bindtap="openPose">
     <image class="pose" src="/assets/movements/{{step.art}}.png" mode="widthFix" />
@@ -46,7 +53,11 @@
   <view class="card">
     <view class="card-title">动作要点</view>
     <view wx:if="{{step.cue}}" class="muted">{{step.cue}}</view>
-    <view wx:else class="light">这一式的技术要点待补（当前只有俯卧撑十式写全）</view>
+    <view wx:else class="light">这一式的技术要点还没写，先按下面的三档标准练</view>
+    <!-- 来源说明：要点是我们自己写的，不是原书原文；不能让人以为这是权威教材 -->
+    <view class="light" style="font-size:21rpx;margin-top:12rpx;">
+      要点是训练常识自撰的（不是原书原文）；动作有疑问的，建议找教练当面看一眼
+    </view>
     <view class="danger" style="font-size:22rpx;margin-top:12rpx;" wx:if="{{step.note}}">
       ⚠ {{step.note}}
     </view>

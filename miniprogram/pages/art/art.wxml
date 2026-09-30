@@ -3,6 +3,8 @@
   <view class="h1">{{art.name}}</view>
   <view class="sub">{{art.en}} · 主练 {{art.focus}}</view>
   <view class="tagline">{{art.tagline}}</view>
+  <!-- 需要什么：访谈里"没有专业器械"是排第三的放弃原因，写清最低条件反而更可信 -->
+  <view class="gear-line"><text class="gear-key">需要什么</text>{{art.gear}}</view>
 
   <!-- 进度卡：只认"已通过几式"，当前式由它推导 -->
   <view class="progress-card {{completed ? 'is-done' : ''}}" bindlongpress="onCardLongPress">

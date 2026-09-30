@@ -107,6 +107,27 @@ Page({
     wx.navigateTo({ url: `/pages/step/step?artId=${m.artId}&no=${m.no}` });
   },
 
+  /** 极简模式入口：同一个式子，但详情页会显示"记几组就提交、不用等达标" */
+  goMainQuick() {
+    const m = this.data.main;
+    if (!m) return;
+    wx.navigateTo({ url: `/pages/step/step?artId=${m.artId}&no=${m.no}&quick=1` });
+  },
+
+  /**
+   * 分享卡片（回应 R2 访谈排第一的放弃原因"没人陪着练"）
+   * 纯前端能力：0 后端、0 域名。真的搭子/排行榜要好友关系，已记入 v2。
+   */
+  onShareAppMessage() {
+    const m = this.data.main;
+    return {
+      title: m
+        ? `我在练「${m.artName} · 第 ${m.no} 式」，一起来？`
+        : '六艺十式 · 在家徒手健身，六个动作各十式',
+      path: m ? `/pages/step/step?artId=${m.artId}&no=${m.no}` : '/pages/index/index'
+    };
+  },
+
   /* ---- 调试/验收入口（仅开发版、体验版可见）：长按 build 信息行 ---- */
   onBuildLongPress() {
     if (!env.debugEnabled()) return;

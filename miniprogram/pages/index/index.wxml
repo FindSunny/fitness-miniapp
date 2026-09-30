@@ -3,6 +3,10 @@
   <view class="h1">六艺十式</view>
   <view class="sub">六个动作 · 每个十式 · 达到标准才进下一式</view>
 
+  <!-- 价值主张：直接回应 R2 访谈里排第 2、3 的放弃原因（没时间 / 没器械）
+       注意用词：是"不用**专业**器械"，不是"零器械" —— 引体要单杠、倒立撑要一面墙 -->
+  <view class="value-line">不用专业器械 · 在家就能练 · 一次约 8–10 分钟</view>
+
   <!-- 存储诊断（放最上面，一眼可见；排查完可移除） -->
   <view class="store-diag" wx:if="{{storeInfo}}" bindlongpress="onBuildLongPress">
     <text class="build">build {{build.stamp}}</text>
@@ -34,6 +38,10 @@
     </view>
     <view class="muted" style="font-size:24rpx;margin-top:14rpx;">{{main.stdLine}}</view>
     <view class="btn primary" bindtap="goMain">开始这一式</view>
+    <!-- 极简入口：回应访谈里"上班没时间" —— 不用等达标，记几组就算 -->
+    <view class="quick-entry" bindtap="goMainQuick">
+      今天只有 10 分钟？→ 只练这一式，记几组就提交（不用等达标）
+    </view>
     <view class="light" style="font-size:22rpx;margin-top:12rpx;">{{main.reason}}</view>
   </view>
 
@@ -80,6 +88,10 @@
       <view class="fig-tag" wx:if="{{item.drawn < item.total}}">部分示意图待补</view>
     </view>
   </view>
+
+  <!-- 分享：回应访谈里排第一的放弃原因"没人陪着练" —— 最低成本的做法是"能喊人"
+       （真的搭子/排行榜需要后端，已记入 v2） -->
+  <button class="btn ghost share-btn" open-type="share">把「六艺十式」发给朋友一起练</button>
 
   <view class="disclaimer">
     本小程序是训练记录工具，提供的动作标准与要点仅供健身参考，不构成医疗或康复建议；如有伤病请先咨询医生。

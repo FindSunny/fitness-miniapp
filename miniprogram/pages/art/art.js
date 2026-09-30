@@ -49,7 +49,7 @@ Page({
     this.setData({
       art: {
         id: art.id, name: art.name, en: art.en, focus: art.focus,
-        tagline: art.tagline, source: art.source
+        tagline: art.tagline, gear: art.gear || '', source: art.source
       },
       steps,
       completed: status.completed,
