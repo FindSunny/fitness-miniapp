@@ -17,11 +17,14 @@ function install() {
   const calls = { toast: [], modal: [], nav: [], title: [], sheet: [] };
   const pendingModals = [];
   const pendingSheets = [];
+  // 默认 develop（开发版）：调试入口可见 —— npm test / E2E 要能覆盖调试入口本身
+  let envVersion = 'develop';
 
   global.wx = {
     getStorageSync: k => storage[k],
     setStorageSync: (k, v) => { storage[k] = v; },
     removeStorageSync: k => { delete storage[k]; },
+    getAccountInfoSync: () => ({ miniProgram: { envVersion } }),
     showToast: o => { calls.toast.push(o); },
     showModal: o => { calls.modal.push(o); pendingModals.push(o); },
     navigateTo: o => { calls.nav.push(o); },
@@ -39,6 +42,8 @@ function install() {
   return {
     calls,
     storage,
+    /** 切换运行环境：develop（默认）/ trial（体验版）/ release（正式版） */
+    setEnvVersion(v) { envVersion = v; },
     /** 装载一个页面模块，返回可直接调用的页面实例（带 setData） */
     load(absPath) {
       delete require.cache[require.resolve(absPath)];

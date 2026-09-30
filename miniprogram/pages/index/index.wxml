@@ -7,15 +7,17 @@
        注意用词：是"不用**专业**器械"，不是"零器械" —— 引体要单杠、倒立撑要一面墙 -->
   <view class="value-line">不用专业器械 · 在家就能练 · 一次约 8–10 分钟</view>
 
-  <!-- 存储诊断（放最上面，一眼可见；排查完可移除） -->
-  <view class="store-diag" wx:if="{{storeInfo}}" bindlongpress="onBuildLongPress">
+  <!-- 存储诊断：**只有开发版显示**（体验版/正式版藏起来 —— 分享给朋友时不该看到这种技术行）
+       env={{envVersion}} 是给"预览码到底算哪个环境"做实证用的（以前只能靠推断） -->
+  <view class="store-diag" wx:if="{{debugEnabled && storeInfo}}" bindlongpress="onBuildLongPress">
     <text class="build">build {{build.stamp}}</text>
+    <text>env={{envVersion}}</text>
     <text>存储：{{storeInfo.backend}}</text>
     <text>记录 {{storeInfo.sessions}} 条</text>
     <text wx:if="{{storeInfo.pending > 0}}">未提交 {{storeInfo.pending}} 组</text>
     <text wx:if="{{storeInfo.sizeKB !== undefined}}">已用 {{storeInfo.sizeKB}} KB</text>
     <text class="err" wx:if="{{storeInfo.error}}">⚠ {{storeInfo.error}}</text>
-    <text class="dbg" wx:if="{{debugEnabled}}">· 长按可调试{{hasDebugSnapshot ? '（有备份）' : ''}}</text>
+    <text class="dbg">· 长按可调试{{hasDebugSnapshot ? '（有备份）' : ''}}</text>
   </view>
 
   <!-- 有已记录但未提交的组 -->
@@ -97,5 +99,8 @@
     本小程序是训练记录工具，提供的动作标准与要点仅供健身参考，不构成医疗或康复建议；如有伤病请先咨询医生。
     动作示意图为自绘，书籍文字与插图版权归原作者及出版方所有。
   </view>
+  <!-- 版本号：**所有环境都显示**，这是正常的产品信息（不是调试信息）。
+       真机验收时看这一行确认"手机上跑的是不是新包"—— 每次上传必须 bump 版本号（见 README §版本固化） -->
+  <view class="app-version">v{{build.version}}</view>
 
 </view>
