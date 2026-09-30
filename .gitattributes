@@ -1,0 +1,14 @@
+# 行尾统一：钩子脚本必须是 LF，否则 Git for Windows 下 `#!/bin/sh\r` 会报 "bad interpreter"
+.githooks/* text eol=lf
+
+# 文本文件默认按仓库里的 LF 存
+*.js   text
+*.json text
+*.md   text
+*.mjs  text
+*.wxml text
+*.wxss text
+
+# 二进制资源不要做行尾转换
+*.png binary
+*.jpg binary
