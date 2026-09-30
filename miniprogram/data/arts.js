@@ -46,7 +46,7 @@ const ARTS = [
         cue: '单臂为主，另一手伸直撑球做杠杆借力，逐步减小借力。' },
       { no: 10, name: '单臂俯卧撑', en: 'One-Arm Push-Up', art: 'mov-pushup-10', view: 'top', perSide: true, std: [[1, 5], [2, 5], [2, 10]],
         cue: '单臂全幅度，另一手背后，双脚最宽；宁慢勿假。',
-        note: '不同资料对这一式的组数记载不一致，本表按常见版本整理；以你能标准完成的次数为准。' }
+        note: '公开资料把这一式的组数写得前后矛盾（中级 6 组 × 10 次却高于升级 1 组 × 100 次），本表按由易到难整理为 2 组 × 5 次 / 2 组 × 10 次；以你能标准完成的次数为准。' }
     ]
   },
   {
@@ -97,9 +97,10 @@ const ARTS = [
         cue: '双手并拢至与头同宽，其余同标准引体；拉起时肘别外张。'},
       { no: 7, name: '偏重引体向上', en: 'Uneven Pull-Up', art: 'mov-pullup-07', view: 'front', perSide: true, std: [[1, 5], [2, 7], [3, 8]] ,
         cue: '一手握杠为主拉，另一手抓自己前臂借力；两边轮换，别歪着拉。'},
+      // 备注已撤：来源中级(2×11)高于升级(2×8) 是明显笔误，第二个来源写作 2×6，与本表一致
+      // （核对记录见 research/data-verification.md，留痕断言在 tests/data.test.js）
       { no: 8, name: '单臂半引体向上', en: '1/2 One-Arm Pull-Up', art: 'mov-pullup-08', view: 'front', perSide: true, std: [[1, 4], [2, 6], [2, 8]],
-        cue: '单手握杠只拉到一半，另一手自然垂放；身体别晃，也别急着加幅度。',
-        note: '不同资料对这一式的次数记载不一致，本表按由易到难整理；以标准动作下的次数为准。' },
+        cue: '单手握杠只拉到一半，另一手自然垂放；身体别晃，也别急着加幅度。' },
       { no: 9, name: '单臂辅助引体向上', en: 'Assisted One-Arm Pull-Up', art: 'mov-pullup-09', view: 'front', perSide: true, std: [[1, 3], [2, 5], [2, 7]] ,
         cue: '单手握杠，另一手抓杠上垂下的毛巾借力；控制慢起慢落，别猛拽。'},
       { no: 10, name: '单臂引体向上', en: 'One-Arm Pull-Up', art: 'mov-pullup-10', view: 'front', perSide: true, std: [[1, 1], [2, 3], [2, 6]] ,

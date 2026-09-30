@@ -126,8 +126,15 @@ test('六艺都有首页封面图', () => {
 });
 
 test('存疑数据必须写明 note（不允许悄悄改数）', () => {
-  assert.ok(getStep('pullup', 8).note, '引体第8式标准被修正过，必须带 note');
-  assert.ok(getStep('pushup', 10).note, '俯卧撑第10式标准存疑，必须带 note');
+  // pushup-10：来源里这一式的组数自相矛盾（中级 6 组 × 10 次高于升级 1 组 × 100 次），
+  // 我们做了"由易到难"的整理 → 必须写面向用户的说明
+  assert.ok(getStep('pushup', 10).note, '俯卧撑第10式标准被整理过，必须带 note');
+
+  // pullup-08：来源中级(2×11)高于升级(2×8) 是明显笔误；第二来源（《囚徒健身》读书笔记）
+  // 写作 2×6，与我们一致 → 已核对清楚，不该再标"存疑"。
+  // 这条断言就是那次核对的留痕（核对记录见 research/data-verification.md）
+  assert.ok(!getStep('pullup', 8).note, '引体第8式已由第二来源核对过，不该再标存疑');
+
   ARTS.forEach(a => a.steps.forEach(s => {
     if (s.note) assert.ok(s.note.length > 8, `${s.id} 的 note 太短，说明不清`);
   }));
