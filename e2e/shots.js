@@ -171,6 +171,15 @@ const STATES = [
     name: '18-step-note', desc: '详情页 · 数据备注改成中性琥珀色（验收 36）',
     state: empty(),
     url: '/pages/step/step?artId=pushup&no=10'
+  },
+  {
+    name: '19-pullup-no-note', desc: '详情页 · 引体第 8 式：来源笔误已核对，备注已撤（验收 36）',
+    state: (() => {
+      const steps = {};
+      for (let i = 1; i <= 7; i++) steps['pullup-' + String(i).padStart(2, '0')] = { passedAt: now };
+      return { version: 2, arts: {}, sessions: [], drafts: {}, steps };
+    })(),
+    url: '/pages/step/step?artId=pullup&no=8'
   }
 ];
 
@@ -247,6 +256,13 @@ const STATES = [
   });
 
   if (UPDATE_BASELINE) {
+    // 有图失败时**拒绝**更新基线：否则失败那张会从基线里静默消失，
+    // 下次跑就变成"新增（基线里没有）"—— 基线会慢慢变成残缺的，比没有还危险。
+    // （踩过：一次 04-art-passed 超时，基线从 19 张变 18 张，命令却报"已更新"）
+    if (pass !== results.length && !process.argv.includes('--force')) {
+      console.error(`\n✗ 有 ${results.length - pass} 张图没拍成功，拒绝更新基线（补跑成功后重试；确要强制：加 --force）`);
+      process.exit(1);
+    }
     const meta = {
       note: '截图视觉基线：fp = 每行"暗像素个数"的 hex 指纹（裁掉顶部 cropTop 行）。' +
             '为什么不用整文件哈希：① 状态栏有实时时钟/电量；② 重启开发者工具后渲染会整体位移约 1px —— 都靠裁剪+指纹容忍掉。' +

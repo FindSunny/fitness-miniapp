@@ -490,8 +490,8 @@ async function recordSet(mp, value) {
     const notePage = await mp.reLaunch('/pages/step/step?artId=pushup&no=10');
     await notePage.waitFor(900);
     const noteText = await textOf(mp, '.note-line');
-    check('详情页备注用中性 note-line，写的是"不同资料…"而不是内部话术',
-      /不同资料/.test(noteText || '') && !/原书|待校|源数据/.test(noteText || ''), noteText);
+    check('详情页备注用中性 note-line，说的是"公开资料…前后矛盾"而不是内部话术',
+      /前后矛盾/.test(noteText || '') && !/原书|待校|源数据/.test(noteText || ''), noteText);
 
     // ============================================================ 13. 收尾
     step('收尾：还原成"全新用户"（不污染手动测试数据）');
