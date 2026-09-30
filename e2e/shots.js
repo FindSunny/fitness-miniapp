@@ -3,8 +3,9 @@
  *
  * 为什么分开：
  *   `npm run e2e` 负责断言（稳定）；截图只在需要证据时单独跑。
- *   每一张图都是「写状态 → reLaunch 到目标页 → 等待渲染 → 截图」，
+ *   每一张图都是「写状态 → reLaunch 到目标页 → 等待渲染 →（可选：滚动/点一下）→ 截图」，
  *   步骤之间互不依赖，某一张失败不影响其他张。
+ *   需要下半屏证据时给状态加 `scroll: <px>`（见下面第 16/17 张）。
  *
  * 用法：npm run e2e:shots
  * 产物：e2e/shots/*.png
@@ -144,6 +145,24 @@ const STATES = [
     name: '15-step-quick', desc: '详情页 · 极简模式（从首页"今天只有 10 分钟"进来）',
     state: empty(),
     url: '/pages/step/step?artId=pushup&no=1&quick=1'
+  },
+  // ↓ 这三张要滚到下半屏：验收第 19/36 项的视觉证据（"列表里那行内部话术没了""底部有版本号"）
+  {
+    name: '16-art-note-rows', desc: '十式列表滚到底 · 第 8/10 行不再有「数据待校对」红字（验收 36）',
+    state: empty(),
+    url: '/pages/art/art?artId=pushup',
+    scroll: 2000
+  },
+  {
+    name: '17-home-bottom', desc: '首页滚到底 · 版本号 v0.1.7（所有环境都显示，验收 19）',
+    state: empty(),
+    url: '/pages/index/index',
+    scroll: 2000
+  },
+  {
+    name: '18-step-note', desc: '详情页 · 数据备注改成中性琥珀色（验收 36）',
+    state: empty(),
+    url: '/pages/step/step?artId=pushup&no=10'
   }
 ];
 
@@ -173,9 +192,18 @@ const STATES = [
           await sleep(800);
         } catch (e) { /* 点不开就按原状态截，不影响其他张 */ }
       }
-      // 说明：不要试图在截图前滚动页面。试过 page.scrollTop()（只对 scroll-view 有效）和
-      // wx.pageScrollTo（会把页面滚成空白，截出来是一张空图），结果都是坏证据 ——
-      // 详情页关键区域的视觉证据交给真机验收，截图只做"首屏"的稳定证据。
+      // 需要看下半屏时给状态加 `scroll: <px>`。
+      // 【修正一条旧结论】以前这里写着"截图前滚动是死路"（试过 page.scrollTop 与 wx.pageScrollTo 都截出空白），
+      // 但那是**滚完立刻截图**：视图层还没重绘完，截到的自然是白板。
+      // 现在实测：`wx.pageScrollTo({scrollTop, duration:0})` 之后**等 0.2 秒就够**，
+      // 滚过与没滚过的图哈希稳定不同、也不会白 —— 所以下半屏（列表第 8/10 行、首页底部版本号）
+      // 现在有真实截图证据了（对比见 TESTING.md「滚动截图」一节）。
+      if (s.scroll) {
+        await mp.evaluate(function (top) {
+          wx.pageScrollTo({ scrollTop: top, duration: 0 });
+        }, s.scroll);
+        await sleep(700);
+      }
       const r = await mp.screenshot({ path: file(s.name) });
       if (!fs.existsSync(file(s.name)) && r) fs.writeFileSync(file(s.name), r, 'base64');
       // 空图也算"成功"会骗人（踩过：pageScrollTo 之后截出一张 10KB 的白板，却报 ✓）
