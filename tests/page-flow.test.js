@@ -22,7 +22,7 @@ const INDEX = path.join(P, 'index', 'index.js');
 const STEP = path.join(P, 'step', 'step.js');
 const ART = path.join(P, 'art', 'art.js');
 
-function fresh() { store.reset(); env.resetCalls(); }
+function fresh() { store.reset(); env.resetCalls(); env.setEnvVersion('develop'); }
 
 /** 把某个艺的前 n 式标记为已通过（造"练到第 n+1 式"的状态） */
 function passSteps(artId, n) {
@@ -848,4 +848,101 @@ test('详情页文案：要点标明"自撰、非原书"，极简提示不许承
   // 真踩过：极简提示曾写"进度照样算"，但**没达标的提交不会推进晋级进度**，这是假话
   assert.ok(!/进度照样算/.test(wxml), '极简模式不能承诺"进度照样算"（只有记录会存，晋级进度不动）');
   assert.match(wxml, /记录照样存/, '极简模式应说明"记录照样存"');
+});
+
+// ---------------------------------------------------------------- 上线前收口（调试信息 / 数据备注）
+
+const fsx = require('node:fs');
+const wxmlOf = f => fsx.readFileSync(path.join(P, f), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+
+test('调试信息只在开发版：体验版/正式版连 data 里都不该有诊断信息', () => {
+  // 踩过：原来判的是 envVersion !== 'release' —— 体验版也算"非正式版"，
+  // 于是**你把体验版发给朋友，朋友第一眼看到"build xxx ｜ 存储：wx.storage ｜ 记录 3 条"**
+  const cases = [['develop', true], ['trial', false], ['release', false]];
+  cases.forEach(([v, show]) => {
+    fresh();
+    env.setEnvVersion(v);
+    const page = env.load(INDEX);
+    page.onShow();
+    assert.strictEqual(page.data.debugEnabled, show, `envVersion=${v} 时 debugEnabled 应为 ${show}`);
+    assert.strictEqual(!!page.data.storeInfo, show, `envVersion=${v} 时诊断信息应${show ? '存在' : '为 null'}`);
+    assert.strictEqual(page.data.envVersion, v, '页面要知道自己在哪个环境（诊断行会印出来）');
+  });
+
+  // 列表页的"长按可造进度"提示同理
+  fresh();
+  env.setEnvVersion('trial');
+  const art = env.load(ART);
+  art.onLoad({ artId: 'pushup' });
+  art.onShow();
+  assert.strictEqual(art.data.debugEnabled, false, '体验版的列表页不能出现调试提示行');
+
+  // 结构上也要门控住：诊断条不能"靠 JS 不给数据"来隐藏（哪天 storeInfo 被别处赋值就漏了）
+  const wxml = wxmlOf('index/index.wxml');
+  assert.match(wxml, /class="store-diag"\s+wx:if="\{\{debugEnabled && storeInfo\}\}"/,
+    '首页诊断条必须被 debugEnabled 门控');
+  assert.match(wxmlOf('art/art.wxml'), /class="debug-line" wx:if="\{\{debugEnabled\}\}"/, '列表页调试提示行同理');
+});
+
+test('后门不进线上：体验版/正式版长按没有任何反应', () => {
+  fresh();
+  env.setEnvVersion('release');
+  let page = env.load(INDEX);
+  page.onShow();
+  page.onBuildLongPress();
+  assert.strictEqual(env.calls.sheet.length, 0, '正式版长按诊断条不该弹出调试菜单');
+
+  const art = env.load(ART);
+  art.onLoad({ artId: 'pushup' });
+  art.onShow();
+  art.onCardLongPress();
+  assert.strictEqual(env.calls.modal.length, 0, '正式版长按进度卡不该弹出造进度输入框');
+
+  // 开发版仍然可用（否则验收时没法造进度）
+  fresh();
+  env.setEnvVersion('develop');
+  page = env.load(INDEX);
+  page.onShow();
+  page.onBuildLongPress();
+  assert.strictEqual(env.calls.sheet.length, 1, '开发版必须还能长按调试');
+  const art2 = env.load(ART);
+  art2.onLoad({ artId: 'pushup' });
+  art2.onShow();
+  art2.onCardLongPress();
+  assert.strictEqual(env.calls.modal.length, 1, '开发版必须还能长按造进度');
+});
+
+test('版本号：所有环境都显示，且与 package.json 一致（验收时靠它认包）', () => {
+  const pkg = JSON.parse(fsx.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8').replace(/^\uFEFF/, ''));
+  ['develop', 'trial', 'release'].forEach(v => {
+    fresh();
+    env.setEnvVersion(v);
+    const page = env.load(INDEX);
+    page.onShow();
+    assert.strictEqual(page.data.build.version, pkg.version,
+      `envVersion=${v} 时版本号应与 package.json 一致（${pkg.version}）`);
+    assert.match(page.data.build.stamp, /^\d{4}-\d{2}-\d{2}\.\d+$/);
+  });
+  // 版本号必须**不在**调试门控里：它是给用户/验收看的正常信息
+  const wxml = wxmlOf('index/index.wxml');
+  assert.match(wxml, /class="app-version">v\{\{build\.version\}\}/, '首页底部要有版本号');
+  assert.ok(!/app-version[^>]*wx:if/.test(wxml), '版本号不能被调试开关藏起来');
+});
+
+test('用户界面上不许出现内部数据话术（"待校对""以原书核对"这类）', () => {
+  const art = wxmlOf('art/art.wxml');
+  assert.ok(!/item\.note/.test(art),
+    '十式列表不能再印 item.note —— 备注是数据来源的内部记录，不是给用户看的');
+  const step = wxmlOf('step/step.wxml');
+  assert.match(step, /class="note-line"/, '详情页的备注要用中性的 note-line 样式');
+  assert.ok(!/⚠\s*\{\{step\.note\}\}/.test(step), '备注不该再用红色警告样式（那是"记载不一致"的说明，不是报错）');
+
+  // 数据里的备注本身也要是"给用户看的一句话"
+  const { ARTS } = require('../miniprogram/data/arts.js');
+  ARTS.forEach(a => a.steps.forEach(s => {
+    if (!s.note) return;
+    ['待校对', '待校正', '原书', '源数据', '建议以'].forEach(w => {
+      assert.ok(!s.note.includes(w), `${s.id} 的备注含内部话术「${w}」：${s.note}`);
+    });
+  }));
 });
