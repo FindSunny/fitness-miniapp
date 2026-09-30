@@ -270,3 +270,47 @@ test('Q7 不用纯黑纯灰：正文/标题不许出现 #000 / #333 / gray', () 
   });
   assert.deepStrictEqual(banned, [], '出现了纯黑/纯灰：\n    ' + banned.join('\n    '));
 });
+
+/* ---------------- Q8：视觉回归基线（指纹比对） ---------------- */
+
+test('Q8 视觉基线：解码正确、指纹容忍 1px 位移、且对真实改动敏感', () => {
+  const { hashScreenshot, fingerprint, diffFingerprint, decodePng, CROP_TOP } =
+    require('../tools/lib/screenshot-hash.js');
+  const dir = path.join(__dirname, '..', 'docs', 'screenshots');
+  const home = path.join(dir, '01-home.png');
+  const list = path.join(dir, '02-art-list.png');
+
+  // 自写解码器最容易在这里悄悄算错，先验尺寸与通道
+  const png = decodePng(fs.readFileSync(home));
+  assert.ok(png.w > 300 && png.h > 600, `截图尺寸异常：${png.w}x${png.h}`);
+  assert.strictEqual(png.ch, 3, 'DevTools 截图是 RGB（3 通道）；通道数变了说明格式变了，指纹含义也会变');
+
+  // 同一张图两次结果必须一样
+  assert.strictEqual(hashScreenshot(home).hash, hashScreenshot(home).hash, '哈希不确定 → 基线不可用');
+  assert.strictEqual(fingerprint(home).rows, fingerprint(home).rows, '指纹不确定 → 基线不可用');
+
+  // ① 裁剪必须真的生效（状态栏有实时时钟，不裁的话每张图每次都"变了"）
+  assert.ok(CROP_TOP >= 40, `CROP_TOP 至少要 40 行才盖得住状态栏，当前 ${CROP_TOP}`);
+  assert.notStrictEqual(hashScreenshot(home).hash, hashScreenshot(home, 0).hash, '裁剪没生效');
+
+  // ② 容忍"重启 IDE 后的 1px 位移"：用**真实的两帧**做对照（不是合成出来的位移 ——
+  //    合成的"整体挪一行"比真实噪声粗暴得多，真实噪声只有 3–4 行坏行）
+  const before = path.join(dir, '01-home.png');                          // 建基线那次会话
+  const after = path.join(__dirname, '..', 'e2e', 'fixtures', 'home-after-ide-restart.png'); // 重启会话后
+  const noise = diffFingerprint(fingerprint(before).rows, fingerprint(after).rows);
+  assert.strictEqual(noise.comparable, true);
+  assert.strictEqual(noise.changed, false,
+    `跨会话的渲染位移被判成"变了"（坏行 ${noise.badRows}/${noise.totalRows}）—— 基线会变成"狼来了"`);
+
+  // ③ 对真实改动敏感：换页面必须判定"变了"
+  const other = diffFingerprint(fingerprint(home).rows, fingerprint(list).rows);
+  assert.strictEqual(other.changed, true, '首页和列表页被判成"没变" —— 基线太钝，等于没有');
+  assert.ok(other.badRows > 50, `不同页面的坏行只有 ${other.badRows} 行，灵敏度过低`);
+
+  // ④ 基线文件本身：cropTop 必须与代码常量一致（不一致等于换了算法，旧指纹全无意义）
+  const base = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'e2e', 'shots-baseline.json'), 'utf8'));
+  assert.strictEqual(base.cropTop, CROP_TOP, '基线里的 cropTop 与代码常量不一致');
+  const names = Object.keys(base.images);
+  assert.ok(names.length >= 15, `基线只有 ${names.length} 张图，太少（至少要覆盖全部状态）`);
+  names.forEach(n => assert.ok(base.images[n].fp, `${n} 缺指纹字段（老格式基线？重跑 --update-baseline）`));
+});

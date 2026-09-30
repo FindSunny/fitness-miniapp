@@ -7,16 +7,24 @@
  *   步骤之间互不依赖，某一张失败不影响其他张。
  *   需要下半屏证据时给状态加 `scroll: <px>`（见下面第 16/17 张）。
  *
- * 用法：npm run e2e:shots
- * 产物：e2e/shots/*.png
+ * 用法：
+ *   npm run e2e:shots                      出图 + 与基线比对（只报告，不判失败）
+ *   npm run e2e:shots -- --update-baseline 把当前这批图存成新基线
+ *   npm run e2e:shots -- --strict          与基线不一致就 exit 1（发布前"冻住"用）
+ * 产物：e2e/shots/*.png + e2e/shots-baseline.json（基线入库，图不入库）
  */
 const fs = require('fs');
 const path = require('path');
 const { getMiniProgram, sleep, waitReady, retry } = require('./lib');
+const { hashScreenshot, fingerprint, diffFingerprint, CROP_TOP } = require('../tools/lib/screenshot-hash.js');
 
 const SHOTS = path.join(__dirname, 'shots');
+const BASELINE = path.join(__dirname, 'shots-baseline.json');
 const KEY = 'cf_state_v1';
 const file = n => path.join(SHOTS, n + '.png');
+
+const UPDATE_BASELINE = process.argv.includes('--update-baseline');
+const STRICT = process.argv.includes('--strict');
 
 const seed = (mp, state) => mp.callWxMethod('setStorageSync', KEY, state);
 const empty = () => ({ version: 2, arts: {}, sessions: [], drafts: {}, steps: {} });
@@ -225,5 +233,63 @@ const STATES = [
   const pass = results.filter(r => r.ok).length;
   console.log(`\n截图：${pass} / ${results.length} 张成功 → e2e/shots/`);
   results.filter(r => !r.ok).forEach(r => console.log(`  ✗ ${r.name} ${r.err || ''}`));
-  process.exit(pass === results.length ? 0 : 1);
+
+  // ---- 视觉回归：跟基线比"行暗度指纹"（裁掉状态栏 + 容忍 1px 位移）----
+  const current = {};
+  results.filter(r => r.ok).forEach(r => {
+    try {
+      const h = hashScreenshot(file(r.name));
+      const fp = fingerprint(file(r.name));
+      current[r.name] = { hash: h.hash, w: h.w, h: h.h, size: h.size, fp: fp.rows, rows: fp.totalRows };
+    } catch (e) {
+      current[r.name] = { hash: 'ERR:' + e.message, w: 0, h: 0, size: 0, fp: '', rows: 0 };
+    }
+  });
+
+  if (UPDATE_BASELINE) {
+    const meta = {
+      note: '截图视觉基线：fp = 每行"暗像素个数"的 hex 指纹（裁掉顶部 cropTop 行）。' +
+            '为什么不用整文件哈希：① 状态栏有实时时钟/电量；② 重启开发者工具后渲染会整体位移约 1px —— 都靠裁剪+指纹容忍掉。' +
+            'hash 只用于"完全一致"的快路径。',
+      cropTop: CROP_TOP,
+      updatedAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      images: current
+    };
+    fs.writeFileSync(BASELINE, JSON.stringify(meta, null, 2) + '\n', 'utf8');
+    console.log(`\n已更新视觉基线：e2e/shots-baseline.json（${Object.keys(current).length} 张，裁掉顶部 ${CROP_TOP} 行 + 1px 位移容忍）`);
+    process.exit(pass === results.length ? 0 : 1);
+  }
+
+  let changed = [];
+  if (fs.existsSync(BASELINE)) {
+    const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+    const old = base.images || {};
+    const names = Object.keys(current);
+    const details = [];
+    names.forEach(n => {
+      if (!old[n] || !old[n].fp || !current[n].fp) return;
+      if (old[n].hash === current[n].hash) return;              // 完全一致，快路径
+      const d = diffFingerprint(old[n].fp, current[n].fp);
+      if (!d.comparable) details.push(`${n}（${d.reason}）`);
+      else if (d.changed) details.push(`${n}（${d.badRows}/${d.totalRows} 行不同，最差第 ${d.worstRow} 行差 ${d.worstDelta} 像素）`);
+    });
+    changed = details;
+    const added = names.filter(n => !old[n]);
+    const removed = Object.keys(old).filter(n => !current[n]);
+    console.log(`\n视觉基线比对（基线 ${base.updatedAt || '未知'}，裁掉顶部 ${base.cropTop} 行 + 容忍 1px 位移）：`);
+    if (!changed.length && !added.length && !removed.length) {
+      console.log(`  ✓ ${names.length} 张全部与基线一致（页面没被意外改动）`);
+    } else {
+      changed.forEach(d => console.log(`  ⚠ 变了：${d}\n    → 改过 UI 就是这样；**没改 UI 却变了**要人工看图（e2e/shots/）`));
+      if (added.length) console.log(`  · 新增（基线里没有）：${added.join('、')} → 跑 npm run e2e:shots -- --update-baseline 收进基线`);
+      if (removed.length) console.log(`  · 基线里有、这次没拍：${removed.join('、')}`);
+    }
+  } else {
+    console.log(`\n（还没有视觉基线：跑 npm run e2e:shots -- --update-baseline 建一个）`);
+  }
+
+  const bad = pass !== results.length;
+  const regression = STRICT && changed.length > 0;
+  if (regression) console.log('\n✗ --strict：与基线不一致的图必须人工确认后再更新基线');
+  process.exit(bad || regression ? 1 : 0);
 })().catch(e => { console.error('截图 pass 失败：', e.message); process.exit(1); });
