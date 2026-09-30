@@ -1,5 +1,7 @@
 # 六艺十式 · 徒手训练小程序
 
+[![test](https://github.com/FindSunny/fitness-miniapp/actions/workflows/test.yml/badge.svg)](https://github.com/FindSunny/fitness-miniapp/actions/workflows/test.yml)
+
 囚徒健身风格的徒手训练小程序（作品集项目）。
 **核心差异化**：不做"几十个动作的时长套餐"，只做**六个动作 × 十个难度等级**的晋级体系 —— 用户随时知道自己在第几式、距离升级还差几次。
 
@@ -12,11 +14,11 @@
 
 ```bash
 npm run preview   # ① 生成网页版交互预览（最快看到效果）
-npm test          # ② 跑测试（101 项，0 依赖，用 Node 内置测试器）
+npm test          # ② 跑测试（105 项，0 依赖，用 Node 内置测试器）
 npm run qr        # ③ 编译 + 出真机预览码（手机扫码就能用）
 npm run upload    # ④ 上传开发版（之后去后台「选为体验版」发给别人）
 npm run e2e:serve # ⑤ 起自动化服务（跑 E2E 前先执行一次）
-npm run e2e       # ⑥ 真机 E2E：96 条断言
+npm run e2e       # ⑥ 真机 E2E：100 条断言
 npm run e2e:shots # ⑦ 真机 E2E 截图：15 张状态图 → e2e/shots/
 npm run fix:config      # 配置被工具改坏时，一条命令补回 miniprogramRoot
 npm run export:figures  # 重新生成动作图（已生成过）
@@ -24,15 +26,15 @@ npm run cards           # 重新生成可打印训练卡 → design/cards/
 npm run size      # 看包体积
 ```
 
-### 测试分层（101 项，`npm test`）
+### 测试分层（105 项，`npm test`）
 
 | 层 | 文件 | 数量 | 管什么 |
 |---|---|---|---|
 | 数据 | `tests/data.test.js` | 17 | 60 式完整性、id 唯一、标准单调、单位/每侧标记、**引用的图片必须存在**、**存疑数据必须写 note**、**禁用医疗表述**、**每式必须有要点且长度/句式合规**、**每艺必须写明器械条件且不许说"零器械"** |
 | 逻辑 | `tests/progress.test.js` | 29 | 晋级判定边界（组数够数值不够 / 数值够组数不够 / 超量 / 乱序 / 非法值 / 计时型 / 每侧 / 组数不单调）、**当前式推导**、**解锁判定**、进度换算、首页推荐规则 |
 | 存储 | `tests/store.test.js` | 8 | 进度与通关状态、首次/最近通关时间、记录上限、重置语义（含清草稿）、草稿落盘、调试备份/还原 |
-| **页面** | `tests/page-flow.test.js` | 43 | **直接驱动真实页面代码**（`tests/helpers/miniapp-stub.js` 给 wx/Page 打桩），覆盖首页推荐、第十式通关流程、复习不回退、列表三态、**锁定不可记录**、**一键档位**、达标后下一式自动进行中、离开再返回、**器械说明透出**、**极简模式（不降标准、不解锁）**、**分享标题与路径**、**详情页文案的语义红线** |
-| **界面质量** | `tests/ui-quality.test.js` | 4 | **从真实 WXSS 读色值/字号算 WCAG 对比度**（41 组文字×背景配对）、字号下限、点按区 ≥88rpx、禁用纯黑纯灰 —— 颜色改浅了测试直接红，见 `ACCEPTANCE.md` 第五节 |
+| **页面** | `tests/page-flow.test.js` | 47 | **直接驱动真实页面代码**（`tests/helpers/miniapp-stub.js` 给 wx/Page 打桩），覆盖首页推荐、第十式通关流程、复习不回退、列表三态、**锁定不可记录**、**一键档位**、达标后下一式自动进行中、离开再返回、**器械说明透出**、**极简模式（不降标准、不解锁）**、**分享标题与路径**、**详情页文案的语义红线** |
+| **界面质量** | `tests/ui-quality.test.js` | 4 | **从真实 WXSS 读色值/字号算 WCAG 对比度**（43 组文字×背景配对）、字号下限、点按区 ≥88rpx、禁用纯黑纯灰 —— 颜色改浅了测试直接红，见 `ACCEPTANCE.md` 第五节 |
 
 > **为什么要有页面层**：曾有两个 bug 逃过了纯函数单测 —— ①第十式达标后无法通关、进度条卡在 90%；②俯卧撑通关后首页仍推荐它。两个都是"页面把数据拼错了"，不是算法错。加了页面层后，这两条都变成了回归测试（用例名里直接写了"回归：曾经仍推荐俯卧撑第 10 式"）。
 
@@ -253,40 +255,67 @@ gapText(...)  // → "距【升级】还差 3 组 × 50次"
 
 ---
 
-## 版本固化（git）
+## 版本固化（git）与分支流程
 
-代码托管的最小闭环：**验收通过的版本 = 一个 commit + 一个 tag**，以后改坏了可以随时回到这一版。
+代码托管的最小闭环：**上线/验收的版本 = 一个 commit + 一个 tag**，以后改坏了可以随时回到这一版。
 
-```bash
-git init -b main                  # 已完成（仓库只圈本项目，不含同目录下别的项目）
+### 三个分支各管什么
 
-# 提交前先设一次身份（全局为空，先按仓库设；想全局生效就把 --global 加上）
-git config user.name  "你的名字"
-git config user.email "你的邮箱"
-
-# ① 先提交"已验收的 v0.1.4 基线"（这批内容早已 add 好，停在暂存区等你提交）
-git commit -m "chore(repo): 首次入库 v0.1.4 验收通过版本"
-git tag tag/260929                # tag/ + 验收当天日期（yyMMdd）
-
-# ② 再提交本轮 R2 改动（锁定式推进 + 一键档位 + 三态列表）
-git add -A
-git commit -m "feat(progress): 锁定式推进 + 一键按标准记录"
-
-# ③ 第二批：内容与门槛（要点 / 器械 / 极简模式 / 分享）
-git commit -m "feat(content): 补全 60 式动作要点 + 器械与极简入口"
+```
+feature/<topic> ─┐
+bug/<topic> ─────┴─→ dev ──(三层验证全绿 + 真机验收)──→ main ──(提审/发布, --no-ff)──→ prod ── tag/<yyMMdd>
 ```
 
-**为什么这几批 commit 是分开的**：`tag/260929` 指向**你真机验收通过的那一版**（v0.1.4）。
-v0.1.5（锁定式推进）和 v0.1.6（第二批）都改了用户可见行为，**还没经过你真机验收**，所以都不进那个 tag ——
-否则 tag 就"指着一个没验过的版本"，以后回溯就说不清了。验收通过后再补一个 tag（`tag/<验收日>`）。
+| 分支 | 定位 | 准入规则 |
+|---|---|---|
+| **dev** | 日常开发/试验 | 什么都能进，**允许红**（`npm test` 挂了也没关系） |
+| **main** | 基线（GitHub 默认分支，**验收包从这里出**） | 只进"`npm test` + `npm run e2e` + `npm run e2e:shots` 全绿 **且** 你真机验收过"的改动，用 `--no-ff` 合并留痕 |
+| **prod** | 线上/提审线（**提审包从这里出**） | **只接受从 main 的 `--no-ff` 合并**；每次合并打 `tag/<yyMMdd>`；微信后台的"选为体验版/提交审核"对应的就是它 |
+| feature/ · bug/ | 大特性 / 线上修复 | 特性从 main 拉；线上 bug 从 prod 拉，修完合 prod 再回灌 main、dev |
 
-**为什么第一个 tag 可以信**：打 tag 之前，在**同一棵代码树**上重跑了三层验证，全绿才冻结 ——
-`npm test` 69/69 ｜ `npm run e2e` 63/63 ｜ `npm run e2e:shots` 10/10（详见 `TESTING.md`）。
-后续各轮的对应数字是：v0.1.5 = **91 / 85 / 13**，v0.1.6（本轮，第二批）= **101 / 96 / 15**，
-同样全绿，但都要等你真机验收完才算数。
+**日常怎么走（真实例子：v0.1.6 → v0.1.7）**
+
+```bash
+git checkout dev                      # ① 在 dev 上开发
+# …改代码 / 跑 npm test…
+git commit -am "fix(ui): …"
+
+git checkout main                     # ② 三层验证全绿 + 你真机验收后，合并进 main
+git merge --no-ff dev -m "merge: dev -> main（v0.1.7）"
+git push origin dev main              # ③ 推送（dev 直推，main 因为带合并提交所以放行）
+
+npm run release:check                 # ④ 发布卫生检查
+npm run upload                        # ⑤ 出验收包（来自 main）
+
+git checkout prod                     # ⑥ 验收通过、要提审/发布时，再合并进 prod 并打 tag
+git merge --no-ff main -m "release: v0.1.7"
+git tag tag/260930 && git push origin prod tag/260930
+```
+
+### 三道护栏（防止"手滑直接推线上"）
+
+1. **本地 pre-push 钩子**（`.githooks/pre-push`）：直接往 main/prod 推非合并提交会被**拒绝**，并打印正确做法。每个克隆装一次：
+   ```bash
+   git config core.hooksPath .githooks      # 这条命令不入库，换机器要重做
+   ```
+   紧急绕过：`git push --no-verify origin main`（不推荐——出问题只能靠回滚）。
+2. **GitHub 规则（公开仓库免费）**：在 `Settings → Rules` 给 main、prod 各建一条 ruleset，勾上
+   **Restrict force pushes** + **Prevent deletions**。这两个是"不可逆错误"的防线（误删分支、强推翻掉历史）。
+3. **`npm run release:check`**：上传前的卫生检查 —— 工作区干净 / 版本号两处一致 / 分支是 main 或 prod / 没有未推送的提交。
+   它已经**挂在 `npm run upload` 前面**（急传测试包可用 `CF_SKIP_RELEASE_CHECK=1` 跳过）。
+
+> **版本号规则**：**每次上传都要 bump patch**（0.1.6 → 0.1.7 → …），`npm run stamp` 负责同步界面上的版本号。
+> 这样"版本号"本身就能唯一标识一个包 —— 你在真机上只要看首页底部那行 `v0.1.7` 就知道加载的是哪个包，
+> 不用再靠 build stamp 区分"同一版本号的两次上传"。
 
 > **每轮都在同一棵树上重跑三层**，这是这套流程唯一值钱的地方：数字变了就说明"改的东西真的影响了什么"，
-> 数字没变却红了就说明"改坏了别的东西"。验收前把这三行抄进群里，比说"我测过了"有用。
+> 数字没变却红了就说明"改坏了别的东西"。验收前把这三行报出来，比说"我测过了"有用。
+> 历史数字：v0.1.4 = 69 / 63 / 10 ｜ v0.1.5 = 91 / 85 / 13 ｜ v0.1.6 = 101 / 96 / 15 ｜ **v0.1.7 = 105 / 100 / 15**（当前）。
+
+### CI
+
+`.github/workflows/test.yml`：push 到 main/dev/prod 以及任何 PR 时，在 GitHub 上跑一遍 `npm test`（零依赖，秒级）。
+**E2E 不进 CI** —— 它要微信开发者工具 + 图形环境，跑不了就别假装绿；E2E 的结论以本地 `npm run e2e` 为准。
 
 不进库的东西（`.gitignore`）：`node_modules/`（依赖）、`.chrome-tmp/`（渲染临时目录）、
 `preview/preview-qr.jpg`（含临时 token）、`preview/index.html`（一条命令可再生）、`e2e/shots/`（每次跑都会变）。

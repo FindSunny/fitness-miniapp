@@ -81,7 +81,7 @@ Page({
     });
   },
 
-  /* ---- 调试/验收入口（仅开发版、体验版可见）：长按进度卡 ---- */
+  /* ---- 调试/验收入口（仅开发版可见）：长按进度卡 ---- */
   onCardLongPress() {
     if (!env.debugEnabled()) return;
     const total = this.art.steps.length;
