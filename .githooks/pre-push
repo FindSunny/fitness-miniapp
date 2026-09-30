@@ -1,0 +1,47 @@
+#!/bin/sh
+# 本地护栏：不许直接 push 到 main / prod
+#
+# 为什么要有：GitHub 上的分支规则只能在服务端拦（而且私有仓库免费计划不一定能用）。
+# 这道钩子在你**本地按回车之前**就拦住 —— 想推 main/prod，必须先走一次真正的合并。
+#
+# 规则：
+#   1) 新建分支（远端还没有）→ 放行
+#   2) 删除远端分支 → 放行
+#   3) 要推的提交里**有合并提交**（说明走了 `git merge --no-ff dev`）→ 放行
+#   4) 其他情况（直接 commit 完就往 main/prod 推）→ 拒绝，并打印正确做法
+#
+# 安装（每个克隆都要做一次，git 配置不入库）：
+#   git config core.hooksPath .githooks
+# 紧急绕过（不推荐，出问题只能靠回滚）：
+#   git push --no-verify origin main
+#
+# 注意：只用 shell 内建命令 + git，不依赖 grep/head ——
+# 钩子环境里 PATH 不保证有 coreutils（踩过：grep: command not found 导致判断全走成"拒绝"）。
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/prod)
+      branch=${remote_ref#refs/heads/}
+      # 删除远端分支 / 新建分支：放行
+      # （用前缀匹配而不是等值比较：万一这一行末尾带了 \r 之类的字符，等值比较会假失败）
+      case "$local_sha" in 0000000000000000000000000000000000000000*) continue;; esac
+      case "$remote_sha" in 0000000000000000000000000000000000000000*) continue;; esac
+      # 这次推送里有合并提交 → 认为是走合并流程进来的：放行
+      merges=$(git rev-list --merges "$remote_sha..$local_sha" 2>/dev/null)
+      if [ -n "$merges" ]; then continue; fi
+
+      echo "" >&2
+      echo "✗ 拒绝直接 push 到 $branch：这个分支只接受**合并**进来的提交" >&2
+      echo "" >&2
+      echo "  正确做法：" >&2
+      echo "    git checkout dev          # 在 dev 上开发、验证、提交" >&2
+      echo "    git checkout $branch" >&2
+      echo "    git merge --no-ff dev     # 保留合并记录" >&2
+      echo "    git push origin $branch" >&2
+      echo "" >&2
+      echo "  紧急绕过（不推荐）：git push --no-verify origin $branch" >&2
+      exit 1
+      ;;
+  esac
+done
+exit 0

@@ -1,0 +1,21 @@
+name: test
+
+# 只跑 Node 层（101+ 项、零依赖、秒级）。
+# 为什么不跑 E2E：E2E 需要微信开发者工具 + 图形环境，跑不了也不要假绿——
+# 它的结论以你本地 `npm run e2e` 的输出为准（见 TESTING.md）。
+on:
+  push:
+    branches: [main, dev, prod]
+  pull_request:
+
+jobs:
+  node-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      # 没有运行时依赖（node:test + node:assert），所以不需要 npm ci
+      - name: 跑测试
+        run: npm test
