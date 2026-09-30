@@ -18,8 +18,8 @@ npm test          # ② 跑测试（105 项，0 依赖，用 Node 内置测试�
 npm run qr        # ③ 编译 + 出真机预览码（手机扫码就能用）
 npm run upload    # ④ 上传开发版（之后去后台「选为体验版」发给别人）
 npm run e2e:serve # ⑤ 起自动化服务（跑 E2E 前先执行一次）
-npm run e2e       # ⑥ 真机 E2E：100 条断言
-npm run e2e:shots # ⑦ 真机 E2E 截图：15 张状态图 → e2e/shots/
+npm run e2e       # ⑥ 真机 E2E：102 条断言
+npm run e2e:shots # ⑦ 真机 E2E 截图：18 张状态图 → e2e/shots/
 npm run fix:config      # 配置被工具改坏时，一条命令补回 miniprogramRoot
 npm run export:figures  # 重新生成动作图（已生成过）
 npm run cards           # 重新生成可打印训练卡 → design/cards/
@@ -310,7 +310,7 @@ git tag tag/260930 && git push origin prod tag/260930
 
 > **每轮都在同一棵树上重跑三层**，这是这套流程唯一值钱的地方：数字变了就说明"改的东西真的影响了什么"，
 > 数字没变却红了就说明"改坏了别的东西"。验收前把这三行报出来，比说"我测过了"有用。
-> 历史数字：v0.1.4 = 69 / 63 / 10 ｜ v0.1.5 = 91 / 85 / 13 ｜ v0.1.6 = 101 / 96 / 15 ｜ **v0.1.7 = 105 / 100 / 15**（当前）。
+> 历史数字：v0.1.4 = 69 / 63 / 10 ｜ v0.1.5 = 91 / 85 / 13 ｜ v0.1.6 = 101 / 96 / 15 ｜ **v0.1.7 = 105 / 102 / 18**（当前）。
 
 ### CI
 
