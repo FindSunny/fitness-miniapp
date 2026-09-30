@@ -18,7 +18,7 @@ const SHOTS = path.join(__dirname, 'shots');
 const STORAGE_KEY = 'cf_state_v1';
 // 期望的断言条数：用来发现"中途崩了但显示全部通过"
 // （每次增删断言都要改这个数——它是这道保险的代价，值得）
-const EXPECTED_CHECKS = 85;
+const EXPECTED_CHECKS = 96;
 const results = [];
 let shotIndex = 0;
 let scenario = '(启动)';
@@ -416,7 +416,50 @@ async function recordSet(mp, value) {
       artData2.steps.slice(0, 2).map(s => s.no + ':' + s.stateText + (s.isCurrent ? '(当前)' : '')).join(' | '));
     await shot(mp, 'finish-no-advance');
 
-    // ============================================================ 10. 收尾
+    // ============================================================ 10. 第二批：器械 / 极简 / 分享
+    step('第二批：器械说明 / 极简入口 / 分享（回应访谈里的"没器械""没时间""没人陪"）');
+    // 先回到干净状态：下面的分享标题/路径要依赖"当前式 = 俯卧撑第 1 式"
+    await seed(mp, { version: 2, arts: {}, sessions: [], drafts: {}, steps: {} });
+    const artPull = await mp.reLaunch('/pages/art/art?artId=pullup');
+    await artPull.waitFor(900);
+    const pullData = await readData(mp, 'pages/art/art');
+    check('列表页透出器械说明（引体向上 = 一根单杠）',
+      /单杠/.test((pullData.art && pullData.art.gear) || ''), pullData.art && pullData.art.gear);
+    check('器械说明行已渲染到页面上', /单杠/.test((await textOf(mp, '.gear-line')) || ''));
+    await shot(mp, 'art-gear');
+
+    page = await mp.reLaunch('/pages/index/index');
+    await page.waitFor(900);
+    check('首页说"不用专业器械"而不是"零器械"（引体要单杠、倒立撑要墙）',
+      /不用专业器械/.test((await textOf(mp, '.value-line')) || ''),
+      await textOf(mp, '.value-line'));
+    check('首页有"今天只有 10 分钟"的极简入口',
+      /10 分钟/.test((await textOf(mp, '.quick-entry')) || ''));
+    check('分享按钮已渲染（必须是 button + open-type=share）', !!(await query(mp, '.share-btn')));
+
+    const idxShare = await fire(mp, 'onShareAppMessage', {}, 'index/index');
+    check('首页分享标题带当前艺与式号', /第 1 式/.test((idxShare && idxShare.title) || ''), idxShare && idxShare.title);
+    check('首页分享路径直达当前式',
+      idxShare && idxShare.path === '/pages/step/step?artId=pushup&no=1', idxShare && idxShare.path);
+
+    // 极简入口 → 详情页（quick=1）
+    await fire(mp, 'goMainQuick', {}, 'index/index');
+    await waitForPage(mp, 'pages/step/step', 6000);
+    await sleep(600);
+    const quickData = await readData(mp, 'pages/step/step');
+    check('极简入口落在同一式上，且带上极简标记',
+      quickData.no === 1 && quickData.quick === true, `no=${quickData.no} quick=${quickData.quick}`);
+    check('详情页显示极简模式提示', !!(await query(mp, '.quick-tip')));
+    check('极简模式不降低达标标准（仍是 1×10 / 2×25 / 3×50）',
+      quickData.tiers.map(t => t.text).join('|') === '1 组 × 10次|2 组 × 25次|3 组 × 50次',
+      quickData.tiers.map(t => t.text).join('|'));
+    await shot(mp, 'step-quick');
+
+    const stepShare = await fire(mp, 'onShareAppMessage', {}, 'step/step');
+    check('详情页分享路径锁在这一式，不带 quick 参数',
+      stepShare && stepShare.path === '/pages/step/step?artId=pushup&no=1', stepShare && stepShare.path);
+
+    // ============================================================ 11. 收尾
     step('收尾：还原成"全新用户"（不污染手动测试数据）');
     await seed(mp, { version: 1, arts: {}, sessions: [] });
     page = await mp.reLaunch('/pages/index/index');

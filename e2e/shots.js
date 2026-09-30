@@ -134,6 +134,16 @@ const STATES = [
     state: empty(),
     url: '/pages/step/step?artId=pushup&no=1',
     tap: 'openPose'
+  },
+  {
+    name: '14-art-gear', desc: '十式列表 · 器械说明行（引体向上：需要一根单杠）',
+    state: empty(),
+    url: '/pages/art/art?artId=pullup'
+  },
+  {
+    name: '15-step-quick', desc: '详情页 · 极简模式（从首页"今天只有 10 分钟"进来）',
+    state: empty(),
+    url: '/pages/step/step?artId=pushup&no=1&quick=1'
   }
 ];
 
