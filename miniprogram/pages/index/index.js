@@ -15,6 +15,7 @@ Page({
     storeInfo: null,
     debugEnabled: false,
     hasDebugSnapshot: false,
+    envVersion: 'develop',
     build
   },
 
@@ -73,6 +74,10 @@ Page({
       reason: rec.reason
     };
 
+    // 只有开发版才把诊断信息放进 data：体验版/正式版的界面必须和正式产品一样干净
+    // （要看清"数据为什么没了"时，用开发版或预览码看这行）
+    const debug = env.debugEnabled();
+
     this.setData({
       arts,
       main,
@@ -81,9 +86,10 @@ Page({
       weeklyCount: progress.countRecentDays(sessions, 7),
       totalSessions: sessions.length,
       // 诊断用：真机上看不清"数据为什么没了"时，这行能直接给出答案
-      storeInfo: store.storageInfo(),
-      debugEnabled: env.debugEnabled(),
+      storeInfo: debug ? store.storageInfo() : null,
+      debugEnabled: debug,
       hasDebugSnapshot: store.hasDebugSnapshot(),
+      envVersion: env.envVersion(),
       // 已记录但还没提交的组（每组都即时落盘，这里提示用户去提交）
       pendingSets: store.pendingSets(),
       pendingList: store.pendingList()

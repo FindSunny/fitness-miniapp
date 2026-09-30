@@ -45,6 +45,20 @@
 .locked-sub { font-size: 24rpx; color: #64748b; margin-top: 10rpx; line-height: 1.6; }
 .locked-note { font-size: 22rpx; color: #64748b; margin-top: 10rpx; }
 
+/* 数据来源备注（"不同资料记载不一致"这类说明）
+   为什么不用 .danger 红色：这是说明不是报错 —— 上线前红色 ⚠ 会让用户以为标准是错的
+   琥珀色底 + 深琥珀字：看得见是一句"备注"，但不像出错（对比度 7.5:1，见 tests/ui-quality.test.js） */
+.note-line {
+  margin-top: 14rpx;
+  padding: 12rpx 16rpx;
+  background: #fffbeb;
+  border: 2rpx solid #fde68a;
+  border-radius: 10rpx;
+  font-size: 21rpx;
+  color: #92400e;
+  line-height: 1.6;
+}
+
 /* 极简模式提示（从首页"只有 10 分钟"进来时显示） */
 .quick-tip {
   margin-bottom: 16rpx;

@@ -113,6 +113,14 @@
   color: #64748b;
 }
 
+/* 版本号（页面最下面，所有环境都显示）：验收时用它确认手机上跑的是不是新包 */
+.app-version {
+  margin-top: 8rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #64748b;
+}
+
 /* 价值主张（回应"没时间 / 没器械"；用词是"不用专业器械"而非"零器械"——
    引体要单杠、倒立撑要一面墙，写"零器械"是不实claim） */
 .value-line {

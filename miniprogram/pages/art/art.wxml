@@ -47,7 +47,9 @@
         </view>
         <view class="muted" style="font-size:22rpx;margin-top:6rpx;">{{item.stdLine}}</view>
         <view class="light" style="font-size:20rpx;margin-top:4rpx;" wx:if="{{!item.hasArt}}">示意图待补</view>
-        <view class="danger" style="font-size:20rpx;margin-top:4rpx;" wx:if="{{item.note}}">数据待校对：{{item.note}}</view>
+        <!-- 这里**不显示** item.note：note 是数据来源的内部记录（哪一式在不同资料里记载不一致），
+             属于"我们自己的数据考古"，印在用户看的列表上是噪音，还带着"待校对"这种吓人的词。
+             用户能用的那句话放在详情页（step.wxml 的"动作要点"卡片里）。-->
       </view>
       <view class="step-state {{item.state}}">
         <text>{{item.stateText}}</text>

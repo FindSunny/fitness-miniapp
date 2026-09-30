@@ -18,7 +18,7 @@ const SHOTS = path.join(__dirname, 'shots');
 const STORAGE_KEY = 'cf_state_v1';
 // 期望的断言条数：用来发现"中途崩了但显示全部通过"
 // （每次增删断言都要改这个数——它是这道保险的代价，值得）
-const EXPECTED_CHECKS = 96;
+const EXPECTED_CHECKS = 100;
 const results = [];
 let shotIndex = 0;
 let scenario = '(启动)';
@@ -459,7 +459,26 @@ async function recordSet(mp, value) {
     check('详情页分享路径锁在这一式，不带 quick 参数',
       stepShare && stepShare.path === '/pages/step/step?artId=pushup&no=1', stepShare && stepShare.path);
 
-    // ============================================================ 11. 收尾
+    // ============================================================ 12. 上线前收口
+    step('上线前收口：调试信息只在开发版、版本号在所有环境可见');
+    await seed(mp, { version: 2, arts: {}, sessions: [], drafts: {}, steps: {} });
+    page = await mp.reLaunch('/pages/index/index');
+    await page.waitFor(900);
+    const idxEnv = await readData(mp, 'pages/index/index');
+    check('自动化跑的是开发版，调试开关是开的',
+      idxEnv.debugEnabled === true, String(idxEnv.debugEnabled));
+    check('诊断条印出了当前环境（用来实证"预览码算哪个环境"）',
+      /env=develop/.test((await textOf(mp, '.store-diag')) || ''), await textOf(mp, '.store-diag'));
+    const pkgVersion = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8').replace(/^\uFEFF/, '')).version;
+    check('首页底部版本号 = package.json 的版本（验收时靠它认包）',
+      (await textOf(mp, '.app-version')) === 'v' + pkgVersion,
+      `${await textOf(mp, '.app-version')} vs v${pkgVersion}`);
+    const artEnv = await mp.reLaunch('/pages/art/art?artId=pushup');
+    await artEnv.waitFor(900);
+    check('列表页出现"长按造进度"提示行（只有开发版才有）', !!(await query(mp, '.debug-line')));
+    await shot(mp, 'home-develop-diag');
+
+    // ============================================================ 13. 收尾
     step('收尾：还原成"全新用户"（不污染手动测试数据）');
     await seed(mp, { version: 1, arts: {}, sessions: [] });
     page = await mp.reLaunch('/pages/index/index');

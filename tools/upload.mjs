@@ -14,11 +14,23 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { callCli, usefulLines, preflight, findCli } from './lib/devtools.mjs';
+import { runReleaseChecks, report } from './lib/release-guard.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 // 去掉可能的 BOM（Windows 上被某些编辑器/PowerShell 写入过，会让 JSON.parse 直接抛错）
 const pkgSrc = fs.readFileSync(path.join(root, 'package.json'), 'utf8').replace(/^\uFEFF/, '');
 const pkg = JSON.parse(pkgSrc);
+
+// 发布卫生检查：工作区干净 / 版本号一致 / 分支是 main 或 prod / 没有未推送的提交
+// （急着传测试包：CF_SKIP_RELEASE_CHECK=1 npm run upload）
+if (process.env.CF_SKIP_RELEASE_CHECK !== '1') {
+  const check = runReleaseChecks({ cwd: root, forUpload: true });
+  console.log('→ 发布前卫生检查');
+  if (!report(check)) {
+    console.error('\n✗ 卫生检查没通过（要跳过：CF_SKIP_RELEASE_CHECK=1 npm run upload）');
+    process.exit(1);
+  }
+}
 
 const version = (process.argv[2] || pkg.version || '').trim();
 const desc = (process.argv[3] || `六艺十式 v${version} · 六艺 × 十式徒手训练晋级记录`).trim();

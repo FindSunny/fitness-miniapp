@@ -141,7 +141,10 @@ const CONTRAST_CASES = [
   ['器械标签',        'art',   '.gear-key',             null, 4.5],
   ['极简提示条',      'step',  '.quick-tip',            null, 4.5],
   ['极简提示标签',    'step',  '.quick-tip-title',      null, 4.5],
-  ['点击看大图',      'step',  '.zoom-tag',             null, 4.5]
+  ['点击看大图',      'step',  '.zoom-tag',             null, 4.5],
+  // 上线前收口
+  ['数据来源备注',    'step',  '.note-line',            null, 4.5],
+  ['版本号',          'index', '.app-version',          PAGE, 4.5]
 ];
 
 test('Q1/Q2 对比度：所有文字/背景配对都达标（WCAG AA）', () => {

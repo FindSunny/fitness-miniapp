@@ -215,8 +215,8 @@
        运行时依赖 <em style="font-style:normal;color:#7dd3fc">0 个</em>，全量验证 3 分钟内出结论。</p>
     <div class="thesis">能在低层抓住的问题，绝不留给高层。</div>
     <div class="stats">
-      <div class="stat"><b>101</b><span>Node 断言 · <em>0.15 秒</em></span></div>
-      <div class="stat"><b>96</b><span>E2E 断言 · 14 场景</span></div>
+      <div class="stat"><b>105</b><span>Node 断言 · <em>0.15 秒</em></span></div>
+      <div class="stat"><b>100</b><span>E2E 断言 · 15 场景</span></div>
       <div class="stat"><b>15</b><span>界面证据图</span></div>
       <div class="stat"><b>0</b><span>运行时依赖</span></div>
     </div>
@@ -245,22 +245,22 @@
       <div class="layer l4">
         <div class="tag">L4<br>页面</div>
         <div class="what"><b>直接驱动真实页面代码</b><div><code>onLoad / onShow / finish</code> 都能在 Node 里调 —— 抓"页面把数据拼错了"（含极简模式不降标准、分享标题与路径）</div></div>
-        <div class="right"><div class="cnt">43 项</div><div class="ms">~80ms</div><div class="bar"><i class="cool" style="width:12%"></i></div></div>
+        <div class="right"><div class="cnt">47 项</div><div class="ms">~80ms</div><div class="bar"><i class="cool" style="width:12%"></i></div></div>
       </div>
       <div class="layer l4b">
         <div class="tag">L4b<br>界面质量</div>
-        <div class="what"><b>从真实 WXSS 算出来的数字项</b><div>WCAG 对比度（<b>41 组</b>文字×背景配对）· 字号下限 · 点按区 ≥88rpx · 禁用纯黑纯灰 —— 颜色改浅了测试直接红</div></div>
+        <div class="what"><b>从真实 WXSS 算出来的数字项</b><div>WCAG 对比度（<b>43 组</b>文字×背景配对）· 字号下限 · 点按区 ≥88rpx · 禁用纯黑纯灰 —— 颜色改浅了测试直接红</div></div>
         <div class="right"><div class="cnt">4 项</div><div class="ms">~5ms</div><div class="bar"><i class="cool" style="width:4%"></i></div></div>
       </div>
       <div class="layer l5">
         <div class="tag">L5<br>编译</div>
-        <div class="what"><b>微信开发者工具 CLI</b><div>真实编译 / 上传 / 出真机预览码 / 包体积体检</div></div>
+        <div class="what"><b>微信开发者工具 CLI</b><div>真实编译 / 上传 / 出真机预览码 / 包体积体检 / 发布卫生检查</div></div>
         <div class="right"><div class="cnt">—</div><div class="ms">30–60s</div><div class="bar"><i class="warm" style="width:45%"></i></div></div>
       </div>
       <div class="layer l6">
         <div class="tag">L6<br>集成</div>
         <div class="what"><b>真实运行时集成断言</b><div><code>miniprogram-automator</code> → 开发者工具里的小程序运行时（<b>非物理真机</b>）</div></div>
-        <div class="right"><div class="cnt">96 条</div><div class="ms">1–2 min</div><div class="bar"><i class="warm" style="width:100%"></i></div></div>
+        <div class="right"><div class="cnt">100 条</div><div class="ms">1–2 min</div><div class="bar"><i class="warm" style="width:100%"></i></div></div>
       </div>
     </div>
     <p class="tiny muted" style="margin-top:12px">
@@ -316,11 +316,11 @@
   <!-- ================= 3. 经验 ================= -->
   <section>
     <h2><span class="n">3</span>最值得抄的经验：断言要换"视角"</h2>
-    <p class="lead">项目里归档了 27 个真实 bug，<b>23 个是用户发现的</b>（真机验收 + 用户访谈）。我自查发现的基本是"工具/文案"类。</p>
+    <p class="lead">项目里归档了 29 个真实 bug，<b>25 个是用户发现的</b>（真机验收 + 用户访谈）。我自查发现的基本是"工具/文案"类。</p>
 
     <div class="card pad" style="margin-bottom:16px">
-      <div class="split" title="27 个 bug 的来源">
-        <div class="u">用户发现 23</div>
+      <div class="split" title="29 个 bug 的来源">
+        <div class="u">用户发现 25</div>
         <div class="m">我自查 4</div>
       </div>
       <p class="tiny muted" style="margin:10px 0 0">
@@ -410,7 +410,7 @@ E2E：<span class="ok">19 / 19 通过</span>
         <ol style="margin:0;padding-left:20px;font-size:13.5px">
           <li><b>不稳定层不得影响结论</b> —— 截图独立成 pass，断言 pass 不写图。</li>
           <li><b>"失败点固定"和"失败点随机"是两类问题</b><br>
-            本轮 E2E 连续两次挂在<b>同一个</b>场景（<code>page node not found</code>）→ 不是 flake，是<b>环境状态退化</b>（开发者工具会话开太久）→ 重启项目窗口即恢复，随后 96/96。</li>
+            本轮 E2E 连续两次挂在<b>同一个</b>场景（<code>page node not found</code>）→ 不是 flake，是<b>环境状态退化</b>（开发者工具会话开太久）→ 重启项目窗口即恢复，随后 100/100。</li>
           <li><b>不要用"重跑一次就过了"糊过去</b> —— 那是在训练自己忽略红灯。</li>
         </ol>
       </div>
@@ -423,7 +423,7 @@ E2E：<span class="ok">19 / 19 通过</span>
     <p class="lead">关键设计：不点坐标，直接调页面的真实事件处理函数 —— 代码路径一样，只是不经过手指。</p>
     <div class="card pad">
       <div class="flow">
-        <div class="node"><b>npm run e2e</b><span>e2e/run.js · 14 个场景</span></div>
+        <div class="node"><b>npm run e2e</b><span>e2e/run.js · 15 个场景</span></div>
         <div class="arrow">→</div>
         <div class="node"><b>automator.connect</b><span>ws://127.0.0.1:9420</span></div>
         <div class="arrow">→</div>
@@ -433,7 +433,7 @@ E2E：<span class="ok">19 / 19 通过</span>
         <div class="arrow">→</div>
         <div class="node"><b>evaluate + getCurrentPages()</b><span>调 onShow / addSet / finish</span></div>
         <div class="arrow">→</div>
-        <div class="node"><b>96 条断言</b><span>+ 独立截图 pass</span></div>
+        <div class="node"><b>100 条断言</b><span>+ 独立截图 pass</span></div>
       </div>
       <p class="tiny muted" style="margin:12px 0 0">
         为什么不用 <code>element.tap()</code>：在自动化实例里点不到 <code>bindtap</code>（试过多轮）；

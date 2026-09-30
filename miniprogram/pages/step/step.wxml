@@ -58,9 +58,9 @@
     <view class="light" style="font-size:21rpx;margin-top:12rpx;">
       要点是训练常识自撰的（不是原书原文）；动作有疑问的，建议找教练当面看一眼
     </view>
-    <view class="danger" style="font-size:22rpx;margin-top:12rpx;" wx:if="{{step.note}}">
-      ⚠ {{step.note}}
-    </view>
+    <!-- 数据来源备注：note 原来是内部话术（"源数据混乱、建议以原书核对"），
+         上线前改成用户视角的一句话，并且不再用红色警告色 —— 这是"各版本记载不一致"的说明，不是报错 -->
+    <view class="note-line" wx:if="{{step.note}}">注：{{step.note}}</view>
   </view>
 
   <!-- 标准 -->

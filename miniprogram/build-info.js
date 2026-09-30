@@ -4,10 +4,11 @@
  *
  * 改代码后手动把这个 stamp 加一，或者跑 `npm run stamp` 自动更新。
  * version 与 package.json 保持一致（`npm run stamp` 会自动同步）；
- * 页面只显示 stamp，version 用于记录"这一版对应哪个发布号"。
+ * **页面显示的是 version**（首页最下面的 v0.1.7，所有环境都显示），stamp 只印在开发版的诊断行里。
+ * 每次上传都要 bump version —— 这样版本号本身就能唯一标识一个包（规则见 README §版本固化）。
  */
 module.exports = {
-  version: '0.1.6',
-  stamp: '2026-09-30.1',   // 每次改动 +1
-  note: '六艺 60 式动作要点补全 + 器械条件 + 极简模式 + 分享卡片'
+  version: '0.1.7',
+  stamp: '2026-09-30.2',   // 每次改动 +1
+  note: '上线前收口：内部话术移出用户界面 + 调试信息只在开发版'
 };
