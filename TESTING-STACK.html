@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>测试技术栈 · 一页纸</title>
+<style>
+  :root{
+    --ink:#111827; --soft:#334155; --gray:#64748b; --light:#94a3b8;
+    --panel:#f8fafc; --border:#e2e8f0; --line:#f1f5f9;
+    --blue:#2563eb; --blue-bg:#eff6ff; --blue-bd:#bfdbfe;
+    --green:#16a34a; --green-dk:#15803d; --green-bg:#f0fdf4; --green-bd:#86efac;
+    --amber:#c2410c; --amber-bg:#fff7ed; --amber-bd:#fed7aa;
+    --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-bd:#ddd6fe;
+    --shadow:0 1px 2px rgba(15,23,42,.04), 0 10px 28px -14px rgba(15,23,42,.16);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#f1f5f9;color:var(--ink);
+    font:15px/1.7 'Segoe UI','Microsoft YaHei','PingFang SC',sans-serif}
+  .page{max-width:1000px;margin:0 auto;padding:0 20px 56px}
+
+  /* 封面 */
+  .hero{margin:0 -20px 24px;padding:40px 38px 34px;
+    background:linear-gradient(160deg,#0f1b30 0%,#0c1424 55%,#0a1220 100%);color:#e2e8f0}
+  .kicker{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:#7dd3fc;border:1px solid rgba(125,211,252,.35);border-radius:999px;padding:3px 12px;margin-bottom:16px}
+  .hero h1{margin:0 0 8px;font-size:27px;line-height:1.35;letter-spacing:-.01em;color:#fff}
+  .hero .sub{margin:0;color:#94a3b8;font-size:14px}
+
+  /* 一句话（主角） */
+  .onesentence{margin-top:22px;padding:20px 22px;border-radius:16px;
+    background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.28);border-left:4px solid #38bdf8}
+  .onesentence .tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.08em;
+    color:#06263a;background:#7dd3fc;border-radius:999px;padding:2px 10px;margin-bottom:12px}
+  .onesentence p{margin:0;font-size:15.5px;line-height:1.85;color:#e6f4ff}
+  .onesentence b{color:#fff;background:rgba(125,211,252,.16);border-radius:5px;padding:1px 5px}
+  .onesentence .em{color:#7dd3fc;font-weight:700}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
+  .stat{background:rgba(255,255,255,.05);border:1px solid rgba(148,163,184,.22);border-radius:12px;padding:12px 14px}
+  .stat b{display:block;font-size:22px;color:#fff;line-height:1.2;letter-spacing:-.02em}
+  .stat span{display:block;font-size:11.5px;color:#94a3b8;margin-top:3px}
+
+  /* 通用 */
+  section{margin-top:26px}
+  h2{font-size:17.5px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  h2 .n{flex:none;width:24px;height:24px;line-height:24px;text-align:center;border-radius:7px;
+    background:var(--blue);color:#fff;font-size:12.5px;font-weight:700}
+  .lead{color:var(--gray);font-size:13px;margin:0 0 14px}
+  .card{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+  .pad{padding:16px 18px}
+  .muted{color:var(--gray)}
+  .tiny{font-size:12.5px}
+  code{font-family:ui-monospace,Consolas,'Courier New',monospace;font-size:12.5px;
+    background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:1px 5px;color:#0f172a}
+  .pill{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:999px;font-weight:600;white-space:nowrap}
+  .pill.b{background:var(--blue-bg);color:#1d4ed8}
+  .pill.g{background:var(--green-bg);color:var(--green-dk)}
+  .pill.a{background:var(--amber-bg);color:var(--amber)}
+  .pill.p{background:var(--purple-bg);color:var(--purple)}
+
+  /* 流水线 */
+  .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:stretch}
+  .flow .f{background:#fff;border:1px solid var(--border);border-top:4px solid var(--light);
+    border-radius:12px;padding:12px 13px;position:relative}
+  .flow .f.f1{border-top-color:#0ea5e9}
+  .flow .f.f2{border-top-color:#8b5cf6}
+  .flow .f.f3{border-top-color:#16a34a}
+  .flow .f.f4{border-top-color:#ca8a04}
+  .flow .f.f5{border-top-color:#0f172a}
+  .flow .f b{display:block;font-size:13.5px}
+  .flow .f .cost{display:block;margin-top:6px;font-size:11.5px;font-weight:700;color:var(--blue)}
+  .flow .f span.d{display:block;font-size:12px;color:var(--gray);margin-top:5px;line-height:1.5}
+  .flow .arrow{align-self:center;text-align:center;color:var(--light);font-size:16px}
+
+  /* 表 */
+  .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;color:var(--gray);font-weight:700;background:var(--panel)}
+  tr:last-child td{border-bottom:none}
+  td .tech{font-size:13px}
+
+  .two{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
+  .deps{background:#0f172a;border-radius:14px;padding:16px 18px;color:#e2e8f0;
+    font-family:ui-monospace,Consolas,'Courier New',monospace;font-size:12.5px;line-height:1.8;overflow-x:auto}
+  .deps .c{color:#64748b}
+  .deps .g{color:#86efac}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+  .chips span{font-size:12px;background:#fff;border:1px solid var(--border);border-radius:999px;
+    padding:4px 11px;color:var(--soft);box-shadow:var(--shadow)}
+  .crosslink{margin-top:20px;font-size:13px;color:var(--gray);text-align:center}
+  footer{margin-top:18px;font-size:12px;color:var(--light);text-align:center}
+
+  @media (max-width:820px){
+    .hero{padding:30px 20px 26px;margin:0 -20px 20px}
+    .hero h1{font-size:22px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .flow{grid-template-columns:1fr}
+    .flow .arrow{display:none}
+    .two{grid-template-columns:1fr}
+    .tscroll table{min-width:600px}
+  }
+  @media print{
+    body{background:#fff}
+    .page{max-width:none;padding:0}
+    .hero{background:#fff;color:#111827;border-bottom:2px solid #111827;padding:0 0 16px;margin:0 0 18px}
+    .hero h1,.onesentence p,.onesentence b{color:#111827}
+    .onesentence{background:var(--panel);border-color:#cbd5e1;border-left-color:#111827}
+    .onesentence .tag{background:#111827;color:#fff}
+    .sub{color:#334155}
+    .stat{border-color:#cbd5e1;background:#fff}
+    .stat b,.stat span{color:#111827}
+    section{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ==================== 封面 + 一句话 ==================== -->
+<header class="hero">
+  <span class="kicker">微信小程序 · 测试技术栈</span>
+  <h1>一句话说清这套测试流程用了什么技术</h1>
+  <p class="sub">六艺十式徒手训练小程序（原生小程序 · 零后端 · 数据只存本机）</p>
+
+  <div class="onesentence">
+    <span class="tag">一句话</span>
+    <p>
+      整套流程只靠<span class="em">一个 Node 运行时</span>、<b>零运行时依赖</b>
+      （测试链只有一个官方 devDependency：<b>miniprogram-automator</b>）——
+      用 <b>Node 内置 <code style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);color:#e6f4ff">node:test</code></b>
+      跑「纯函数 / 存储 / 页面 / 界面质量」四层断言（页面层靠<b>自写的 wx/Page 打桩</b>直接驱动真实页面代码，
+      界面质量靠<b>从真实 WXSS 读色值按 WCAG 公式复算</b>），
+      再用微信官方的 <b>miniprogram-automator</b> 经 WebSocket 接进<b>开发者工具里的小程序真实运行时</b>做 E2E
+      （<b>evaluate 调真实事件处理函数</b> + <b>mp.screenshot 截图</b>），
+      用自写的<b>零依赖 PNG 解码器 + 行暗度指纹</b>把 19 张截图变成视觉基线，
+      最后由<b>开发者工具 CLI</b> 负责编译/上传、<b>Git 分支护栏 + GitHub Actions</b> 守发布门。
+    </p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>0</b><span>运行时依赖（dependencies 为空）</span></div>
+    <div class="stat"><b>1</b><span>devDependency（官方 automator）</span></div>
+    <div class="stat"><b>111</b><span>Node 断言 · 0.15 秒</span></div>
+    <div class="stat"><b>102</b><span>E2E 断言 · 15 场景</span></div>
+  </div>
+</header>
+
+<!-- ==================== 一条流水线 ==================== -->
+<section>
+  <h2><span class="n">1</span>一条流水线：越往右越贵</h2>
+  <p class="lead">下面六行表格就是这条流水线逐段展开；成本差 5 个数量级，所以问题尽量在左边拦住。</p>
+  <div class="flow">
+    <div class="f f1">
+      <b>纯函数断言</b><span class="cost">~50ms</span>
+      <span class="d">node:test + node:assert<br>判定 / 推导 / 推荐</span>
+    </div>
+    <div class="f f2">
+      <b>页面断言</b><span class="cost">~80ms</span>
+      <span class="d">自写 wx/Page 打桩<br>驱动真实页面代码</span>
+    </div>
+    <div class="f f3">
+      <b>真实运行时 E2E</b><span class="cost">1–2min</span>
+      <span class="d">miniprogram-automator<br>WebSocket :9420</span>
+    </div>
+    <div class="f f4">
+      <b>截图视觉基线</b><span class="cost">~1min</span>
+      <span class="d">零依赖 PNG 解码<br>行暗度指纹比对</span>
+    </div>
+    <div class="f f5">
+      <b>发布门</b><span class="cost">30–60s</span>
+      <span class="d">DevTools CLI + pre-push<br>+ GitHub Actions</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 六行表格 ==================== -->
+<section>
+  <h2><span class="n">2</span>六层技术清单</h2>
+  <p class="lead">每行 = 一层，三列 = 用什么 / 干什么 / 为什么值得。</p>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:22%">层</th><th style="width:30%">用的技术</th><th>一句话作用</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pill b">L1–L3</span> 数据 / 逻辑 / 存储</td>
+        <td class="tech"><code>node:test</code> + <code>node:assert</code>，纯 CommonJS 纯函数</td>
+        <td>秒级、零依赖，覆盖绝大多数"判断类"bug</td>
+      </tr>
+      <tr>
+        <td><span class="pill g">L1b</span> 数据来源</td>
+        <td class="tech">来源快照 JSON + 逐条对齐断言</td>
+        <td>把"数据抄错一个数字"这种界面上看不出的错挡住</td>
+      </tr>
+      <tr>
+        <td><span class="pill p">L4</span> 页面</td>
+        <td class="tech"><b>自写 <code>wx</code>/<code>Page</code> 打桩</b>（<code>tests/helpers/miniapp-stub.js</code>）</td>
+        <td>让真实页面代码在 Node 里被驱动，抓"页面把数据拼错了"</td>
+      </tr>
+      <tr>
+        <td><span class="pill p">L4b</span> 界面质量</td>
+        <td class="tech">正则读 <b>WXSS</b> + WCAG 对比度公式 + rpx 阈值</td>
+        <td>对比度/字号/点按区变成<b>算得出来</b>的断言，零噪声</td>
+      </tr>
+      <tr>
+        <td><span class="pill a">L6 / L6b</span> E2E 与截图</td>
+        <td class="tech"><code>miniprogram-automator</code> ↔ <code>cli auto</code> WebSocket；零依赖 PNG 解码 + 指纹比对</td>
+        <td>在真实运行时里跑 102 条断言、19 张截图做视觉回归</td>
+      </tr>
+      <tr>
+        <td><span class="pill a">L5</span> + 发布门</td>
+        <td class="tech">开发者工具 CLI（<code>preview</code>/<code>upload</code>）+ <code>.githooks/pre-push</code> + <code>release:check</code> + GitHub Actions</td>
+        <td>编译/上传/版本号/分支与工作区全部可复算</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ==================== 最小必需 + 依赖实况 ==================== -->
+<section>
+  <h2><span class="n">3</span>最小必需三件套（换项目只留这些也能跑）</h2>
+  <div class="two">
+    <div>
+      <div class="card pad">
+        <b style="font-size:14px">① 内置测试器 + 一层纯函数断言</b>
+        <p class="tiny muted" style="margin:5px 0 0">node:test，零依赖、秒级。业务逻辑抽成纯函数是前提。</p>
+      </div>
+      <div class="card pad" style="margin-top:10px">
+        <b style="font-size:14px">② 一层"打桩 + 真实代码"的页面断言</b>
+        <p class="tiny muted" style="margin:5px 0 0">给 wx / Page 打桩，让页面代码在 Node 里被真正驱动 —— 专抓"数据拼错了"。</p>
+      </div>
+      <div class="card pad" style="margin-top:10px">
+        <b style="font-size:14px">③ 一个「期望条数常量」守卫</b>
+        <p class="tiny muted" style="margin:5px 0 0">EXPECTED_CHECKS：断言条数对不上就报警，防"中途崩了却报全绿"。</p>
+      </div>
+      <p class="tiny muted" style="margin:12px 0 0">
+        其余（E2E、截图基线、发布门、界面质量）都是<b>按需再加</b>的层 —— 它们不是"更高级"，而是各管一段不同的风险。
+      </p>
+    </div>
+    <div>
+      <div class="deps">
+        <span class="c">// package.json（实测，不是宣称）</span><br>
+        <span class="g">"dependencies"</span>: {},<br>
+        <span class="g">"devDependencies"</span>: {<br>
+        &nbsp;&nbsp;"miniprogram-automator": "^0.12.1"<br>
+        }<br>
+        <span class="c">// 小程序包本身：0 依赖、0 网络请求</span><br>
+        <span class="c">// 视觉基线用自写 PNG 解码器，不引图像库</span>
+      </div>
+      <div class="card pad" style="margin-top:12px">
+        <b style="font-size:13.5px">关键词</b>
+        <div class="chips">
+          <span>node:test</span><span>node:assert</span><span>wx/Page 打桩</span>
+          <span>WXSS + WCAG</span><span>rpx 阈值</span>
+          <span>miniprogram-automator</span><span>WebSocket :9420</span>
+          <span>evaluate 调真实处理函数</span><span>mp.screenshot</span>
+          <span>PNG 解码 + 行暗度指纹</span>
+          <span>DevTools CLI</span><span>pre-push hook</span><span>GitHub Actions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="crosslink">
+  需要展开时再往下看：<a href="./TESTING-METHOD.html">《小程序测试方法论：从开发主旨到断言设计》</a>
+  （原则 + 实现，含八条可迁移原则与照搬清单）
+  ｜ <a href="./TESTING-REPORT.html">《测试方案复盘》</a>（这个项目测试是怎么长出来的、踩了哪些坑）
+  ｜ 验收清单见仓库 <code>ACCEPTANCE.md</code>，测试细节见 <code>TESTING.md</code>
+</div>
+
+<footer>
+  六艺十式 · 测试技术栈一页纸 ｜ 对应项目 <code>v0.1.8</code>（build 2026-09-30.3）｜ 数字随每次提交更新
+</footer>
+
+</div>
+</body>
+</html>
