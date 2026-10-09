@@ -162,7 +162,8 @@ const STATES = [
     scroll: 2000
   },
   {
-    name: '17-home-bottom', desc: '首页滚到底 · 版本号 v0.1.7（所有环境都显示，验收 19）',
+    // 别把版本号写进描述：版本每次上传都会 bump，写死就会过时（这里原来写着 v0.1.7，实际已是 v0.1.8）
+    name: '17-home-bottom', desc: '首页滚到底 · 版本号（所有环境都显示，验收 19）',
     state: empty(),
     url: '/pages/index/index',
     scroll: 2000
