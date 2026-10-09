@@ -105,7 +105,126 @@ C = `tests/ui-quality.test.js`（43 组 WCAG 对比度 + 字号下限 + 点按�
 1. 先做 **L1**（设计令牌断言）—— 投入最小、收益最大，而且不依赖任何截图工具；
 2. 再做 **L4**（复用自己的基线）—— 我们已经有 19 张图 + 指纹比对 + 空白补拍 + 几何守卫，直接抄；
 3. 然后做 **L2**（Figma 结构比对）—— 需要 Figma 文件的节点几何（REST API 或 Dev Mode 导出），
-   比像素值钱得多；
-4. **L3/L5 按需**；`strict` 与设计稿的比对**不要做**。
+   比像素值钱得多（**但要比锚点、不要比树，见第八节**）；
+4. **L3/L5 按需**；`strict` 与设计稿的逐像素比对**不要做**（当门禁）。
 
 > 相关：本项目的实践细节见 `TESTING.md` 第六节之二（视觉回归基线）与 `TESTING-REPORT.html` 第 4 节「坑 C」。
+
+---
+
+## 七、修正一：不是"不用设计稿对比"，而是"别拿像素比对当门禁"
+
+第五节说"逐像素比设计稿不要做"，容易被读成"设计稿对比没用"。**更准确的说法是**：
+
+> 设计稿对比**值得做**，但要把它从"像素 diff"**降级成"规范 + 几何断言"**；像素 diff 只当提示，不当门禁。
+
+| 形态 | 比什么 | 噪声 | 定位 |
+|---|---|---|---|
+| ① **规范**（tokens） | 颜色 / 字号 / 行高 / 间距 / 圆角 / 触达区 | **零** | **门禁**（CI 能拦） |
+| ② **几何**（锚点元素） | 关键元素相对父级的位置/尺寸比例、对齐、间距、视觉顺序 | 低（数值 + 容差） | **门禁**（能拦，且能定位到元素） |
+| ③ **像素** | 截图对截图 | 高 | **提示**（人看，不拦） |
+
+**时机**：设计稿对比属于**设计走查**（每次迭代做一次、人工主导），不是"每次提交都跑的门禁"。
+把它做成门禁的结果，一定是团队两周内把它关掉。
+
+## 八、修正二：结构会变，所以要比"锚点"而不是比"树"
+
+"实现过程中组件和页面结构会发生变化"——这条完全成立，而且**正是"树形结构比对"会死掉的原因**：
+
+- Figma 的图层树（Frame/Group/Auto-layout）与 DOM/WXML 的组件树**本来就不是一回事**；
+- 实现过程中拆组件、加 wrapper、换 `<view>` 层级，**视觉完全没变、树却全变了**；
+- 树形 diff 会把"重构"报成"回归" —— 这就是误报的来源。
+
+**正确做法：锚点（design anchor）**，比"锚点对"的几何，不比"树的形状"：
+
+```
+Figma 侧                               代码侧                                     比对内容
+layer "home/main-card"          ←→    data-design="home.main-card"              相对父级的 x/y/w/h 比例
+layer "home/main-card/title"    ←→    data-design="home.main-card.title"        + 间距 / 对齐 / 字号
+layer "home/main-card/cta"      ←→    data-design="home.main-card.cta"          + 视觉顺序（锚点序列）
+```
+
+落地要点：
+
+1. **锚点写在代码里**：小程序 WXML 支持自定义 `data-*`（也可用稳定 class）；
+   取几何用 `wx.createSelectorQuery().select(...).boundingClientRect()`，
+   E2E 里也能走 automator 的元素 `boundingClientRect()`。
+2. **锚点映射表单独维护**（例如 `design-anchors.json`：Figma 图层名 ↔ 代码锚点）——
+   **重构时结构变了、映射不变 → 断言不炸**；只有"设计意图变了"（间距/尺寸/顺序）才红。
+3. 比的是**相对几何 + 不变量**，不是绝对像素：
+   `卡片内边距 = 父宽 × (24/375) ± 2px`、`主按钮高度 ≥ 88rpx`、`标题在卡片左上、间距 12rpx ±2`。
+4. **视觉顺序**用"锚点序列"表达（`[卡片, 标题, 标准行, 按钮]`）——
+   顺序错位是真实回归，但用序列而不是 DOM 树表达，就不怕包一层 wrapper。
+5. 判据一句话：**视觉测试只该对"视觉变化"报警**。锚点法天然做到（重构不报警），树形法天然做不到。
+6. 附带好处：失败信息能直接说"`home.main-card` 内边距是 28、设计稿是 24"，
+   比"第 437 行有 1.2% 像素不同"有用得多。
+
+> 结论：**结构会变 → 所以更不能比树。** 用锚点把"设计意图"从"实现结构"里解耦，
+> 这是"设计稿对比"能长期活下去的前提。
+
+## 九、BackstopJS 的原理（以及它为什么是这类工具里报告最好的）
+
+一句话：**配置驱动的"截图 → 比对 → 报告"CLI 框架**；渲染用 Chrome Headless（Puppeteer 或 Playwright），
+比对用 [Resemble.js](https://github.com/Huddle/Resemble.js)。
+
+### 1. 三条命令 = 一个基线流转环
+
+```
+backstop reference  ──截图──>  backstop_data/bitmaps_reference/      （基线，入库）
+backstop test       ──截图──>  backstop_data/bitmaps_test/<时间戳>/   （本次结果）
+                               └─ 与 reference 逐张比对
+                                  ├─> html_report/  浏览器报告：参考/本次/差异三视图 + 拖动对比
+                                  ├─> ci_report/    CI 用的 JUnit 报告
+                                  └─> 退出码 0 / 1
+backstop approve    ──把 test 提升为 reference（= "人看过图、认可了"这个动作）──> bitmaps_reference/
+```
+
+**`approve` 是它最值钱的设计**：报告里能拖动对比，看完一条命令固化新基线 ——
+它把"人必须看图"变成流程里的显式步骤，而不是一句口头约定。（我们项目的 `--update-baseline` 是同一个思路。）
+
+### 2. 一个 scenario 的执行流水线（属性按官方顺序生效）
+
+```
+label → onBeforeScript（设 cookie/state）→ goto url（或 referenceUrl）
+      → 等就绪：readyEvent（console.log 标记）/ readySelector / readyTimeout（默认 30s）
+      → delay（固定等待）
+      → 处理动态区：hideSelectors（visibility:hidden，**保留布局占位**）
+                    removeSelectors（从 DOM 删掉，**会改变布局**）
+      → onReadyScript（click / hover / keyPress / scrollToSelector / postInteractionWait）
+      → 截图 selectors：document（整页）/ viewport（视口）/ CSS 选择器
+                        （selectorExpansion 展开全部，expect 校验数量）
+      → 落盘 PNG（文件名模板 {scenarioLabel}_{selectorLabel}_{viewportLabel}）
+      → 与 reference 比对（Resemble.js）→ 报告 + 退出码
+```
+
+### 3. 比对这一步的关键参数（也是坑的清单）
+
+| 参数 | 默认 | 含义 / 坑 |
+|---|---|---|
+| `misMatchThreshold` | **0.1%** | 允许的差异像素占比。**Resemble 的 misMatchPercentage 只检测 0.01% 以上的差异** —— 要比更细需开 `usePreciseMatching` |
+| `requireSameDimensions` | **true** | 尺寸变了直接失败。**这就是"设备 / DPR 必须一致"的硬约束**（我们在小程序侧踩的是同一个坑：363×785 → 377×813） |
+| `resembleOutputOptions.ignoreAntialiasing` | false | 忽略抗锯齿边缘差异 —— 治"字体渲染不同"的噪声 |
+| `resembleOutputOptions.errorType` | — | 可设 `movement`（对位移更敏感），比纯色差更接近"元素跑了" |
+| `asyncCaptureLimit` / `asyncCompareLimit` | 10 / 50 | 并行度，按内存调 |
+| `engine` | `puppeteer` | 可换 `playwright`（chromium/firefox/webkit）；`engineOptions.storageState` 可带登录态 |
+
+### 4. 它专为"噪声"准备的两个开关（值得抄的工程思路）
+
+- `hideSelectors`（`visibility:hidden`，**保留布局**）vs `removeSelectors`（**从 DOM 移除**，会改布局）：
+  时间/头像/广告位这类动态内容用前者；"完全不参与、也不在乎布局变化"的用后者。
+- `backstop test --docker`：官方 README 直接贴了"同一页面在 Linux 与 Mac 上字体渲染不同"的对比图，
+  用容器把渲染环境钉死 —— **跨环境一致性的正解，而不是调阈值**。
+
+### 5. 诚实评价
+
+- **强**：报告最好（三视图 + 拖动 + 直接 approve）、`--filter` 只重跑失败的、可 `require('backstopjs')`
+  嵌进 Node 脚本、支持交互（click/hover/keypress/scroll）后再截图。
+- **弱**：像素比对无语义（按钮左右互换但像素差低于阈值 → 静默通过）；基线入库会膨胀
+  （官方建议 `.gitignore` 掉 `html_report/` 与 `bitmaps_test/`）；approve 流程要跑本地 server；
+  只吃 **URL**，所以**小程序本体喂不进去**。
+- ⚠️ **维护风险**：官方 README 顶部现在写着「**BackstopJS needs a new maintainer/owner**」——
+  选它就要接受"可能停止维护"；长期支持上 Playwright 内置的 `toHaveScreenshot()` 更稳。
+- **与本项目的关系**：我们有 `preview/index.html`（同一份 `arts.js` / `progress.js` 注入的网页预览），
+  所以"用 BackstopJS 测网页预览"可行（但要诚实标注：测的是网页版，不是小程序本体）。
+  另外 `e2e/shots.js` + 指纹本质就是一个"迷你 BackstopJS"，差别在于：
+  **我们直接驱动小程序运行时（更真），但报告能力弱（没有三视图、没有 approve 流程）。**
