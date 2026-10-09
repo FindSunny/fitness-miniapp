@@ -3,277 +3,235 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>测试实况看板 · 六艺十式</title>
+<title>测试是怎么跑起来的 · 六艺十式</title>
 <style>
-  /* ===================== 设计令牌：暖白 + 森林绿 ===================== */
+  /* ============ 多巴胺调色板 ============ */
   :root{
-    --bg:#F5F5EF;            /* 米白背景 */
-    --card:#FFFEFB;          /* 暖白卡片 */
-    --card-2:#FBFBF4;
-    --ink:#1F2A22;           /* 深森林绿（正文） */
-    --ink-strong:#16311F;    /* 标题 */
-    --forest:#2F5D46;        /* 主色 */
-    --forest-dk:#1F4735;
-    --forest-soft:#E8EFE9;
-    --moss:#6E8B72;
-    --muted:#6B7568;
-    --faint:#96A096;
-    --brick:#A8443A;         /* 砖红：未满足 / 失败 */
-    --brick-soft:#F7E8E4;
-    --lime:#B9CE3B;          /* 黄绿：原文高亮 */
-    --lime-soft:#EDF3C9;
-    --border:#E3E2D7;
-    --line:#EFEEE5;
-    --shadow:0 1px 2px rgba(31,71,53,.04), 0 12px 28px -22px rgba(31,71,53,.28);
-    --mono:ui-monospace,'SFMono-Regular',Consolas,'Courier New',monospace;
+    --pink:#FF2E93; --pink-l:#FFD6EC;
+    --lime:#C8FF3D; --lime-l:#EEFFC9;
+    --cyan:#22E1FF; --cyan-l:#D4F7FF;
+    --orange:#FF8A00; --orange-l:#FFE6C7;
+    --purple:#A855F7; --purple-l:#EDDCFF;
+    --yellow:#FFE24B;
+    --ink:#141018; --paper:#FFFDF7; --grid:#E9E4F5;
+    --ok:#00C46A; --bad:#FF3B30;
+    --shadow:5px 5px 0 var(--ink);
+    --shadow-sm:3px 3px 0 var(--ink);
   }
   *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
+  html{scroll-behavior:smooth}
   body{
-    margin:0;padding:0 0 60px;background:var(--bg);color:var(--ink);
-    font:15px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+    margin:0;padding:0 0 70px;color:var(--ink);background:var(--paper);
+    font:16px/1.65 'Segoe UI','Microsoft YaHei','PingFang SC',system-ui,sans-serif;
+    overflow-x:hidden;
   }
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  /* 背景彩色斑块（多巴胺的底色） */
+  body::before,body::after{content:"";position:fixed;z-index:0;border-radius:50%;filter:blur(60px);opacity:.55;pointer-events:none}
+  body::before{width:520px;height:520px;background:var(--cyan-l);top:-140px;left:-120px}
+  body::after{width:620px;height:620px;background:var(--pink-l);bottom:-220px;right:-180px}
+  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 20px}
 
-  /* ===================== 页头 ===================== */
-  header.top{padding:34px 0 0}
-  .eyebrow{display:flex;align-items:center;gap:8px;color:var(--forest);font-size:12.5px;font-weight:600;letter-spacing:.08em}
-  .eyebrow::before{content:'';width:16px;height:1px;background:var(--forest)}
-  h1{margin:12px 0 8px;font-size:clamp(23px,3.6vw,31px);line-height:1.3;font-weight:650;letter-spacing:-.01em;color:var(--ink-strong)}
-  h1 .accent{color:var(--forest)}
-  .subtitle{margin:0;max-width:74ch;color:var(--muted);font-size:14.5px}
+  /* ============ 顶部 ============ */
+  .top{padding:34px 0 8px}
+  .kicker{display:inline-block;background:var(--ink);color:var(--yellow);font-weight:800;font-size:12px;
+    letter-spacing:.16em;text-transform:uppercase;padding:6px 14px;border-radius:999px;transform:rotate(-1.5deg)}
+  h1{font-size:clamp(26px,5.4vw,46px);line-height:1.1;margin:16px 0 10px;font-weight:900;letter-spacing:-.02em}
+  h1 .hl{background:linear-gradient(100deg,var(--pink),var(--orange) 45%,var(--lime));-webkit-background-clip:text;
+    background-clip:text;color:transparent}
+  .sub{font-size:16px;color:#4b4457;max-width:70ch;margin:0 0 6px}
+  .sub b{background:var(--lime);padding:0 5px;border-radius:5px}
 
-  /* KPI */
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0 0}
-  .kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
-  .kpi .v{font-size:32px;font-weight:680;letter-spacing:-.02em;color:var(--forest-dk);line-height:1.15}
-  .kpi .v small{font-size:14px;font-weight:600;color:var(--moss);margin-left:3px}
-  .kpi .k{font-size:12.5px;color:var(--muted);margin-top:4px}
-  .kpi .meta{font-size:11.5px;color:var(--faint);margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+  /* 大按钮 */
+  .runbar{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0 6px}
+  .run{display:flex;flex-direction:column;gap:2px;border:3px solid var(--ink);border-radius:16px;
+    background:#fff;box-shadow:var(--shadow);padding:12px 16px;cursor:pointer;transition:.14s;min-width:210px}
+  .run:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+  .run:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+  .run code{font-family:ui-monospace,Consolas,monospace;font-size:14.5px;font-weight:800}
+  .run span{font-size:12px;color:#5b5470}
+  .run[data-on="1"]{background:var(--lime)}
+  .run[data-on="1"] span{color:#2f3a05}
 
-  /* ===================== 区块 ===================== */
-  section{margin-top:34px}
-  .sec-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
-  h2{margin:0;font-size:18px;font-weight:650;color:var(--ink-strong);letter-spacing:-.01em}
-  .sec-head .idx{font:600 12px/1 var(--mono);color:var(--moss);border:1px solid var(--border);background:var(--card);border-radius:6px;padding:4px 7px}
-  .sec-desc{margin:6px 0 16px;color:var(--muted);font-size:13.5px;max-width:84ch}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
-  .pad{padding:18px 20px}
+  /* 数字卡 */
+  .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0 8px}
+  .num{border:3px solid var(--ink);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow-sm);background:#fff}
+  .num:nth-child(1){background:var(--cyan)}
+  .num:nth-child(2){background:var(--lime)}
+  .num:nth-child(3){background:var(--orange)}
+  .num:nth-child(4){background:var(--purple);color:#fff}
+  .num b{display:block;font-size:32px;font-weight:900;line-height:1.05;letter-spacing:-.02em}
+  .num span{font-size:12px;font-weight:700}
 
-  /* 关键结论 */
-  .findings{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .find{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--forest);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
-  .find h3{margin:0 0 6px;font-size:14.5px;font-weight:650;color:var(--ink-strong)}
-  .find p{margin:0;font-size:13.5px;color:var(--muted)}
-  .find .tag{display:inline-block;font-size:11.5px;font-weight:600;color:var(--forest);background:var(--forest-soft);border-radius:5px;padding:2px 7px;margin-bottom:8px}
-  .find.warn{border-left-color:var(--brick)}
-  .find.warn .tag{color:var(--brick);background:var(--brick-soft)}
+  /* ============ 通用块 ============ */
+  section{margin-top:40px}
+  h2{font-size:clamp(20px,3.4vw,29px);font-weight:900;margin:0 0 6px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  h2 .badge{background:var(--ink);color:#fff;font-size:13px;padding:5px 12px;border-radius:999px;font-weight:800;transform:rotate(-1.5deg)}
+  .hint{color:#5b5470;font-size:14px;margin:0 0 16px;max-width:80ch}
+  .card{background:#fff;border:3px solid var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:18px}
+  .card+.card{margin-top:14px}
 
-  /* 条形图 */
-  .charts{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
-  .chart .chart-title{font-size:13.5px;font-weight:650;color:var(--ink-strong);margin-bottom:2px}
-  .chart .chart-note{font-size:11.5px;color:var(--faint);margin-bottom:14px}
-  .bars{display:flex;flex-direction:column;gap:9px}
-  .bar-row{display:grid;grid-template-columns:118px 1fr 46px;gap:10px;align-items:center;font-size:12.5px}
-  .bar-row .lab{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bar-row .lab em{font-style:normal;color:var(--faint)}
-  .bar-track{height:9px;background:var(--card-2);border:1px solid var(--line);border-radius:999px;overflow:hidden}
-  .bar-fill{height:100%;background:var(--forest);border-radius:999px;transition:width .5s ease}
-  .bar-fill.alt{background:var(--moss)}
-  .bar-fill.lime{background:var(--lime)}
-  .bar-row .num{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
-  .cost .bar-row{grid-template-columns:104px 1fr 62px}
-
-  /* 阶段切换 */
-  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
-  .tab{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);
-    border-radius:9px;padding:9px 14px;font:inherit;font-size:13.5px;font-weight:600;color:var(--ink);
-    cursor:pointer;box-shadow:0 1px 2px rgba(31,71,53,.03);transition:.15s}
-  .tab:hover{border-color:var(--moss);background:#fff}
-  .tab[aria-selected="true"]{background:var(--forest);border-color:var(--forest);color:#fff}
-  .tab .n{font:600 11.5px/1 var(--mono);opacity:.6}
-  .tab[aria-selected="true"] .n{opacity:.85}
+  /* Tab */
+  .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 16px}
+  .tab{border:3px solid var(--ink);border-radius:999px;padding:9px 18px;font-weight:800;font-size:14.5px;
+    background:#fff;cursor:pointer;box-shadow:var(--shadow-sm);transition:.12s;display:flex;align-items:center;gap:8px}
+  .tab:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+  .tab[aria-selected="true"]{background:var(--ink);color:var(--yellow)}
+  .tab .dot{width:10px;height:10px;border-radius:50%;background:var(--cyan);border:2px solid var(--ink)}
+  .tab[aria-selected="true"] .dot{background:var(--lime)}
   .panel[hidden]{display:none}
 
-  /* 流程 chips */
-  .pipe{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:2px 0 0}
-  .chip{background:var(--card-2);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:12.5px;color:var(--ink)}
-  .chip.k{background:var(--forest-soft);border-color:#D3E0D6;color:var(--forest-dk);font-weight:600}
-  .arw{color:var(--faint);font-size:12px}
+  /* 步骤时间轴 */
+  .steps{display:flex;flex-direction:column;gap:10px;counter-reset:s}
+  .step{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;background:#fff;
+    border:3px solid var(--ink);border-radius:16px;padding:12px 16px 12px 12px;box-shadow:var(--shadow-sm)}
+  .step .idx{counter-increment:s;width:44px;height:44px;border-radius:12px;background:var(--cyan);
+    border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px}
+  .step .idx::before{content:counter(s)}
+  .step:nth-child(2) .idx{background:var(--lime)}
+  .step:nth-child(3) .idx{background:var(--yellow)}
+  .step:nth-child(4) .idx{background:var(--orange)}
+  .step:nth-child(5) .idx{background:var(--purple);color:#fff}
+  .step:nth-child(6) .idx{background:var(--pink);color:#fff}
+  .step b{font-size:15.5px}
+  .step p{margin:3px 0 0;font-size:14px;color:#4b4457}
+  .step .code{font-family:ui-monospace,Consolas,monospace;font-size:13px;background:#F4F1FF;
+    border:2px solid var(--ink);border-radius:8px;padding:2px 7px;display:inline-block;margin:4px 4px 0 0}
 
-  /* 步骤 */
-  .steps{display:flex;flex-direction:column;gap:0;counter-reset:s}
-  .step{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:13px 0;border-top:1px solid var(--line)}
-  .step:first-child{border-top:none}
-  .step .idx{counter-increment:s;width:24px;height:24px;border-radius:7px;background:var(--forest-soft);
-    color:var(--forest-dk);font:600 12px/24px var(--mono);text-align:center}
-  .step .idx::before{content:counter(s,decimal-leading-zero)}
-  .step b{font-size:14px;font-weight:650;color:var(--ink-strong)}
-  .step p{margin:4px 0 0;font-size:13.5px;color:var(--muted)}
-  code{font-family:var(--mono);font-size:12.5px;background:var(--card-2);border:1px solid var(--line);
-    border-radius:5px;padding:1px 5px;color:var(--forest-dk)}
+  /* 流水线 chips */
+  .pipe{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+  .chip{background:var(--yellow);border:3px solid var(--ink);border-radius:999px;padding:6px 13px;font-size:13px;font-weight:800;box-shadow:var(--shadow-sm)}
+  .chip.p{background:var(--pink);color:#fff}
+  .chip.c{background:var(--cyan)}
+  .chip.l{background:var(--lime)}
+  .chip.o{background:var(--orange)}
+  .chip.u{background:var(--purple);color:#fff}
+  .arw{font-weight:900;color:var(--ink);opacity:.5}
 
-  /* 明细（用例） */
-  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-  input[type=search]{flex:1;min-width:220px;background:var(--card);border:1px solid var(--border);border-radius:9px;
-    padding:9px 13px;font:inherit;font-size:13.5px;color:var(--ink);outline:none}
-  input[type=search]:focus{border-color:var(--moss);box-shadow:0 0 0 3px rgba(47,93,70,.07)}
-  .btn{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 13px;
-    font:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
-  .btn:hover{border-color:var(--moss);background:#fff}
-  .grp{border:1px solid var(--border);border-radius:11px;background:var(--card);overflow:hidden;margin-bottom:8px}
-  .grp>summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;cursor:pointer;list-style:none;padding:11px 14px}
+  /* 用例清单 */
+  .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  input[type=search]{flex:1;min-width:220px;border:3px solid var(--ink);border-radius:999px;padding:10px 16px;
+    font-size:14.5px;font-family:inherit;box-shadow:var(--shadow-sm);outline:none;background:#fff}
+  input[type=search]:focus{background:var(--lime-l)}
+  .btn{border:3px solid var(--ink);border-radius:999px;background:#fff;font-weight:800;font-size:13.5px;
+    padding:9px 15px;cursor:pointer;box-shadow:var(--shadow-sm);font-family:inherit}
+  .btn:hover{background:var(--yellow);transform:translate(-1px,-1px)}
+  .grp{border:3px solid var(--ink);border-radius:16px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm);margin-bottom:10px}
+  .grp>summary{cursor:pointer;list-style:none;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    background:linear-gradient(90deg,var(--cyan-l),#fff)}
   .grp>summary::-webkit-details-marker{display:none}
-  .grp>summary::before{content:'+';font:600 14px/1 var(--mono);color:var(--moss);width:12px}
-  .grp[open]>summary::before{content:'−'}
-  .grp .tag{font:600 11.5px/1 var(--mono);color:var(--forest);background:var(--forest-soft);border-radius:5px;padding:3px 6px}
-  .grp .gname{font-size:13.5px;font-weight:600;color:var(--ink-strong)}
-  .grp .gnote{font-size:12.5px;color:var(--faint)}
-  .grp .gcount{margin-left:auto;font:600 12px/1 var(--mono);color:var(--muted)}
-  .cases{padding:2px 14px 12px}
-  .case{display:grid;grid-template-columns:14px 1fr;gap:8px;padding:5px 0;font-size:13.5px;border-top:1px solid var(--line)}
-  .case i{font-style:normal;color:var(--moss);font-size:12px}
-  .case.reg i{color:var(--brick)}
-  .case .hl{background:var(--lime-soft);border-bottom:1px solid #D9E48F;border-radius:3px;padding:0 3px}
+  .grp .tag{background:var(--ink);color:#fff;font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px}
+  .grp .gname{font-weight:900;font-size:15px}
+  .grp .gcount{margin-left:auto;font-size:12.5px;font-weight:800;background:var(--lime);border:2px solid var(--ink);border-radius:999px;padding:2px 10px}
+  .cases{padding:6px 16px 14px}
+  .case{display:grid;grid-template-columns:22px 1fr;gap:8px;padding:5px 0;font-size:14px;border-bottom:1px dashed var(--grid)}
+  .case:last-child{border-bottom:none}
+  .case i{font-style:normal;color:var(--ok);font-weight:900}
+  .case.reg i{color:var(--orange)}
+  .case .rn{background:var(--orange-l);border-radius:5px;padding:0 4px}
 
   /* 日志 */
-  .logcard{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
-  .logbar{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--card-2);flex-wrap:wrap}
-  .logbar .fname{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .logbox{border:3px solid var(--ink);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);background:#0C1024}
+  .logbar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#171B3A;border-bottom:3px solid var(--ink);flex-wrap:wrap}
+  .dots{display:flex;gap:6px}
+  .dots i{width:12px;height:12px;border-radius:50%;display:block}
+  .dots i:nth-child(1){background:var(--pink)}
+  .dots i:nth-child(2){background:var(--yellow)}
+  .dots i:nth-child(3){background:var(--lime)}
+  .logbar .fname{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:#9FA6D8}
   .logbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
-  .logbar .spd{font:600 11.5px/1 var(--mono);color:var(--faint)}
-  .logbar .btn{padding:6px 11px;font-size:12.5px}
-  pre.log{margin:0;padding:14px 16px;max-height:430px;overflow:auto;background:#FCFCF7;
-    font-family:var(--mono);font-size:12.5px;line-height:1.75;color:#3A463C;white-space:pre-wrap;word-break:break-word}
-  pre.log .ok{color:var(--forest);font-weight:600}
-  pre.log .bad{color:var(--brick);font-weight:600}
-  pre.log .dim{color:var(--faint)}
-  pre.log .hd{color:var(--forest-dk);font-weight:600}
+  .logbar .btn{background:#232A57;color:#E8ECFF;border-color:#3A4380;box-shadow:none;padding:6px 12px}
+  .logbar .btn:hover{background:var(--yellow);color:var(--ink);border-color:var(--ink)}
+  .logbar .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .spd{font-family:ui-monospace,monospace;font-size:12px;color:#9FA6D8}
+  pre.log{margin:0;padding:14px 16px;max-height:420px;overflow:auto;font-family:ui-monospace,Consolas,monospace;
+    font-size:12.5px;line-height:1.6;color:#C9D2FF;white-space:pre-wrap;word-break:break-word}
+  pre.log .ok{color:#5AE68F}
+  pre.log .bad{color:#FF6B6B;font-weight:700}
+  pre.log .dim{color:#6B74A8}
+  pre.log .hd{color:var(--yellow);font-weight:700}
+  .cursor{display:inline-block;width:9px;height:15px;background:var(--lime);vertical-align:-2px;animation:bl .9s steps(2) infinite}
+  @keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
 
-  /* 风险卡（砖红） */
-  .risks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  .risk{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--brick);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
-  .risk h3{margin:0 0 6px;font-size:14px;font-weight:650;color:var(--ink-strong)}
-  .risk .who{display:inline-block;font:600 11.5px/1 var(--mono);color:var(--brick);background:var(--brick-soft);border-radius:5px;padding:3px 6px;margin-bottom:8px}
-  .risk p{margin:0;font-size:13.5px;color:var(--muted)}
+  /* 失败读法 */
+  .fail3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .fail3 .f{border:3px solid var(--ink);border-radius:18px;padding:14px 16px;background:#fff;box-shadow:var(--shadow-sm)}
+  .fail3 .f h4{margin:0 0 6px;font-size:15px;font-weight:900}
+  .fail3 .f .who{display:inline-block;font-size:11.5px;font-weight:800;padding:2px 9px;border-radius:999px;border:2px solid var(--ink);margin-bottom:8px}
+  .fail3 .f:nth-child(1) .who{background:var(--pink);color:#fff}
+  .fail3 .f:nth-child(2) .who{background:var(--cyan)}
+  .fail3 .f:nth-child(3) .who{background:var(--lime)}
+  .fail3 .f p{margin:0;font-size:13.5px;color:#4b4457}
+  .fail3 .f code{background:#F4F1FF;border:2px solid var(--ink);border-radius:6px;padding:1px 5px;font-size:12.5px}
 
   /* 页脚 */
-  footer.foot{margin-top:34px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow)}
-  .foot h3{margin:0 0 8px;font-size:14.5px;font-weight:650;color:var(--ink-strong)}
-  .foot p{margin:0 0 8px;font-size:13.5px;color:var(--muted)}
-  .foot .cmds{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
-  .foot .cmds code{padding:5px 9px}
-  .links{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
-  .links a{color:var(--forest);text-decoration:none;font-size:13.5px;font-weight:600;border-bottom:1px solid rgba(47,93,70,.28)}
-  .links a:hover{border-bottom-color:var(--forest)}
+  .foot{margin-top:38px;border:3px solid var(--ink);border-radius:20px;background:var(--ink);color:#fff;
+    padding:20px 22px;box-shadow:var(--shadow)}
+  .foot h3{margin:0 0 8px;font-size:17px;font-weight:900;color:var(--yellow)}
+  .foot code{background:#2A2A44;color:var(--lime);border-radius:6px;padding:2px 7px;font-size:13px}
+  .foot .fl{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .foot a{color:var(--ink);background:var(--lime);border:2px solid #fff;border-radius:999px;padding:6px 13px;
+    font-size:13px;font-weight:800;text-decoration:none}
+  .foot a:hover{background:var(--cyan)}
 
-  @media (max-width:900px){
-    .kpis{grid-template-columns:repeat(2,1fr)}
-    .findings,.charts,.risks{grid-template-columns:1fr}
+  .float{animation:fl 5s ease-in-out infinite}
+  @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  .pop{animation:pop .25s ease-out}
+
+  @media (max-width:860px){
+    .nums,.fail3{grid-template-columns:repeat(2,1fr)}
+    .run{flex:1 1 100%}
   }
   @media print{
-    body{background:#fff}
-    .logbar,.toolbar{display:none}
+    body::before,body::after{display:none}
+    .logbar,.tools,.runbar{display:none}
     .panel[hidden]{display:block!important}
-    pre.log{max-height:none;background:#fff}
-    .card,.grp,.step,.risk{break-inside:avoid}
+    pre.log{max-height:none;background:#fff;color:#111}
+    .card,.grp,.step{break-inside:avoid}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- ===================== 页头 + KPI ===================== -->
+  <!-- ===================== 顶部 ===================== -->
   <header class="top">
-    <div class="eyebrow">测试实况 · 六艺十式</div>
-    <h1>触发测试之后，<span class="accent">实际跑了什么</span></h1>
-    <p class="subtitle">
-      本项目当前真实运行的三遍测试：秒级的 Node 断言、微信开发者工具里真实小程序运行时的 E2E、
-      以及 19 张截图的视觉基线。下列指标、用例名与日志均取自实际运行结果（非示意）。
+    <span class="kicker">六艺十式 · 测试实况</span>
+    <h1>触发测试之后，<span class="hl">到底跑了什么</span>？</h1>
+    <p class="sub">
+      这是本项目<b>现在真实在跑</b>的三遍测试：秒级的 Node 断言、真实小程序运行时里的 E2E、以及 19 张截图的视觉基线。
+      下面每个阶段的步骤、用例名、日志，都取自实际运行（不是示意）。
     </p>
 
-    <div class="kpis">
-      <div class="kpi">
-        <div class="v">111<small>条</small></div>
-        <div class="k">Node 断言</div>
-        <div class="meta">约 0.22 秒 · 6 个测试文件 · 零依赖</div>
+    <div class="runbar">
+      <div class="run" data-go="node" data-on="1">
+        <code>npm test</code><span>Node 层断言 · 约 0.2 秒 · 零依赖</span>
       </div>
-      <div class="kpi">
-        <div class="v">102<small>条</small></div>
-        <div class="k">E2E 断言</div>
-        <div class="meta">15 个场景 · 1–2 分钟 · 真实运行时</div>
+      <div class="run" data-go="e2e">
+        <code>npm run e2e</code><span>真实运行时 E2E · 1–2 分钟</span>
       </div>
-      <div class="kpi">
-        <div class="v">19<small>张</small></div>
-        <div class="k">截图基线</div>
-        <div class="meta">行暗度指纹比对 · 容忍 1px 位移</div>
+      <div class="run" data-go="shots">
+        <code>npm run e2e:shots</code><span>截图 + 视觉基线比对 · 约 1 分钟</span>
       </div>
-      <div class="kpi">
-        <div class="v">0<small>个</small></div>
-        <div class="k">运行时依赖</div>
-        <div class="meta">仅 1 个 devDependency（官方 automator）</div>
-      </div>
+    </div>
+
+    <div class="nums">
+      <div class="num"><b>111</b><span>Node 断言</span></div>
+      <div class="num"><b>102</b><span>E2E 断言 / 15 场景</span></div>
+      <div class="num"><b>19</b><span>截图基线</span></div>
+      <div class="num"><b>0</b><span>运行时依赖</span></div>
     </div>
   </header>
 
-  <!-- ===================== 关键结论 ===================== -->
-  <section id="findings">
-    <div class="sec-head"><span class="idx">01</span><h2>关键结论</h2></div>
-    <p class="sec-desc">先给判断，再给明细；下面每一节都能追到具体用例与日志。</p>
-    <div class="findings">
-      <div class="find">
-        <span class="tag">成本结构</span>
-        <h3>判断类问题全部压在秒级层，E2E 只负责它独有的风险</h3>
-        <p>111 条 Node 断言跑完约 0.22 秒，E2E 的 102 条需要 1–2 分钟。因此凡是纯函数层能判定的，一律不放到 E2E —— 后者只验证真实渲染、页面流程与原生行为。</p>
-      </div>
-      <div class="find">
-        <span class="tag">覆盖重心</span>
-        <h3>页面层占 42%，且其中 81% 是本项目专属语义</h3>
-        <p>47 条页面断言里 38 条围绕"锁定式推进、达标解锁、三态列表"等产品规则。这类断言最值钱，也最需要绑定依据（验收清单 / 来源快照），否则会随需求腐化。</p>
-      </div>
-      <div class="find">
-        <span class="tag">数据可信</span>
-        <h3>60 式标准逐条对回来源快照，差异必须在案</h3>
-        <p>58/60 一字不差，2 处刻意修正在测试里有记录，并有"反向断言"防止有人改快照让数据看起来对齐。</p>
-      </div>
-      <div class="find warn">
-        <span class="tag">已知缺口</span>
-        <h3>视觉基线的余量偏薄，且基线本身不判对错</h3>
-        <p>同代码跨会话重跑时噪声已达 5 行坏行，触发线是 6 行；基线记录的是"上次被认可的样子"，对错仍由人工审批与上游规范决定。</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== 分类条形图 ===================== -->
-  <section id="charts">
-    <div class="sec-head"><span class="idx">02</span><h2>分布与成本</h2></div>
-    <p class="sec-desc">左：Node 断言按层分布（数字取自测试文件实际条数）。右：三遍测试的耗时对比，以及 E2E 各场景的断言密度。</p>
-    <div class="charts">
-      <div class="card pad chart">
-        <div class="chart-title">Node 断言的分层分布</div>
-        <div class="chart-note">共 111 条 · 越靠上越便宜，也越容易被忽略</div>
-        <div class="bars" id="chart-layers"></div>
-      </div>
-      <div class="card pad chart cost">
-        <div class="chart-title">三遍测试的耗时</div>
-        <div class="chart-note">条形按最长者归一；Node 层约为 E2E 的 1/400</div>
-        <div class="bars" id="chart-cost"></div>
-        <div class="chart-title" style="margin-top:18px">E2E 各场景断言密度</div>
-        <div class="chart-note">15 个场景 · 单场景 1–14 条</div>
-        <div class="bars" id="chart-scenes"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== 阶段切换（交互） ===================== -->
-  <section id="stages">
-    <div class="sec-head"><span class="idx">03</span><h2>三个阶段：逐层展开</h2></div>
-    <p class="sec-desc">选择阶段，查看它的执行步骤、全部用例明细（可搜索）与实际运行日志（可逐行重播）。</p>
+  <!-- ===================== 阶段切换 ===================== -->
+  <section id="stage">
+    <h2><span class="badge">①</span>三个阶段：点一下切换</h2>
+    <p class="hint">选中一个阶段，看它触发后逐步做了什么、有哪些用例、以及<b>真实日志</b>（可点「重播」逐行播放）。</p>
 
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" aria-selected="true" data-tab="node"><span class="n">01</span>Node 断言 · npm test</button>
-      <button class="tab" role="tab" aria-selected="false" data-tab="e2e"><span class="n">02</span>E2E · npm run e2e</button>
-      <button class="tab" role="tab" aria-selected="false" data-tab="shots"><span class="n">03</span>截图基线 · npm run e2e:shots</button>
+      <button class="tab" role="tab" aria-selected="true" data-tab="node"><span class="dot"></span>Node 断言 · npm test</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="e2e"><span class="dot" style="background:var(--orange)"></span>E2E · npm run e2e</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="shots"><span class="dot" style="background:var(--purple)"></span>截图基线 · npm run e2e:shots</button>
     </div>
 
     <div class="panel" data-panel="node"></div>
@@ -281,139 +239,114 @@
     <div class="panel" data-panel="shots" hidden></div>
   </section>
 
-  <!-- ===================== 风险与判读 ===================== -->
-  <section id="risks">
-    <div class="sec-head"><span class="idx">04</span><h2>未满足项与误判风险</h2></div>
-    <p class="sec-desc">测试自身的输出同样可能骗人。以下三种情况本项目都实际遇到过，均已加守卫。</p>
-    <div class="risks">
-      <div class="risk">
+  <!-- ===================== 失败怎么读 ===================== -->
+  <section id="fail">
+    <h2><span class="badge">②</span>红了怎么读</h2>
+    <p class="hint">测试自己的输出也要能被判读 —— 这三种情况最容易误判。</p>
+    <div class="fail3">
+      <div class="f">
         <span class="who">E2E · 条数守卫</span>
-        <h3>场景中途崩溃却报全绿</h3>
-        <p>脚本内含 <code>EXPECTED_CHECKS = 102</code>：实际通过条数与期望不符即报警，不给"中止即成功"的机会。</p>
+        <h4>跑一半崩了，却报全绿</h4>
+        <p>脚本里写着 <code>EXPECTED_CHECKS = 102</code>：实际通过条数对不上就直接报警，不给"中止即成功"的机会。</p>
       </div>
-      <div class="risk">
+      <div class="f">
         <span class="who">截图 · 几何守卫</span>
-        <h3>19 张被误判为"全部变化"</h3>
-        <p>工具窗口尺寸改变（363×785 → 377×813）会使指纹逐行失配。现改为单独提示"环境尺寸变化、不可比"，不再逐张报红。</p>
+        <h4>19 张全被标"变了"</h4>
+        <p>工具窗口尺寸变了（363×785 → 377×813）会让指纹逐行失配。现在会<b>单独提示</b>"这不是内容变化"，不再逐张刷屏。</p>
       </div>
-      <div class="risk">
+      <div class="f">
         <span class="who">截图 · 空白补拍</span>
-        <h3>空白图被当成成功</h3>
-        <p>加了体积下限，并只对"空白"补拍一次；断言失败、页面报错照旧抛出 —— 补拍不等于把红改绿。</p>
+        <h4>一张 10KB 白板算成功</h4>
+        <p>体积下限 + 只对"空白"补拍一次（约 2 秒）；断言失败、页面报错照旧抛出来 —— 补拍不是把红变绿。</p>
       </div>
     </div>
   </section>
 
   <!-- ===================== 页脚 ===================== -->
-  <footer class="foot">
-    <h3>在本机运行</h3>
-    <p>前置：Node ≥ 20（本机 24）与微信开发者工具（E2E 与截图需要它，且需图形环境）。</p>
-    <div class="cmds">
+  <div class="foot">
+    <h3>在你机器上怎么跑</h3>
+    <p style="margin:0 0 4px;font-size:14px;color:#D8D8F0">
+      前置：Node ≥ 20（本机 24）＋ 微信开发者工具（E2E 与截图需要它，且是 Windows 图形环境）。
+    </p>
+    <div class="fl">
       <code>npm test</code><code>npm run e2e:serve</code><code>npm run e2e</code><code>npm run e2e:shots</code>
     </div>
-    <p style="margin-top:10px">跑 E2E 期间不要修改项目文件（会触发重编译并清空页面栈）。E2E 不进 CI：它需要图形环境，跑不了就不假装绿，CI 只跑 <code>npm test</code>。</p>
-    <p>数据来源：用例名与日志由 <code>tools/collect-test-data.mjs</code> 从仓库与真实运行中采集（日志已脱敏），随每次提交更新。</p>
-    <div class="links">
-      <a href="./TESTING-STACK.html">测试技术栈 · 一页纸</a>
-      <a href="./TESTING-METHOD.html">小程序测试方法论</a>
-      <a href="./TESTING-REPORT.html">测试方案复盘</a>
-      <a href="./ACCEPTANCE.md">验收清单（36 项）</a>
-    </div>
-  </footer>
+    <p style="margin:12px 0 0;font-size:13px;color:#B9BCE0">
+      跑 E2E 期间不要改项目文件（会触发重编译、清空页面栈）。E2E 不进 CI：它需要图形环境，
+      跑不了就不假装绿 —— CI 只跑 <code>npm test</code>。
+    </p>
+    <p style="margin:10px 0 0;font-size:13px;color:#B9BCE0">
+      数据来源：用例名与日志由 <code>tools/collect-test-data.mjs</code> 从仓库与真实运行中采集，随每次提交更新。
+    </p>
+  </div>
 
 </div>
 
-<!-- ===================== 真实数据（由 tools/collect-test-data.mjs 注入） ===================== -->
+<!-- ===================== 真实数据（采集自仓库与实际运行） ===================== -->
 <!-- DATA:START -->
-<script id="testdata" type="application/json">{"version":"0.1.8","stamp":"2026-09-30.3","collectedAt":"2026-10-09 10:05","node":{"total":111,"files":[{"file":"tests/data.test.js","layer":"L1","name":"数据完整性","note":"60 式的内容与合规检查","tests":["构建标记：build-info 的 version 必须与 package.json 一致","六艺齐全，顺序与名称正确","每艺都是 10 式，式号连续","全部动作 id 唯一（60 个）","每式都有三档标准，且数值单调不减","单位只允许 reps / sec","倒立撑前三式是计时（秒），其余都是计次","偏重/单臂类动作标记为每侧","引用到的示意图文件必须真实存在","俯卧撑十式图已画全（MVP 主线）","六艺每一式都必须有自己的示意图（60 张，且每张的引用指向自己那一式）","六艺都有首页封面图","存疑数据必须写明 note（不允许悄悄改数）","数据里不能出现医疗类表述","每一式都有\"要点\"，且是一句话而不是半截话","每一艺都写明器械条件，且不许说\"零器械\"","查询 API 正常"]},{"file":"tests/data-source.test.js","layer":"L1b","name":"数据来源对齐","note":"每一式标准与来源快照逐条核对","tests":["来源快照本身完整：六艺 × 十式，每式三档","60 式标准与来源逐条对齐（差异只允许是已记录的那几条）","已记录的修正必须\"真的在修正\"（快照更新了就不该再挂着）","「每侧」标记与来源一致（来源写了\"全部为每侧\"的，我们必须是 true）","单位与来源一致（倒立撑前三式是秒，其余是次）"]},{"file":"tests/progress.test.js","layer":"L2","name":"判定逻辑","note":"纯函数：达标 / 推导 / 推荐","tests":["空记录：没有任何档位","1×10 达成初级","2×25 达成中级，并算出\"还差 3 组 × 50 次\"","已经做了一部分下一档的组数时，缺口相应减少","3×50 达成升级 → 可以进下一式","组数够但数值不够，不算达标（2×50 只到中级）","数值够但组数不够，不算达标（1×50 只到初级）","超量完成也算达标（4×60 到升级）","乱序记录不影响判定（先多后少）","非法值被过滤掉","计时型动作：30/60/120 秒","每侧动作：标准与提示都带\"每侧\"","组数不单调的标准也要判对（单臂倒立撑 1×1 / 2×2 / 1×5）","formatStdLine / formatTier 文案","currentNo：当前式 = 第一个没通过的式（推导，不存储）","canPractice：只有\"已通过的式\"和\"当前式\"能记录（锁定式推进）","artStatus 进度换算（含通关）","artStatus：「没练过」不能显示\"进行中\"（回归：真机验收发现六个艺全是进行中）","countRecentDays 只统计窗口内的天数","推荐：优先最近练过、且未通关的艺","推荐：最近练的艺已通关 → 跳过它，顺延到下一个未通关的艺","推荐：通关多个后继续顺延（俯卧撑+深蹲已通关 → 引体向上）","推荐：没有任何记录 → 从第一个艺开始","推荐：六艺全部通关 → all-done","推荐：式号越界时收敛到有效范围","stepStates：锁定式推进下只有三态（已通过 / 进行中 / 未解锁）","stepBanner：详情页顶部状态说明（三种）","formatTime / sessionText 文案","latestSession 取最近一条"]},{"file":"tests/store.test.js","layer":"L3","name":"本地存储","note":"进度、草稿、上限、重置","tests":["存储：默认状态干净","存储：进的唯一真相是\"已通过表\"，不再存\"当前式\"","存储：训练记录可追加、可按艺查询、取最近","存储：通关记里程碑，重置会清掉通关与未提交的草稿（记录保留）","存储：completeArt 保留首次通关时间，复习只更新\"最近一次\"","存储：调试造进度会先备份，还原后回到真实进度","存储：草稿——每组即时落盘、可恢复、提交后清除","存储：记录上限 500 条，防止无限增长"]},{"file":"tests/page-flow.test.js","layer":"L4","name":"页面流程","note":"驱动真实页面代码跑一遍","tests":["首页：没有记录时推荐俯卧撑第 1 式","首页：练过之后再打开，标题才变成「接着练」","首页：全新用户六个艺都显示\"未开始\"（回归：真机验收发现六个艺全是\"进行中\"）","首页：俯卧撑通关后，推荐自动顺延到深蹲（回归：曾经仍推荐俯卧撑第 10 式）","首页：正在练深蹲第 3 式（前两式已通过）→ 推荐深蹲第 3 式","首页：重置俯卧撑后，它会重新回到推荐位（重置的语义就是要重练）","首页：六艺全部通关 → 进入完成态","首页：全部通关后重置一个艺 → 推荐回到该艺（而不是完成态）","首页：六艺十式图已全部画全（60 张；回归：曾经只有俯卧撑有逐式图）","详情页：记一组立刻落盘，离开再进来还在（回归：真机曾\"返回后数据没了\"）","详情页：提交后草稿清掉，转成正式记录","详情页：点示意图能看大图，再点一下关掉（示意图太小看不见细节）","详情页：换式之后大图状态要复位（不能带着上一个式子的遮罩）","详情页：删除某组 / 清空 会同步更新草稿","快捷档位：点「中级」→ 直接按 2 组 × 25 填入，判定立刻跟上（回归：访谈说\"要手输太麻烦\"）","快捷档位：计时类动作按\"秒\"（倒立撑前三式）","锁定：未解锁的式不能记录，且明确告诉用户先练哪一式","锁定：点「下一式」只是查看，不会把当前式带走（回归：访谈里\"点下一式状态就乱了\"）","锁定：达标提交后（点\"留在本式\"）→ 列表里下一式必须是\"进行中\"（回归：访谈发现列表里一个进行中都没有）","锁定：达标提交后点「去练下一式」→ 第 2 式可直接记录","锁定：已通过的式可以复习记录，且不会把当前式拉回去","锁定：草稿也算\"动过\"——当前式记一组没提交，列表副文案要写清楚","验收#3：首页点\"有 N 组未提交\"提示会跳到对应那一式","验收#16：列表页重置清掉已通过与未提交的组，但保留训练记录","调试入口：列表页长按进度卡能造进度，也能还原真实进度","详情页：第十式达标 + 其余九式已通过 → 通关、弹「全部完成」","详情页：只有第 10 式通过（历史数据/跨版本）→ 不算通关（回归：曾误报\"全部完成\"）","详情页：未达标就完成 → 有明确反馈，不再\"像点击没反应\"（回归）","详情页：第十式未达标 → 只记录，不通关","详情页：通关后复习第 10 式，通关标记与首次通关时间都不被覆盖","详情页：非最后一式达标 → 弹晋级框，确认后进入下一式","列表页：三态文字与标记正确（已通过 / 进行中 / 未解锁）","往返：未达标提交 → 回列表 → 显示\"进行中 · 已练 1 次\"（回归：曾经看不出练过）","往返：练完提交 → 重进详情页 → 必须看到这条历史记录（回归：曾完全看不到）","往返：记一组就离开 → 重进恢复；提交后草稿转历史","列表页：顶部器械说明来自数据，不是页面里写死的文案","详情页：?quick=1 才是极简模式，普通进入不是","详情页：极简模式只加一句提示，不降低达标标准、也不解锁后式","首页：极简入口带 quick=1，普通入口不带","首页：分享卡片带当前艺与式号，路径直达那一式","首页：全部通关时分享回首页，标题里不出现\"第 N 式\"","详情页：分享路径锁在这一式本身，不带极简/调试参数","详情页文案：要点标明\"自撰、非原书\"，极简提示不许承诺\"进度照样算\"","调试信息只在开发版：体验版/正式版连 data 里都不该有诊断信息","后门不进线上：体验版/正式版长按没有任何反应","版本号：所有环境都显示，且与 package.json 一致（验收时靠它认包）","用户界面上不许出现内部数据话术（\"待校对\"\"以原书核对\"这类）"]},{"file":"tests/ui-quality.test.js","layer":"L4b","name":"界面质量","note":"从真实样式文件算出来的数字","tests":["Q1/Q2 对比度：所有文字/背景配对都达标（WCAG AA）","Q3 字号：关键信息 ≥22rpx、装饰性提示 ≥20rpx","Q4 点按区：主操作有效点按高度 ≥88rpx（视觉可小，靠隐形外扩补）","Q7 不用纯黑纯灰：正文/标题不许出现 #000 / #333 / gray","Q8 视觉基线：解码正确、指纹容忍 1px 位移、且对真实改动敏感"]}]},"e2e":{"total":102,"expected":102,"scenarios":[{"name":"首页：推荐与六艺卡片","checks":["推荐卡片指向 俯卧撑 第 1 式","推荐文案说明了原因","全新用户看到的是「开始训练」而不是「接着练」","六艺卡片渲染 6 张","六个进度条都存在","俯卧撑显示\"图 10/10\"（回归：曾经 9/10）","全新用户六个艺都显示\"未开始\"","卡片状态文案够短（半个卡片宽不折行）","六艺十式图已全部画全（60 张）","存储走的是真 storage（非内存降级）"]},{"name":"首页 → 俯卧撑十式列表（触发真实 goArt）","checks":["跳到十式列表页","进度为 第 1 / 10 式","第 1 式 = 进行中","第 2–10 式 = 未解锁（锁定式推进：不能跳级）","列表渲染 10 行","表头进度条 0%"]},{"name":"列表 → 墙壁俯卧撑详情（触发真实 goStep）","checks":["跳到详情页","动作名 = 墙壁俯卧撑","详情页顶部横幅说明\"当前在练\"","三档标准渲染 3 行","标准文案 = 初级 1×10 / 中级 2×25 / 升级 3×50","示意图已渲染","图指向 mov-pushup-01","示意图按比例占满宽度（mode=widthFix，不再被固定高度压小）","示意图上有\"点击看大图\"提示","点示意图打开全屏大图","大图里真的渲染了图片","再点一下关闭大图（遮罩消失）"]},{"name":"记录两组 25 次 → 看判定文案","checks":["记录了两组","判定为【中级】","算出\"还差 3 组 × 50次\"","页面上真的显示了这句（渲染层）"]},{"name":"做满升级标准 → 弹达标框 → 下一式自动解锁（回归：访谈发现\"达标后列表里没有进行中\"）","checks":["达成【升级】","canAdvance = true","训练记录写入本地存储","这一式被记为\"已通过\"","训练记录挂在第 1 式上","达标后第 1 式 = 已通过","达标后第 2 式 = 进行中（回归：访谈里这里一个\"进行中\"都没有）","列表里\"进行中\"只有 1 个（锁定式推进的必然结果）"]},{"name":"第十式做满 → 通关（回归：曾经无法通关、进度卡 90%）","checks":["识别为最后一式","显示\"最后一式\"提示条","达成【升级】","已标记通关","首次通关时间已记录","通关记录已落库（第 10 式）","弹窗确认后请求返回上一页"]},{"name":"回首页 → 推荐顺延（回归：曾经仍推荐俯卧撑第 10 式）","checks":["推荐顺延到 深蹲 第 1 式","推荐原因 = 已通关 1 艺","未进入全通关态","已通关计数 = 1","俯卧撑卡片显示\"已通关\"（渲染层）","未通关的艺不显示\"已通关\"","俯卧撑进度条 100%"]},{"name":"六艺全通关 → 首页完成态","checks":["进入全部通关态","推荐卡片被替换（main 为空）","六艺全部 100%","计数 6 / 6","显示\"全部通关\"标题"]},{"name":"未达标就\"完成本次训练\" → 明确反馈（回归：真机上曾像点击无反应）","checks":["页面留下\"上一次记录\"结果","结果写明达成档位","结果写明还差多少","记录已落库（1 条）","组数已清空，可继续记录","\"上一次记录\"卡片已渲染","列表：当前式显示\"进行中\"（可练）","列表：副文案短到\"已练 1 次\"（回归①：曾经看不出练过；②：曾经太长挤折左侧）","列表：未达标的下一式 = 未解锁（没通过就不解锁）","列表：未解锁的行不再重复\"先通过第 N 式\"（同一句重复 8 遍是噪音）","列表：副文案都很短（半宽卡片里不跟左侧抢位置）","重进详情页能看到历史记录（回归：曾完全看不到）","历史记录内容正确","历史卡片已渲染"]},{"name":"快捷档位：点「中级」→ 直接变成 2 组 × 25（回归：访谈说\"要手输次数，太麻烦\"）","checks":["快捷档位按钮渲染 3 个","一键填入 = 2 组 × 25","判定立刻变成【中级】","组标签已渲染 2 个"]},{"name":"锁定：未解锁的式只能看，不能记录（只有在练的那一式能记）","checks":["第 3 式显示为未解锁","顶部横幅说明未解锁","页面写明先通过哪一式","动作图与三档标准照常可见（\"仅支持查看\"）","未解锁时不出现记录按钮"]},{"name":"锁定：点「下一式」只是查看，不会把当前式带走","checks":["存储里已不再有 currentNo 字段（改成推导）","翻页后当前式仍是第 1 式（只是\"查看\"第 2 式）"]},{"name":"第二批：器械说明 / 极简入口 / 分享（回应访谈里的\"没器械\"\"没时间\"\"没人陪\"）","checks":["列表页透出器械说明（引体向上 = 一根单杠）","器械说明行已渲染到页面上","首页说\"不用专业器械\"而不是\"零器械\"（引体要单杠、倒立撑要墙）","首页有\"今天只有 10 分钟\"的极简入口","分享按钮已渲染（必须是 button + open-type=share）","首页分享标题带当前艺与式号","首页分享路径直达当前式","极简入口落在同一式上，且带上极简标记","详情页显示极简模式提示","极简模式不降低达标标准（仍是 1×10 / 2×25 / 3×50）","详情页分享路径锁在这一式，不带 quick 参数"]},{"name":"上线前收口：调试信息只在开发版、版本号在所有环境可见","checks":["自动化跑的是开发版，调试开关是开的","诊断条印出了当前环境（用来实证\"预览码算哪个环境\"）","首页底部版本号 = package.json 的版本（验收时靠它认包）","列表页出现\"长按造进度\"提示行（只有开发版才有）","十式列表 10 行里没有任何一行出现\"待校对\"","详情页备注用中性 note-line，说的是\"公开资料…前后矛盾\"而不是内部话术"]},{"name":"收尾：还原成\"全新用户\"（不污染手动测试数据）","checks":["已还原：推荐回到俯卧撑第 1 式"]}]},"shots":{"total":19,"cropTop":48,"states":[{"name":"01-home-fresh","desc":"首页 · 全新用户","steps":["写入本地存储：全新用户（空进度）","打开首页","截图落盘 → 与基线指纹比对"]},{"name":"02-art-fresh","desc":"十式列表 · 全新（第 1 式进行中，其余未解锁）","steps":["写入本地存储：全新用户（空进度）","打开十式列表（俯卧撑）","截图落盘 → 与基线指纹比对"]},{"name":"03-art-practiced","desc":"十式列表 · 第 1 式已通过（练过 2 次）+ 第 2 式进行中（有未提交的组）","steps":["写入本地存储：前 1 式「已通过」 + 2 条历史记录 + 一条未提交的草稿","打开十式列表（俯卧撑）","截图落盘 → 与基线指纹比对"]},{"name":"04-art-passed","desc":"十式列表 · 前三式已通过（第 4 式进行中，其余未解锁）","steps":["写入本地存储：前 3 式「已通过」 + 1 条历史记录","打开十式列表（俯卧撑）","截图落盘 → 与基线指纹比对"]},{"name":"05-step-current","desc":"详情页 · 当前在练（有历史记录）","steps":["写入本地存储：1 条历史记录","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"06-step-passed","desc":"详情页 · 已通过（横幅应为绿色）","steps":["写入本地存储：前 1 式「已通过」 + 1 条历史记录","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"07-step-draft","desc":"详情页 · 有未提交的组（草稿恢复提示）","steps":["写入本地存储：一条未提交的草稿","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"08-step-last","desc":"详情页 · 第十式（九个已通过）","steps":["写入本地存储：前 9 式「已通过」 + 1 条历史记录","打开动作详情页（俯卧撑 · 第 10 式）","截图落盘 → 与基线指纹比对"]},{"name":"09-home-progress","desc":"首页 · 俯卧撑已通关，推荐顺延到深蹲","steps":["写入本地存储：已通关 + 1 条历史记录","打开首页","截图落盘 → 与基线指纹比对"]},{"name":"10-home-all-done","desc":"首页 · 六艺全部通关","steps":["写入本地存储：已通关 + 前 1 式「已通过」 + 1 条历史记录","打开首页","截图落盘 → 与基线指纹比对"]},{"name":"11-step-locked","desc":"详情页 · 未解锁的式（只能看，不能记）","steps":["写入本地存储：全新用户（空进度）","打开动作详情页（俯卧撑 · 第 3 式）","截图落盘 → 与基线指纹比对"]},{"name":"12-step-quick-tier","desc":"详情页 · 一键按【中级】填入 2 组 × 25","steps":["写入本地存储：一条未提交的草稿","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"13-step-pose-big","desc":"详情页 · 点示意图看全屏大图（tap 触发）","steps":["写入本地存储：全新用户（空进度）","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"14-art-gear","desc":"十式列表 · 器械说明行（引体向上：需要一根单杠）","steps":["写入本地存储：全新用户（空进度）","打开十式列表（引体向上）","截图落盘 → 与基线指纹比对"]},{"name":"15-step-quick","desc":"详情页 · 极简模式（从首页\"今天只有 10 分钟\"进来）","steps":["写入本地存储：全新用户（空进度）","打开动作详情页（俯卧撑 · 第 1 式 · 极简模式）","截图落盘 → 与基线指纹比对"]},{"name":"16-art-note-rows","desc":"十式列表滚到底 · 第 8/10 行不再有「数据待校对」红字（验收 36）","steps":["写入本地存储：全新用户（空进度）","打开十式列表（俯卧撑）","滚动到页面下方（2000px）","截图落盘 → 与基线指纹比对"]},{"name":"17-home-bottom","desc":"首页滚到底 · 版本号（所有环境都显示，验收 19）","steps":["写入本地存储：全新用户（空进度）","打开首页","滚动到页面下方（2000px）","截图落盘 → 与基线指纹比对"]},{"name":"18-step-note","desc":"详情页 · 数据备注改成中性琥珀色（验收 36）","steps":["写入本地存储：全新用户（空进度）","打开动作详情页（俯卧撑 · 第 10 式）","截图落盘 → 与基线指纹比对"]},{"name":"19-pullup-no-note","desc":"详情页 · 引体第 8 式：来源笔误已核对，备注已撤（验收 36）","steps":["写入本地存储：前 1 式「已通过」","打开动作详情页（引体向上 · 第 8 式）","截图落盘 → 与基线指纹比对"]}]},"logs":{"node":"> convict-fitness-miniapp@0.1.8 test\n> node --test\n\n✔ 来源快照本身完整：六艺 × 十式，每式三档 (1.3793ms)\n✔ 60 式标准与来源逐条对齐（差异只允许是已记录的那几条） (0.8577ms)\n✔ 已记录的修正必须\"真的在修正\"（快照更新了就不该再挂着） (0.3694ms)\n✔ 「每侧」标记与来源一致（来源写了\"全部为每侧\"的，我们必须是 true） (0.2662ms)\n✔ 单位与来源一致（倒立撑前三式是秒，其余是次） (0.3423ms)\n✔ 构建标记：build-info 的 version 必须与 package.json 一致 (2.4714ms)\n✔ 六艺齐全，顺序与名称正确 (0.146ms)\n✔ 每艺都是 10 式，式号连续 (0.1239ms)\n✔ 全部动作 id 唯一（60 个） (0.1222ms)\n✔ 每式都有三档标准，且数值单调不减 (0.8337ms)\n✔ 单位只允许 reps / sec (0.1464ms)\n✔ 倒立撑前三式是计时（秒），其余都是计次 (0.1369ms)\n✔ 偏重/单臂类动作标记为每侧 (0.1482ms)\n✔ 引用到的示意图文件必须真实存在 (3.367ms)\n✔ 俯卧撑十式图已画全（MVP 主线） (0.5913ms)\n✔ 六艺每一式都必须有自己的示意图（60 张，且每张的引用指向自己那一式） (1.5341ms)\n✔ 六艺都有首页封面图 (0.3812ms)\n✔ 存疑数据必须写明 note（不允许悄悄改数） (0.122ms)\n✔ 数据里不能出现医疗类表述 (0.187ms)\n✔ 每一式都有\"要点\"，且是一句话而不是半截话 (0.2111ms)\n✔ 每一艺都写明器械条件，且不许说\"零器械\" (0.1111ms)\n✔ 查询 API 正常 (0.1012ms)\n✔ 首页：没有记录时推荐俯卧撑第 1 式 (4.0579ms)\n✔ 首页：练过之后再打开，标题才变成「接着练」 (1.2592ms)\n✔ 首页：全新用户六个艺都显示\"未开始\"（回归：真机验收发现六个艺全是\"进行中\"） (0.8178ms)\n✔ 首页：俯卧撑通关后，推荐自动顺延到深蹲（回归：曾经仍推荐俯卧撑第 10 式） (0.6377ms)\n✔ 首页：正在练深蹲第 3 式（前两式已通过）→ 推荐深蹲第 3 式 (0.433ms)\n✔ 首页：重置俯卧撑后，它会重新回到推荐位（重置的语义就是要重练） (0.4964ms)\n✔ 首页：六艺全部通关 → 进入完成态 (0.4841ms)\n✔ 首页：全部通关后重置一个艺 → 推荐回到该艺（而不是完成态） (0.5095ms)\n✔ 首页：六艺十式图已全部画全（60 张；回归：曾经只有俯卧撑有逐式图） (0.4539ms)\n✔ 详情页：记一组立刻落盘，离开再进来还在（回归：真机曾\"返回后数据没了\"） (2.7694ms)\n✔ 详情页：提交后草稿清掉，转成正式记录 (0.9728ms)\n✔ 详情页：点示意图能看大图，再点一下关掉（示意图太小看不见细节） (0.7725ms)\n✔ 详情页：换式之后大图状态要复位（不能带着上一个式子的遮罩） (0.4316ms)\n✔ 详情页：删除某组 / 清空 会同步更新草稿 (0.5146ms)\n✔ 快捷档位：点「中级」→ 直接按 2 组 × 25 填入，判定立刻跟上（回归：访谈说\"要手输太麻烦\"） (0.5806ms)\n✔ 快捷档位：计时类动作按\"秒\"（倒立撑前三式） (0.3722ms)\n✔ 锁定：未解锁的式不能记录，且明确告诉用户先练哪一式 (0.4474ms)\n✔ 锁定：点「下一式」只是查看，不会把当前式带走（回归：访谈里\"点下一式状态就乱了\"） (0.6245ms)\n✔ 锁定：达标提交后（点\"留在本式\"）→ 列表里下一式必须是\"进行中\"（回归：访谈发现列表里一个进行中都没有） (1.3285ms)\n✔ 锁定：达标提交后点「去练下一式」→ 第 2 式可直接记录 (0.68ms)\n✔ 锁定：已通过的式可以复习记录，且不会把当前式拉回去 (1.2289ms)\n✔ 锁定：草稿也算\"动过\"——当前式记一组没提交，列表副文案要写清楚 (0.3849ms)\n✔ 验收#3：首页点\"有 N 组未提交\"提示会跳到对应那一式 (0.4106ms)\n✔ 验收#16：列表页重置清掉已通过与未提交的组，但保留训练记录 (0.4152ms)\n✔ 调试入口：列表页长按进度卡能造进度，也能还原真实进度 (0.5909ms)\n✔ 详情页：第十式达标 + 其余九式已通过 → 通关、弹「全部完成」 (0.5138ms)\n✔ 详情页：只有第 10 式通过（历史数据/跨版本）→ 不算通关（回归：曾误报\"全部完成\"） (0.401ms)\n✔ 详情页：未达标就完成 → 有明确反馈，不再\"像点击没反应\"（回归） (0.4291ms)\n✔ 详情页：第十式未达标 → 只记录，不通关 (0.3795ms)\n✔ 详情页：通关后复习第 10 式，通关标记与首次通关时间都不被覆盖 (0.7748ms)\n✔ 详情页：非最后一式达标 → 弹晋级框，确认后进入下一式 (0.3964ms)\n✔ 列表页：三态文字与标记正确（已通过 / 进行中 / 未解锁） (0.4371ms)\n✔ 往返：未达标提交 → 回列表 → 显示\"进行中 · 已练 1 次\"（回归：曾经看不出练过） (0.6719ms)\n✔ 往返：练完提交 → 重进详情页 → 必须看到这条历史记录（回归：曾完全看不到） (0.6515ms)\n✔ 往返：记一组就离开 → 重进恢复；提交后草稿转历史 (0.8779ms)\n✔ 列表页：顶部器械说明来自数据，不是页面里写死的文案 (3.164ms)\n✔ 详情页：?quick=1 才是极简模式，普通进入不是 (1.8336ms)\n✔ 详情页：极简模式只加一句提示，不降低达标标准、也不解锁后式 (1.2358ms)\n✔ 首页：极简入口带 quick=1，普通入口不带 (0.4728ms)\n✔ 首页：分享卡片带当前艺与式号，路径直达那一式 (0.3662ms)\n✔ 首页：全部通关时分享回首页，标题里不出现\"第 N 式\" (0.3437ms)\n✔ 详情页：分享路径锁在这一式本身，不带极简/调试参数 (0.3287ms)\n✔ 详情页文案：要点标明\"自撰、非原书\"，极简提示不许承诺\"进度照样算\" (0.2554ms)\n✔ 调试信息只在开发版：体验版/正式版连 data 里都不该有诊断信息 (1.0349ms)\n✔ 后门不进线上：体验版/正式版长按没有任何反应 (0.8609ms)\n✔ 版本号：所有环境都显示，且与 package.json 一致（验收时靠它认包） (0.9214ms)\n✔ 用户界面上不许出现内部数据话术（\"待校对\"\"以原书核对\"这类） (0.427ms)\n✔ 空记录：没有任何档位 (0.9702ms)\n✔ 1×10 达成初级 (0.3223ms)\n✔ 2×25 达成中级，并算出\"还差 3 组 × 50 次\" (0.264ms)\n✔ 已经做了一部分下一档的组数时，缺口相应减少 (0.1406ms)\n✔ 3×50 达成升级 → 可以进下一式 (0.1917ms)\n✔ 组数够但数值不够，不算达标（2×50 只到中级） (0.1519ms)\n✔ 数值够但组数不够，不算达标（1×50 只到初级） (0.1256ms)\n✔ 超量完成也算达标（4×60 到升级） (0.149ms)\n✔ 乱序记录不影响判定（先多后少） (0.1684ms)\n✔ 非法值被过滤掉 (0.2688ms)\n✔ 计时型动作：30/60/120 秒 (0.9067ms)\n✔ 每侧动作：标准与提示都带\"每侧\" (0.1828ms)\n✔ 组数不单调的标准也要判对（单臂倒立撑 1×1 / 2×2 / 1×5） (0.5315ms)\n✔ formatStdLine / formatTier 文案 (0.0906ms)\n✔ currentNo：当前式 = 第一个没通过的式（推导，不存储） (0.1988ms)\n✔ canPractice：只有\"已通过的式\"和\"当前式\"能记录（锁定式推进） (0.1171ms)\n✔ artStatus 进度换算（含通关） (0.2799ms)\n✔ artStatus：「没练过」不能显示\"进行中\"（回归：真机验收发现六个艺全是进行中） (0.1447ms)\n✔ countRecentDays 只统计窗口内的天数 (0.5969ms)\n✔ 推荐：优先最近练过、且未通关的艺 (0.2156ms)\n✔ 推荐：最近练的艺已通关 → 跳过它，顺延到下一个未通关的艺 (0.0863ms)\n✔ 推荐：通关多个后继续顺延（俯卧撑+深蹲已通关 → 引体向上） (0.0628ms)\n✔ 推荐：没有任何记录 → 从第一个艺开始 (0.0463ms)\n✔ 推荐：六艺全部通关 → all-done (0.0605ms)\n✔ 推荐：式号越界时收敛到有效范围 (0.0429ms)\n✔ stepStates：锁定式推进下只有三态（已通过 / 进行中 / 未解锁） (0.3729ms)\n✔ stepBanner：详情页顶部状态说明（三种） (0.123ms)\n✔ formatTime / sessionText 文案 (0.0935ms)\n✔ latestSession 取最近一条 (0.0538ms)\n✔ 存储：默认状态干净 (0.976ms)\n✔ 存储：进的唯一真相是\"已通过表\"，不再存\"当前式\" (0.1811ms)\n✔ 存储：训练记录可追加、可按艺查询、取最近 (0.1977ms)\n✔ 存储：通关记里程碑，重置会清掉通关与未提交的草稿（记录保留） (0.2308ms)\n✔ 存储：completeArt 保留首次通关时间，复习只更新\"最近一次\" (0.1014ms)\n✔ 存储：调试造进度会先备份，还原后回到真实进度 (0.2968ms)\n✔ 存储：草稿——每组即时落盘、可恢复、提交后清除 (0.2479ms)\n✔ 存储：记录上限 500 条，防止无限增长 (1.1112ms)\n\n  ── 界面质量检查单 · A 组（Q1/Q2 对比度）──\n  ✅ 16.96:1 (需 4.5) 页面正文             #111827 on #f8fafc\n  ⚠️ 大标题 .h1          .h1                            跳过：没读到 color\n  ✅  4.55:1 (需 4.5) 副标题 .sub         #64748b on #f8fafc\n  ✅  4.76:1 (需 4.5) 次要文字 .muted      #64748b on #ffffff\n  ✅  4.76:1 (需 4.5) 浅色提示 .light      #64748b on #ffffff\n  ✅  5.17:1 (需 4.5) 强调字 .accent      #2563eb on #ffffff\n  ✅  4.83:1 (需 4.5) 危险字 .danger      #dc2626 on #ffffff\n  ✅  4.55:1 (需 4.5) 免责声明             #64748b on #f8fafc\n  ✅  6.92:1 (需 4.5) 灰色徽标             #475569 on #f1f5f9\n  ✅ 10.35:1 (需 4.5) 小标签 .chip        #334155 on #ffffff\n  ✅ 17.74:1 (需 4.5) 主按钮 .btn         #fff on #111827\n  ✅  4.55:1 (需 4.5) 列表图例             #64748b on #f8fafc\n  ✅  4.55:1 (需 4.5) 图例·未解锁           #64748b on #f8fafc\n  ✅  6.92:1 (需 4.5) 序号圆点             #475569 on #f1f5f9\n  ✅  4.64:1 (需 4.5) 未解锁式名            #64748b on #fcfcfd\n  ✅  6.92:1 (需 4.5) 状态块·未解锁          #475569 on #f1f5f9\n  ✅  4.57:1 (需 4.5) 状态块·已通过          #15803d on #dcfce7\n  ✅  5.49:1 (需 4.5) 状态块·进行中          #1d4ed8 on #dbeafe\n  ✅  4.76:1 (需 4.5) 调试行              #64748b on #ffffff\n  ✅  6.92:1 (需 4.5) 诊断行              #475569 on #f1f5f9\n  ✅  4.76:1 (需 4.5) 卡片状态·未开始         #64748b on #ffffff\n  ✅  6.70:1 (需 4.5) 卡片状态·进行中         #1d4ed8 on #ffffff\n  ✅  5.02:1 (需 4.5) 卡片状态·已通关         #15803d on #ffffff\n  ✅  4.76:1 (需 4.5) 卡片进度数字           #64748b on #ffffff\n  ✅  4.76:1 (需 4.5) 图待补提示            #64748b on #ffffff\n  ✅  4.55:1 (需 4.5) 横幅·未解锁           #64748b on #f8fafc\n  ✅  6.16:1 (需 4.5) 横幅·进行中           #1d4ed8 on #eff6ff\n  ✅  4.79:1 (需 4.5) 横幅·已通过           #15803d on #f0fdf4\n  ✅  4.76:1 (需 4.5) 卡片小标题            #64748b on #ffffff\n  ✅  4.76:1 (需 4.5) 式号指示             #64748b on #ffffff\n  ✅  4.55:1 (需 4.5) 未解锁说明            #64748b on #f8fafc\n  ✅  4.76:1 (需 4.5) 档位数值             #64748b on #ffffff\n  ✅  4.76:1 (需 4.5) 历史时间             #64748b on #ffffff\n  ✅ 10.35:1 (需 4.5) 历史成绩             #334155 on #ffffff\n  ✅  6.16:1 (需 4.5) 价值主张             #1d4ed8 on #eff6ff\n  ✅  7.24:1 (需 4.5) 极简入口             #475569 on #f8fafc\n  ✅ 17.74:1 (需 4.5) 分享按钮             #111827 on #ffffff\n  ✅  7.24:1 (需 4.5) 器械说明行            #475569 on #f8fafc\n  ✅  6.92:1 (需 4.5) 器械标签             #475569 on #f1f5f9\n  ✅  7.24:1 (需 4.5) 极简提示条            #475569 on #f8fafc\n  ✅  6.16:1 (需 4.5) 极简提示标签           #1d4ed8 on #eff6ff\n  ✅  6.16:1 (需 4.5) 点击看大图            #1d4ed8 on #eff6ff\n  ✅  6.84:1 (需 4.5) 数据来源备注           #92400e on #fffbeb\n  ✅  4.55:1 (需 4.5) 版本号              #64748b on #f8fafc\n\n  ── Q4 点按区（视觉 + 隐形外扩）──\n  ✅ 有效  88rpx (需 88) = 视觉  88 + 外扩  0   主按钮 .btn\n  ✅ 有效  88rpx (需 88) = 视觉  88 + 外扩  0   记一组 .add-btn\n  ✅ 有效  90rpx (需 88) = 视觉  74 + 外扩 16   上一式/下一式\n  ✅ 有效 120rpx (需 88) = 视觉 120 + 外扩  0   档位按钮 .quick-btn\n  ✅ 有效  88rpx (需 88) = 视觉  66 + 外扩 22   删组标签 .chip\n  ✅ 有效  88rpx (需 88) = 视觉  88 + 外扩  0   展开历史 .hist-toggle\n  ✅ 有效  90rpx (需 88) = 视觉  74 + 外扩 16   极简入口 .quick-entry\n✔ Q1/Q2 对比度：所有文字/背景配对都达标（WCAG AA） (5.6678ms)\n✔ Q3 字号：关键信息 ≥22rpx、装饰性提示 ≥20rpx (0.7987ms)\n✔ Q4 点按区：主操作有效点按高度 ≥88rpx（视觉可小，靠隐形外扩补） (1.7403ms)\n✔ Q7 不用纯黑纯灰：正文/标题不许出现 #000 / #333 / gray (0.2145ms)\n✔ Q8 视觉基线：解码正确、指纹容忍 1px 位移、且对真实改动敏感 (67.374ms)\nℹ tests 111\nℹ suites 0\nℹ pass 111\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 234.5886","e2e":"> convict-fitness-miniapp@0.1.8 e2e\n> node e2e/run.js\n\n→ 连接小程序自动化服务…\n→ 没有可用的自动化服务（Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled），正在启动…\n→ 正在执行 cli auto 启动自动化服务（输出如下）…\nnode.exe : - initialize\nAt line:1 char:1\n+ & \"C:\\Program Files\\nodejs/node.exe\" \"C:\\Program Files\\nodejs/node_mo ...\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : NotSpecified: (- initialize:String) [], RemoteException\n    + FullyQualifiedErrorId : NativeCommandError\n \n\n(node:35256) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative inste\nad.\n(Use `微信开发者工具 --trace-deprecation ...` to show where the warning was created)\n√ IDE server has started, listening on http://127.0.0.1:63512\n- preparing\n- Fetching AppID () permissions\n√ Using AppID: wx················\n√ auto\n→ cli auto 退出码 0，等待自动化服务就绪…\n→ 自动化服务已就绪（等待 3s）\n→ App 就绪（当前页 pages/index/index）\n\n▸ 首页：推荐与六艺卡片\n  ✓ 推荐卡片指向 俯卧撑 第 1 式\n  ✓ 推荐文案说明了原因\n  ✓ 全新用户看到的是「开始训练」而不是「接着练」\n  ✓ 六艺卡片渲染 6 张\n  ✓ 六个进度条都存在\n  ✓ 俯卧撑显示\"图 10/10\"（回归：曾经 9/10）\n  ✓ 全新用户六个艺都显示\"未开始\"\n  ✓ 卡片状态文案够短（半个卡片宽不折行）\n  ✓ 六艺十式图已全部画全（60 张）\n  ✓ 存储走的是真 storage（非内存降级）\n\n▸ 首页 → 俯卧撑十式列表（触发真实 goArt）\n  ✓ 跳到十式列表页\n  ✓ 进度为 第 1 / 10 式\n  ✓ 第 1 式 = 进行中\n  ✓ 第 2–10 式 = 未解锁（锁定式推进：不能跳级）\n  ✓ 列表渲染 10 行\n  ✓ 表头进度条 0%\n\n▸ 列表 → 墙壁俯卧撑详情（触发真实 goStep）\n  ✓ 跳到详情页\n  ✓ 动作名 = 墙壁俯卧撑\n  ✓ 详情页顶部横幅说明\"当前在练\"\n  ✓ 三档标准渲染 3 行\n  ✓ 标准文案 = 初级 1×10 / 中级 2×25 / 升级 3×50\n  ✓ 示意图已渲染\n  ✓ 图指向 mov-pushup-01\n  ✓ 示意图按比例占满宽度（mode=widthFix，不再被固定高度压小）\n  ✓ 示意图上有\"点击看大图\"提示\n  ✓ 点示意图打开全屏大图\n  ✓ 大图里真的渲染了图片\n  ✓ 再点一下关闭大图（遮罩消失）\n\n▸ 记录两组 25 次 → 看判定文案\n  ✓ 记录了两组\n  ✓ 判定为【中级】\n  ✓ 算出\"还差 3 组 × 50次\"\n  ✓ 页面上真的显示了这句（渲染层）\n\n▸ 做满升级标准 → 弹达标框 → 下一式自动解锁（回归：访谈发现\"达标后列表里没有进行中\"）\n  ✓ 达成【升级】\n  ✓ canAdvance = true\n  ✓ 训练记录写入本地存储\n  ✓ 这一式被记为\"已通过\"\n  ✓ 训练记录挂在第 1 式上\n  ✓ 达标后第 1 式 = 已通过\n  ✓ 达标后第 2 式 = 进行中（回归：访谈里这里一个\"进行中\"都没有）\n  ✓ 列表里\"进行中\"只有 1 个（锁定式推进的必然结果）\n\n▸ 第十式做满 → 通关（回归：曾经无法通关、进度卡 90%）\n  ✓ 识别为最后一式\n  ✓ 显示\"最后一式\"提示条\n  ✓ 达成【升级】\n  ✓ 已标记通关\n  ✓ 首次通关时间已记录\n  ✓ 通关记录已落库（第 10 式）\n  ✓ 弹窗确认后请求返回上一页\n\n▸ 回首页 → 推荐顺延（回归：曾经仍推荐俯卧撑第 10 式）\n  ✓ 推荐顺延到 深蹲 第 1 式\n  ✓ 推荐原因 = 已通关 1 艺\n  ✓ 未进入全通关态\n  ✓ 已通关计数 = 1\n  ✓ 俯卧撑卡片显示\"已通关\"（渲染层）\n  ✓ 未通关的艺不显示\"已通关\"\n  ✓ 俯卧撑进度条 100%\n\n▸ 六艺全通关 → 首页完成态\n  ✓ 进入全部通关态\n  ✓ 推荐卡片被替换（main 为空）\n  ✓ 六艺全部 100%\n  ✓ 计数 6 / 6\n  ✓ 显示\"全部通关\"标题\n\n▸ 未达标就\"完成本次训练\" → 明确反馈（回归：真机上曾像点击无反应）\n  ✓ 页面留下\"上一次记录\"结果\n  ✓ 结果写明达成档位\n  ✓ 结果写明还差多少\n  ✓ 记录已落库（1 条）\n  ✓ 组数已清空，可继续记录\n  ✓ \"上一次记录\"卡片已渲染\n  ✓ 列表：当前式显示\"进行中\"（可练）\n  ✓ 列表：副文案短到\"已练 1 次\"（回归①：曾经看不出练过；②：曾经太长挤折左侧）\n  ✓ 列表：未达标的下一式 = 未解锁（没通过就不解锁）\n  ✓ 列表：未解锁的行不再重复\"先通过第 N 式\"（同一句重复 8 遍是噪音）\n  ✓ 列表：副文案都很短（半宽卡片里不跟左侧抢位置）\n  ✓ 重进详情页能看到历史记录（回归：曾完全看不到）\n  ✓ 历史记录内容正确\n  ✓ 历史卡片已渲染\n\n▸ 快捷档位：点「中级」→ 直接变成 2 组 × 25（回归：访谈说\"要手输次数，太麻烦\"）\n  ✓ 快捷档位按钮渲染 3 个\n  ✓ 一键填入 = 2 组 × 25\n  ✓ 判定立刻变成【中级】\n  ✓ 组标签已渲染 2 个\n\n▸ 锁定：未解锁的式只能看，不能记录（只有在练的那一式能记）\n  ✓ 第 3 式显示为未解锁\n  ✓ 顶部横幅说明未解锁\n  ✓ 页面写明先通过哪一式\n  ✓ 动作图与三档标准照常可见（\"仅支持查看\"）\n  ✓ 未解锁时不出现记录按钮\n\n▸ 锁定：点「下一式」只是查看，不会把当前式带走\n  ✓ 存储里已不再有 currentNo 字段（改成推导）\n  ✓ 翻页后当前式仍是第 1 式（只是\"查看\"第 2 式）\n\n▸ 第二批：器械说明 / 极简入口 / 分享（回应访谈里的\"没器械\"\"没时间\"\"没人陪\"）\n  ✓ 列表页透出器械说明（引体向上 = 一根单杠）\n  ✓ 器械说明行已渲染到页面上\n  ✓ 首页说\"不用专业器械\"而不是\"零器械\"（引体要单杠、倒立撑要墙）\n  ✓ 首页有\"今天只有 10 分钟\"的极简入口\n  ✓ 分享按钮已渲染（必须是 button + open-type=share）\n  ✓ 首页分享标题带当前艺与式号\n  ✓ 首页分享路径直达当前式\n  ✓ 极简入口落在同一式上，且带上极简标记\n  ✓ 详情页显示极简模式提示\n  ✓ 极简模式不降低达标标准（仍是 1×10 / 2×25 / 3×50）\n  ✓ 详情页分享路径锁在这一式，不带 quick 参数\n\n▸ 上线前收口：调试信息只在开发版、版本号在所有环境可见\n  ✓ 自动化跑的是开发版，调试开关是开的\n  ✓ 诊断条印出了当前环境（用来实证\"预览码算哪个环境\"）\n  ✓ 首页底部版本号 = package.json 的版本（验收时靠它认包）\n  ✓ 列表页出现\"长按造进度\"提示行（只有开发版才有）\n  ✓ 十式列表 10 行里没有任何一行出现\"待校对\"\n  ✓ 详情页备注用中性 note-line，说的是\"公开资料…前后矛盾\"而不是内部话术\n\n▸ 收尾：还原成\"全新用户\"（不污染手动测试数据）\n  ✓ 已还原：推荐回到俯卧撑第 1 式\n\n────────────────────────────────────────────────────────\nE2E：102 / 102 通过\n截图：e2e/shots/（0 张）","shots":"> convict-fitness-miniapp@0.1.8 e2e:shots\n> node e2e/shots.js\n\n→ 连接自动化服务…\n→ 已连接现有自动化服务 ws://127.0.0.1:9420\n  01-home-fresh  首页 · 全新用户 … ✓\n  02-art-fresh  十式列表 · 全新（第 1 式进行中，其余未解锁） … ✓\n  03-art-practiced  十式列表 · 第 1 式已通过（练过 2 次）+ 第 2 式进行中（有未提交的组） … ✓\n  04-art-passed  十式列表 · 前三式已通过（第 4 式进行中，其余未解锁） … ✓\n  05-step-current  详情页 · 当前在练（有历史记录） … ✓\n  06-step-passed  详情页 · 已通过（横幅应为绿色） … ✓\n  07-step-draft  详情页 · 有未提交的组（草稿恢复提示） … ✓\n  08-step-last  详情页 · 第十式（九个已通过） … ✓\n  09-home-progress  首页 · 俯卧撑已通关，推荐顺延到深蹲 … ✓\n  10-home-all-done  首页 · 六艺全部通关 … ✓\n  11-step-locked  详情页 · 未解锁的式（只能看，不能记） … ✓\n  12-step-quick-tier  详情页 · 一键按【中级】填入 2 组 × 25 … ✓\n  13-step-pose-big  详情页 · 点示意图看全屏大图（tap 触发） … ✓\n  14-art-gear  十式列表 · 器械说明行（引体向上：需要一根单杠） … ✓\n  15-step-quick  详情页 · 极简模式（从首页\"今天只有 10 分钟\"进来） … ✓\n  16-art-note-rows  十式列表滚到底 · 第 8/10 行不再有「数据待校对」红字（验收 36） … ✓\n  17-home-bottom  首页滚到底 · 版本号（所有环境都显示，验收 19） … ✓\n  18-step-note  详情页 · 数据备注改成中性琥珀色（验收 36） … ✓\n  19-pullup-no-note  详情页 · 引体第 8 式：来源笔误已核对，备注已撤（验收 36） … ✓\n\n截图：19 / 19 张成功 → e2e/shots/\n\n视觉基线比对（基线 2026-10-09 04:14，裁掉顶部 48 行 + 容忍 1px 位移）：\n  ✓ 19 张全部与基线一致（页面没被意外改动）"},"logMeta":{}}</script>
+<script id="testdata" type="application/json">{"version":"0.1.8","stamp":"2026-09-30.3","collectedAt":"2026-10-09 09:42","node":{"total":111,"files":[{"file":"tests/data.test.js","layer":"L1","name":"数据完整性","note":"60 式的内容与合规检查","tests":["构建标记：build-info 的 version 必须与 package.json 一致","六艺齐全，顺序与名称正确","每艺都是 10 式，式号连续","全部动作 id 唯一（60 个）","每式都有三档标准，且数值单调不减","单位只允许 reps / sec","倒立撑前三式是计时（秒），其余都是计次","偏重/单臂类动作标记为每侧","引用到的示意图文件必须真实存在","俯卧撑十式图已画全（MVP 主线）","六艺每一式都必须有自己的示意图（60 张，且每张的引用指向自己那一式）","六艺都有首页封面图","存疑数据必须写明 note（不允许悄悄改数）","数据里不能出现医疗类表述","每一式都有\"要点\"，且是一句话而不是半截话","每一艺都写明器械条件，且不许说\"零器械\"","查询 API 正常"]},{"file":"tests/data-source.test.js","layer":"L1b","name":"数据来源对齐","note":"每一式标准与来源快照逐条核对","tests":["来源快照本身完整：六艺 × 十式，每式三档","60 式标准与来源逐条对齐（差异只允许是已记录的那几条）","已记录的修正必须\"真的在修正\"（快照更新了就不该再挂着）","「每侧」标记与来源一致（来源写了\"全部为每侧\"的，我们必须是 true）","单位与来源一致（倒立撑前三式是秒，其余是次）"]},{"file":"tests/progress.test.js","layer":"L2","name":"判定逻辑","note":"纯函数：达标 / 推导 / 推荐","tests":["空记录：没有任何档位","1×10 达成初级","2×25 达成中级，并算出\"还差 3 组 × 50 次\"","已经做了一部分下一档的组数时，缺口相应减少","3×50 达成升级 → 可以进下一式","组数够但数值不够，不算达标（2×50 只到中级）","数值够但组数不够，不算达标（1×50 只到初级）","超量完成也算达标（4×60 到升级）","乱序记录不影响判定（先多后少）","非法值被过滤掉","计时型动作：30/60/120 秒","每侧动作：标准与提示都带\"每侧\"","组数不单调的标准也要判对（单臂倒立撑 1×1 / 2×2 / 1×5）","formatStdLine / formatTier 文案","currentNo：当前式 = 第一个没通过的式（推导，不存储）","canPractice：只有\"已通过的式\"和\"当前式\"能记录（锁定式推进）","artStatus 进度换算（含通关）","artStatus：「没练过」不能显示\"进行中\"（回归：真机验收发现六个艺全是进行中）","countRecentDays 只统计窗口内的天数","推荐：优先最近练过、且未通关的艺","推荐：最近练的艺已通关 → 跳过它，顺延到下一个未通关的艺","推荐：通关多个后继续顺延（俯卧撑+深蹲已通关 → 引体向上）","推荐：没有任何记录 → 从第一个艺开始","推荐：六艺全部通关 → all-done","推荐：式号越界时收敛到有效范围","stepStates：锁定式推进下只有三态（已通过 / 进行中 / 未解锁）","stepBanner：详情页顶部状态说明（三种）","formatTime / sessionText 文案","latestSession 取最近一条"]},{"file":"tests/store.test.js","layer":"L3","name":"本地存储","note":"进度、草稿、上限、重置","tests":["存储：默认状态干净","存储：进的唯一真相是\"已通过表\"，不再存\"当前式\"","存储：训练记录可追加、可按艺查询、取最近","存储：通关记里程碑，重置会清掉通关与未提交的草稿（记录保留）","存储：completeArt 保留首次通关时间，复习只更新\"最近一次\"","存储：调试造进度会先备份，还原后回到真实进度","存储：草稿——每组即时落盘、可恢复、提交后清除","存储：记录上限 500 条，防止无限增长"]},{"file":"tests/page-flow.test.js","layer":"L4","name":"页面流程","note":"驱动真实页面代码跑一遍","tests":["首页：没有记录时推荐俯卧撑第 1 式","首页：练过之后再打开，标题才变成「接着练」","首页：全新用户六个艺都显示\"未开始\"（回归：真机验收发现六个艺全是\"进行中\"）","首页：俯卧撑通关后，推荐自动顺延到深蹲（回归：曾经仍推荐俯卧撑第 10 式）","首页：正在练深蹲第 3 式（前两式已通过）→ 推荐深蹲第 3 式","首页：重置俯卧撑后，它会重新回到推荐位（重置的语义就是要重练）","首页：六艺全部通关 → 进入完成态","首页：全部通关后重置一个艺 → 推荐回到该艺（而不是完成态）","首页：六艺十式图已全部画全（60 张；回归：曾经只有俯卧撑有逐式图）","详情页：记一组立刻落盘，离开再进来还在（回归：真机曾\"返回后数据没了\"）","详情页：提交后草稿清掉，转成正式记录","详情页：点示意图能看大图，再点一下关掉（示意图太小看不见细节）","详情页：换式之后大图状态要复位（不能带着上一个式子的遮罩）","详情页：删除某组 / 清空 会同步更新草稿","快捷档位：点「中级」→ 直接按 2 组 × 25 填入，判定立刻跟上（回归：访谈说\"要手输太麻烦\"）","快捷档位：计时类动作按\"秒\"（倒立撑前三式）","锁定：未解锁的式不能记录，且明确告诉用户先练哪一式","锁定：点「下一式」只是查看，不会把当前式带走（回归：访谈里\"点下一式状态就乱了\"）","锁定：达标提交后（点\"留在本式\"）→ 列表里下一式必须是\"进行中\"（回归：访谈发现列表里一个进行中都没有）","锁定：达标提交后点「去练下一式」→ 第 2 式可直接记录","锁定：已通过的式可以复习记录，且不会把当前式拉回去","锁定：草稿也算\"动过\"——当前式记一组没提交，列表副文案要写清楚","验收#3：首页点\"有 N 组未提交\"提示会跳到对应那一式","验收#16：列表页重置清掉已通过与未提交的组，但保留训练记录","调试入口：列表页长按进度卡能造进度，也能还原真实进度","详情页：第十式达标 + 其余九式已通过 → 通关、弹「全部完成」","详情页：只有第 10 式通过（历史数据/跨版本）→ 不算通关（回归：曾误报\"全部完成\"）","详情页：未达标就完成 → 有明确反馈，不再\"像点击没反应\"（回归）","详情页：第十式未达标 → 只记录，不通关","详情页：通关后复习第 10 式，通关标记与首次通关时间都不被覆盖","详情页：非最后一式达标 → 弹晋级框，确认后进入下一式","列表页：三态文字与标记正确（已通过 / 进行中 / 未解锁）","往返：未达标提交 → 回列表 → 显示\"进行中 · 已练 1 次\"（回归：曾经看不出练过）","往返：练完提交 → 重进详情页 → 必须看到这条历史记录（回归：曾完全看不到）","往返：记一组就离开 → 重进恢复；提交后草稿转历史","列表页：顶部器械说明来自数据，不是页面里写死的文案","详情页：?quick=1 才是极简模式，普通进入不是","详情页：极简模式只加一句提示，不降低达标标准、也不解锁后式","首页：极简入口带 quick=1，普通入口不带","首页：分享卡片带当前艺与式号，路径直达那一式","首页：全部通关时分享回首页，标题里不出现\"第 N 式\"","详情页：分享路径锁在这一式本身，不带极简/调试参数","详情页文案：要点标明\"自撰、非原书\"，极简提示不许承诺\"进度照样算\"","调试信息只在开发版：体验版/正式版连 data 里都不该有诊断信息","后门不进线上：体验版/正式版长按没有任何反应","版本号：所有环境都显示，且与 package.json 一致（验收时靠它认包）","用户界面上不许出现内部数据话术（\"待校对\"\"以原书核对\"这类）"]},{"file":"tests/ui-quality.test.js","layer":"L4b","name":"界面质量","note":"从真实样式文件算出来的数字","tests":["Q1/Q2 对比度：所有文字/背景配对都达标（WCAG AA）","Q3 字号：关键信息 ≥22rpx、装饰性提示 ≥20rpx","Q4 点按区：主操作有效点按高度 ≥88rpx（视觉可小，靠隐形外扩补）","Q7 不用纯黑纯灰：正文/标题不许出现 #000 / #333 / gray","Q8 视觉基线：解码正确、指纹容忍 1px 位移、且对真实改动敏感"]}]},"e2e":{"total":102,"expected":102,"scenarios":[{"name":"首页：推荐与六艺卡片","checks":["推荐卡片指向 俯卧撑 第 1 式","推荐文案说明了原因","全新用户看到的是「开始训练」而不是「接着练」","六艺卡片渲染 6 张","六个进度条都存在","俯卧撑显示\"图 10/10\"（回归：曾经 9/10）","全新用户六个艺都显示\"未开始\"","卡片状态文案够短（半个卡片宽不折行）","六艺十式图已全部画全（60 张）","存储走的是真 storage（非内存降级）"]},{"name":"首页 → 俯卧撑十式列表（触发真实 goArt）","checks":["跳到十式列表页","进度为 第 1 / 10 式","第 1 式 = 进行中","第 2–10 式 = 未解锁（锁定式推进：不能跳级）","列表渲染 10 行","表头进度条 0%"]},{"name":"列表 → 墙壁俯卧撑详情（触发真实 goStep）","checks":["跳到详情页","动作名 = 墙壁俯卧撑","详情页顶部横幅说明\"当前在练\"","三档标准渲染 3 行","标准文案 = 初级 1×10 / 中级 2×25 / 升级 3×50","示意图已渲染","图指向 mov-pushup-01","示意图按比例占满宽度（mode=widthFix，不再被固定高度压小）","示意图上有\"点击看大图\"提示","点示意图打开全屏大图","大图里真的渲染了图片","再点一下关闭大图（遮罩消失）"]},{"name":"记录两组 25 次 → 看判定文案","checks":["记录了两组","判定为【中级】","算出\"还差 3 组 × 50次\"","页面上真的显示了这句（渲染层）"]},{"name":"做满升级标准 → 弹达标框 → 下一式自动解锁（回归：访谈发现\"达标后列表里没有进行中\"）","checks":["达成【升级】","canAdvance = true","训练记录写入本地存储","这一式被记为\"已通过\"","训练记录挂在第 1 式上","达标后第 1 式 = 已通过","达标后第 2 式 = 进行中（回归：访谈里这里一个\"进行中\"都没有）","列表里\"进行中\"只有 1 个（锁定式推进的必然结果）"]},{"name":"第十式做满 → 通关（回归：曾经无法通关、进度卡 90%）","checks":["识别为最后一式","显示\"最后一式\"提示条","达成【升级】","已标记通关","首次通关时间已记录","通关记录已落库（第 10 式）","弹窗确认后请求返回上一页"]},{"name":"回首页 → 推荐顺延（回归：曾经仍推荐俯卧撑第 10 式）","checks":["推荐顺延到 深蹲 第 1 式","推荐原因 = 已通关 1 艺","未进入全通关态","已通关计数 = 1","俯卧撑卡片显示\"已通关\"（渲染层）","未通关的艺不显示\"已通关\"","俯卧撑进度条 100%"]},{"name":"六艺全通关 → 首页完成态","checks":["进入全部通关态","推荐卡片被替换（main 为空）","六艺全部 100%","计数 6 / 6","显示\"全部通关\"标题"]},{"name":"未达标就\"完成本次训练\" → 明确反馈（回归：真机上曾像点击无反应）","checks":["页面留下\"上一次记录\"结果","结果写明达成档位","结果写明还差多少","记录已落库（1 条）","组数已清空，可继续记录","\"上一次记录\"卡片已渲染","列表：当前式显示\"进行中\"（可练）","列表：副文案短到\"已练 1 次\"（回归①：曾经看不出练过；②：曾经太长挤折左侧）","列表：未达标的下一式 = 未解锁（没通过就不解锁）","列表：未解锁的行不再重复\"先通过第 N 式\"（同一句重复 8 遍是噪音）","列表：副文案都很短（半宽卡片里不跟左侧抢位置）","重进详情页能看到历史记录（回归：曾完全看不到）","历史记录内容正确","历史卡片已渲染"]},{"name":"快捷档位：点「中级」→ 直接变成 2 组 × 25（回归：访谈说\"要手输次数，太麻烦\"）","checks":["快捷档位按钮渲染 3 个","一键填入 = 2 组 × 25","判定立刻变成【中级】","组标签已渲染 2 个"]},{"name":"锁定：未解锁的式只能看，不能记录（只有在练的那一式能记）","checks":["第 3 式显示为未解锁","顶部横幅说明未解锁","页面写明先通过哪一式","动作图与三档标准照常可见（\"仅支持查看\"）","未解锁时不出现记录按钮"]},{"name":"锁定：点「下一式」只是查看，不会把当前式带走","checks":["存储里已不再有 currentNo 字段（改成推导）","翻页后当前式仍是第 1 式（只是\"查看\"第 2 式）"]},{"name":"第二批：器械说明 / 极简入口 / 分享（回应访谈里的\"没器械\"\"没时间\"\"没人陪\"）","checks":["列表页透出器械说明（引体向上 = 一根单杠）","器械说明行已渲染到页面上","首页说\"不用专业器械\"而不是\"零器械\"（引体要单杠、倒立撑要墙）","首页有\"今天只有 10 分钟\"的极简入口","分享按钮已渲染（必须是 button + open-type=share）","首页分享标题带当前艺与式号","首页分享路径直达当前式","极简入口落在同一式上，且带上极简标记","详情页显示极简模式提示","极简模式不降低达标标准（仍是 1×10 / 2×25 / 3×50）","详情页分享路径锁在这一式，不带 quick 参数"]},{"name":"上线前收口：调试信息只在开发版、版本号在所有环境可见","checks":["自动化跑的是开发版，调试开关是开的","诊断条印出了当前环境（用来实证\"预览码算哪个环境\"）","首页底部版本号 = package.json 的版本（验收时靠它认包）","列表页出现\"长按造进度\"提示行（只有开发版才有）","十式列表 10 行里没有任何一行出现\"待校对\"","详情页备注用中性 note-line，说的是\"公开资料…前后矛盾\"而不是内部话术"]},{"name":"收尾：还原成\"全新用户\"（不污染手动测试数据）","checks":["已还原：推荐回到俯卧撑第 1 式"]}]},"shots":{"total":19,"cropTop":48,"states":[{"name":"01-home-fresh","desc":"首页 · 全新用户","steps":["写入本地存储：全新用户（空进度）","打开首页","截图落盘 → 与基线指纹比对"]},{"name":"02-art-fresh","desc":"十式列表 · 全新（第 1 式进行中，其余未解锁）","steps":["写入本地存储：全新用户（空进度）","打开十式列表（俯卧撑）","截图落盘 → 与基线指纹比对"]},{"name":"03-art-practiced","desc":"十式列表 · 第 1 式已通过（练过 2 次）+ 第 2 式进行中（有未提交的组）","steps":["写入本地存储：前 1 式「已通过」 + 2 条历史记录 + 一条未提交的草稿","打开十式列表（俯卧撑）","截图落盘 → 与基线指纹比对"]},{"name":"04-art-passed","desc":"十式列表 · 前三式已通过（第 4 式进行中，其余未解锁）","steps":["写入本地存储：前 3 式「已通过」 + 1 条历史记录","打开十式列表（俯卧撑）","截图落盘 → 与基线指纹比对"]},{"name":"05-step-current","desc":"详情页 · 当前在练（有历史记录）","steps":["写入本地存储：1 条历史记录","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"06-step-passed","desc":"详情页 · 已通过（横幅应为绿色）","steps":["写入本地存储：前 1 式「已通过」 + 1 条历史记录","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"07-step-draft","desc":"详情页 · 有未提交的组（草稿恢复提示）","steps":["写入本地存储：一条未提交的草稿","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"08-step-last","desc":"详情页 · 第十式（九个已通过）","steps":["写入本地存储：前 9 式「已通过」 + 1 条历史记录","打开动作详情页（俯卧撑 · 第 10 式）","截图落盘 → 与基线指纹比对"]},{"name":"09-home-progress","desc":"首页 · 俯卧撑已通关，推荐顺延到深蹲","steps":["写入本地存储：已通关 + 1 条历史记录","打开首页","截图落盘 → 与基线指纹比对"]},{"name":"10-home-all-done","desc":"首页 · 六艺全部通关","steps":["写入本地存储：已通关 + 前 1 式「已通过」 + 1 条历史记录","打开首页","截图落盘 → 与基线指纹比对"]},{"name":"11-step-locked","desc":"详情页 · 未解锁的式（只能看，不能记）","steps":["写入本地存储：全新用户（空进度）","打开动作详情页（俯卧撑 · 第 3 式）","截图落盘 → 与基线指纹比对"]},{"name":"12-step-quick-tier","desc":"详情页 · 一键按【中级】填入 2 组 × 25","steps":["写入本地存储：一条未提交的草稿","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"13-step-pose-big","desc":"详情页 · 点示意图看全屏大图（tap 触发）","steps":["写入本地存储：全新用户（空进度）","打开动作详情页（俯卧撑 · 第 1 式）","截图落盘 → 与基线指纹比对"]},{"name":"14-art-gear","desc":"十式列表 · 器械说明行（引体向上：需要一根单杠）","steps":["写入本地存储：全新用户（空进度）","打开十式列表（引体向上）","截图落盘 → 与基线指纹比对"]},{"name":"15-step-quick","desc":"详情页 · 极简模式（从首页\"今天只有 10 分钟\"进来）","steps":["写入本地存储：全新用户（空进度）","打开动作详情页（俯卧撑 · 第 1 式 · 极简模式）","截图落盘 → 与基线指纹比对"]},{"name":"16-art-note-rows","desc":"十式列表滚到底 · 第 8/10 行不再有「数据待校对」红字（验收 36）","steps":["写入本地存储：全新用户（空进度）","打开十式列表（俯卧撑）","滚动到页面下方（2000px）","截图落盘 → 与基线指纹比对"]},{"name":"17-home-bottom","desc":"首页滚到底 · 版本号（所有环境都显示，验收 19）","steps":["写入本地存储：全新用户（空进度）","打开首页","滚动到页面下方（2000px）","截图落盘 → 与基线指纹比对"]},{"name":"18-step-note","desc":"详情页 · 数据备注改成中性琥珀色（验收 36）","steps":["写入本地存储：全新用户（空进度）","打开动作详情页（俯卧撑 · 第 10 式）","截图落盘 → 与基线指纹比对"]},{"name":"19-pullup-no-note","desc":"详情页 · 引体第 8 式：来源笔误已核对，备注已撤（验收 36）","steps":["写入本地存储：前 1 式「已通过」","打开动作详情页（引体向上 · 第 8 式）","截图落盘 → 与基线指纹比对"]}]},"logs":{"node":"> convict-fitness-miniapp@0.1.8 test\n> node --test\n\n✔ 来源快照本身完整：六艺 × 十式，每式三档 (1.3793ms)\n✔ 60 式标准与来源逐条对齐（差异只允许是已记录的那几条） (0.8577ms)\n✔ 已记录的修正必须\"真的在修正\"（快照更新了就不该再挂着） (0.3694ms)\n✔ 「每侧」标记与来源一致（来源写了\"全部为每侧\"的，我们必须是 true） (0.2662ms)\n✔ 单位与来源一致（倒立撑前三式是秒，其余是次） (0.3423ms)\n✔ 构建标记：build-info 的 version 必须与 package.json 一致 (2.4714ms)\n✔ 六艺齐全，顺序与名称正确 (0.146ms)\n✔ 每艺都是 10 式，式号连续 (0.1239ms)\n✔ 全部动作 id 唯一（60 个） (0.1222ms)\n✔ 每式都有三档标准，且数值单调不减 (0.8337ms)\n✔ 单位只允许 reps / sec (0.1464ms)\n✔ 倒立撑前三式是计时（秒），其余都是计次 (0.1369ms)\n✔ 偏重/单臂类动作标记为每侧 (0.1482ms)\n✔ 引用到的示意图文件必须真实存在 (3.367ms)\n✔ 俯卧撑十式图已画全（MVP 主线） (0.5913ms)\n✔ 六艺每一式都必须有自己的示意图（60 张，且每张的引用指向自己那一式） (1.5341ms)\n✔ 六艺都有首页封面图 (0.3812ms)\n✔ 存疑数据必须写明 note（不允许悄悄改数） (0.122ms)\n✔ 数据里不能出现医疗类表述 (0.187ms)\n✔ 每一式都有\"要点\"，且是一句话而不是半截话 (0.2111ms)\n✔ 每一艺都写明器械条件，且不许说\"零器械\" (0.1111ms)\n✔ 查询 API 正常 (0.1012ms)\n✔ 首页：没有记录时推荐俯卧撑第 1 式 (4.0579ms)\n✔ 首页：练过之后再打开，标题才变成「接着练」 (1.2592ms)\n✔ 首页：全新用户六个艺都显示\"未开始\"（回归：真机验收发现六个艺全是\"进行中\"） (0.8178ms)\n✔ 首页：俯卧撑通关后，推荐自动顺延到深蹲（回归：曾经仍推荐俯卧撑第 10 式） (0.6377ms)\n✔ 首页：正在练深蹲第 3 式（前两式已通过）→ 推荐深蹲第 3 式 (0.433ms)\n✔ 首页：重置俯卧撑后，它会重新回到推荐位（重置的语义就是要重练） (0.4964ms)\n✔ 首页：六艺全部通关 → 进入完成态 (0.4841ms)\n✔ 首页：全部通关后重置一个艺 → 推荐回到该艺（而不是完成态） (0.5095ms)\n✔ 首页：六艺十式图已全部画全（60 张；回归：曾经只有俯卧撑有逐式图） (0.4539ms)\n✔ 详情页：记一组立刻落盘，离开再进来还在（回归：真机曾\"返回后数据没了\"） (2.7694ms)\n✔ 详情页：提交后草稿清掉，转成正式记录 (0.9728ms)\n✔ 详情页：点示意图能看大图，再点一下关掉（示意图太小看不见细节） (0.7725ms)\n✔ 详情页：换式之后大图状态要复位（不能带着上一个式子的遮罩） (0.4316ms)\n✔ 详情页：删除某组 / 清空 会同步更新草稿 (0.5146ms)\n✔ 快捷档位：点「中级」→ 直接按 2 组 × 25 填入，判定立刻跟上（回归：访谈说\"要手输太麻烦\"） (0.5806ms)\n✔ 快捷档位：计时类动作按\"秒\"（倒立撑前三式） (0.3722ms)\n✔ 锁定：未解锁的式不能记录，且明确告诉用户先练哪一式 (0.4474ms)\n✔ 锁定：点「下一式」只是查看，不会把当前式带走（回归：访谈里\"点下一式状态就乱了\"） (0.6245ms)\n✔ 锁定：达标提交后（点\"留在本式\"）→ 列表里下一式必须是\"进行中\"（回归：访谈发现列表里一个进行中都没有） (1.3285ms)\n✔ 锁定：达标提交后点「去练下一式」→ 第 2 式可直接记录 (0.68ms)\n✔ 锁定：已通过的式可以复习记录，且不会把当前式拉回去 (1.2289ms)\n✔ 锁定：草稿也算\"动过\"——当前式记一组没提交，列表副文案要写清楚 (0.3849ms)\n✔ 验收#3：首页点\"有 N 组未提交\"提示会跳到对应那一式 (0.4106ms)\n✔ 验收#16：列表页重置清掉已通过与未提交的组，但保留训练记录 (0.4152ms)\n✔ 调试入口：列表页长按进度卡能造进度，也能还原真实进度 (0.5909ms)\n✔ 详情页：第十式达标 + 其余九式已通过 → 通关、弹「全部完成」 (0.5138ms)\n✔ 详情页：只有第 10 式通过（历史数据/跨版本）→ 不算通关（回归：曾误报\"全部完成\"） (0.401ms)\n✔ 详情页：未达标就完成 → 有明确反馈，不再\"像点击没反应\"（回归） (0.4291ms)\n✔ 详情页：第十式未达标 → 只记录，不通关 (0.3795ms)\n✔ 详情页：通关后复习第 10 式，通关标记与首次通关时间都不被覆盖 (0.7748ms)\n✔ 详情页：非最后一式达标 → 弹晋级框，确认后进入下一式 (0.3964ms)\n✔ 列表页：三态文字与标记正确（已通过 / 进行中 / 未解锁） (0.4371ms)\n✔ 往返：未达标提交 → 回列表 → 显示\"进行中 · 已练 1 次\"（回归：曾经看不出练过） (0.6719ms)\n✔ 往返：练完提交 → 重进详情页 → 必须看到这条历史记录（回归：曾完全看不到） (0.6515ms)\n✔ 往返：记一组就离开 → 重进恢复；提交后草稿转历史 (0.8779ms)\n✔ 列表页：顶部器械说明来自数据，不是页面里写死的文案 (3.164ms)\n✔ 详情页：?quick=1 才是极简模式，普通进入不是 (1.8336ms)\n✔ 详情页：极简模式只加一句提示，不降低达标标准、也不解锁后式 (1.2358ms)\n✔ 首页：极简入口带 quick=1，普通入口不带 (0.4728ms)\n✔ 首页：分享卡片带当前艺与式号，路径直达那一式 (0.3662ms)\n✔ 首页：全部通关时分享回首页，标题里不出现\"第 N 式\" (0.3437ms)\n✔ 详情页：分享路径锁在这一式本身，不带极简/调试参数 (0.3287ms)\n✔ 详情页文案：要点标明\"自撰、非原书\"，极简提示不许承诺\"进度照样算\" (0.2554ms)\n✔ 调试信息只在开发版：体验版/正式版连 data 里都不该有诊断信息 (1.0349ms)\n✔ 后门不进线上：体验版/正式版长按没有任何反应 (0.8609ms)\n✔ 版本号：所有环境都显示，且与 package.json 一致（验收时靠它认包） (0.9214ms)\n✔ 用户界面上不许出现内部数据话术（\"待校对\"\"以原书核对\"这类） (0.427ms)\n✔ 空记录：没有任何档位 (0.9702ms)\n✔ 1×10 达成初级 (0.3223ms)\n✔ 2×25 达成中级，并算出\"还差 3 组 × 50 次\" (0.264ms)\n✔ 已经做了一部分下一档的组数时，缺口相应减少 (0.1406ms)\n✔ 3×50 达成升级 → 可以进下一式 (0.1917ms)\n✔ 组数够但数值不够，不算达标（2×50 只到中级） (0.1519ms)\n✔ 数值够但组数不够，不算达标（1×50 只到初级） (0.1256ms)\n✔ 超量完成也算达标（4×60 到升级） (0.149ms)\n✔ 乱序记录不影响判定（先多后少） (0.1684ms)\n✔ 非法值被过滤掉 (0.2688ms)\n✔ 计时型动作：30/60/120 秒 (0.9067ms)\n✔ 每侧动作：标准与提示都带\"每侧\" (0.1828ms)\n✔ 组数不单调的标准也要判对（单臂倒立撑 1×1 / 2×2 / 1×5） (0.5315ms)\n✔ formatStdLine / formatTier 文案 (0.0906ms)\n✔ currentNo：当前式 = 第一个没通过的式（推导，不存储） (0.1988ms)\n✔ canPractice：只有\"已通过的式\"和\"当前式\"能记录（锁定式推进） (0.1171ms)\n✔ artStatus 进度换算（含通关） (0.2799ms)\n✔ artStatus：「没练过」不能显示\"进行中\"（回归：真机验收发现六个艺全是进行中） (0.1447ms)\n✔ countRecentDays 只统计窗口内的天数 (0.5969ms)\n✔ 推荐：优先最近练过、且未通关的艺 (0.2156ms)\n✔ 推荐：最近练的艺已通关 → 跳过它，顺延到下一个未通关的艺 (0.0863ms)\n✔ 推荐：通关多个后继续顺延（俯卧撑+深蹲已通关 → 引体向上） (0.0628ms)\n✔ 推荐：没有任何记录 → 从第一个艺开始 (0.0463ms)\n✔ 推荐：六艺全部通关 → all-done (0.0605ms)\n✔ 推荐：式号越界时收敛到有效范围 (0.0429ms)\n✔ stepStates：锁定式推进下只有三态（已通过 / 进行中 / 未解锁） (0.3729ms)\n✔ stepBanner：详情页顶部状态说明（三种） (0.123ms)\n✔ formatTime / sessionText 文案 (0.0935ms)\n✔ latestSession 取最近一条 (0.0538ms)\n✔ 存储：默认状态干净 (0.976ms)\n✔ 存储：进的唯一真相是\"已通过表\"，不再存\"当前式\" (0.1811ms)\n✔ 存储：训练记录可追加、可按艺查询、取最近 (0.1977ms)\n✔ 存储：通关记里程碑，重置会清掉通关与未提交的草稿（记录保留） (0.2308ms)\n✔ 存储：completeArt 保留首次通关时间，复习只更新\"最近一次\" (0.1014ms)\n✔ 存储：调试造进度会先备份，还原后回到真实进度 (0.2968ms)\n✔ 存储：草稿——每组即时落盘、可恢复、提交后清除 (0.2479ms)\n✔ 存储：记录上限 500 条，防止无限增长 (1.1112ms)\n\n  ── 界面质量检查单 · A 组（Q1/Q2 对比度）──\n  ✅ 16.96:1 (需 4.5) 页面正文             #111827 on #f8fafc\n  ⚠️ 大标题 .h1          .h1                            跳过：没读到 color\n  ✅  4.55:1 (需 4.5) 副标题 .sub         #64748b on #f8fafc\n  ✅  4.76:1 (需 4.5) 次要文字 .muted      #64748b on #ffffff\n  ✅  4.76:1 (需 4.5) 浅色提示 .light      #64748b on #ffffff\n  ✅  5.17:1 (需 4.5) 强调字 .accent      #2563eb on #ffffff\n  ✅  4.83:1 (需 4.5) 危险字 .danger      #dc2626 on #ffffff\n  ✅  4.55:1 (需 4.5) 免责声明             #64748b on #f8fafc\n  ✅  6.92:1 (需 4.5) 灰色徽标             #475569 on #f1f5f9\n  ✅ 10.35:1 (需 4.5) 小标签 .chip        #334155 on #ffffff\n  ✅ 17.74:1 (需 4.5) 主按钮 .btn         #fff on #111827\n  ✅  4.55:1 (需 4.5) 列表图例             #64748b on #f8fafc\n  ✅  4.55:1 (需 4.5) 图例·未解锁           #64748b on #f8fafc\n  ✅  6.92:1 (需 4.5) 序号圆点             #475569 on #f1f5f9\n  ✅  4.64:1 (需 4.5) 未解锁式名            #64748b on #fcfcfd\n  ✅  6.92:1 (需 4.5) 状态块·未解锁          #475569 on #f1f5f9\n  ✅  4.57:1 (需 4.5) 状态块·已通过          #15803d on #dcfce7\n  ✅  5.49:1 (需 4.5) 状态块·进行中          #1d4ed8 on #dbeafe\n  ✅  4.76:1 (需 4.5) 调试行              #64748b on #ffffff\n  ✅  6.92:1 (需 4.5) 诊断行              #475569 on #f1f5f9\n  ✅  4.76:1 (需 4.5) 卡片状态·未开始         #64748b on #ffffff\n  ✅  6.70:1 (需 4.5) 卡片状态·进行中         #1d4ed8 on #ffffff\n  ✅  5.02:1 (需 4.5) 卡片状态·已通关         #15803d on #ffffff\n  ✅  4.76:1 (需 4.5) 卡片进度数字           #64748b on #ffffff\n  ✅  4.76:1 (需 4.5) 图待补提示            #64748b on #ffffff\n  ✅  4.55:1 (需 4.5) 横幅·未解锁           #64748b on #f8fafc\n  ✅  6.16:1 (需 4.5) 横幅·进行中           #1d4ed8 on #eff6ff\n  ✅  4.79:1 (需 4.5) 横幅·已通过           #15803d on #f0fdf4\n  ✅  4.76:1 (需 4.5) 卡片小标题            #64748b on #ffffff\n  ✅  4.76:1 (需 4.5) 式号指示             #64748b on #ffffff\n  ✅  4.55:1 (需 4.5) 未解锁说明            #64748b on #f8fafc\n  ✅  4.76:1 (需 4.5) 档位数值             #64748b on #ffffff\n  ✅  4.76:1 (需 4.5) 历史时间             #64748b on #ffffff\n  ✅ 10.35:1 (需 4.5) 历史成绩             #334155 on #ffffff\n  ✅  6.16:1 (需 4.5) 价值主张             #1d4ed8 on #eff6ff\n  ✅  7.24:1 (需 4.5) 极简入口             #475569 on #f8fafc\n  ✅ 17.74:1 (需 4.5) 分享按钮             #111827 on #ffffff\n  ✅  7.24:1 (需 4.5) 器械说明行            #475569 on #f8fafc\n  ✅  6.92:1 (需 4.5) 器械标签             #475569 on #f1f5f9\n  ✅  7.24:1 (需 4.5) 极简提示条            #475569 on #f8fafc\n  ✅  6.16:1 (需 4.5) 极简提示标签           #1d4ed8 on #eff6ff\n  ✅  6.16:1 (需 4.5) 点击看大图            #1d4ed8 on #eff6ff\n  ✅  6.84:1 (需 4.5) 数据来源备注           #92400e on #fffbeb\n  ✅  4.55:1 (需 4.5) 版本号              #64748b on #f8fafc\n\n  ── Q4 点按区（视觉 + 隐形外扩）──\n  ✅ 有效  88rpx (需 88) = 视觉  88 + 外扩  0   主按钮 .btn\n  ✅ 有效  88rpx (需 88) = 视觉  88 + 外扩  0   记一组 .add-btn\n  ✅ 有效  90rpx (需 88) = 视觉  74 + 外扩 16   上一式/下一式\n  ✅ 有效 120rpx (需 88) = 视觉 120 + 外扩  0   档位按钮 .quick-btn\n  ✅ 有效  88rpx (需 88) = 视觉  66 + 外扩 22   删组标签 .chip\n  ✅ 有效  88rpx (需 88) = 视觉  88 + 外扩  0   展开历史 .hist-toggle\n  ✅ 有效  90rpx (需 88) = 视觉  74 + 外扩 16   极简入口 .quick-entry\n✔ Q1/Q2 对比度：所有文字/背景配对都达标（WCAG AA） (5.6678ms)\n✔ Q3 字号：关键信息 ≥22rpx、装饰性提示 ≥20rpx (0.7987ms)\n✔ Q4 点按区：主操作有效点按高度 ≥88rpx（视觉可小，靠隐形外扩补） (1.7403ms)\n✔ Q7 不用纯黑纯灰：正文/标题不许出现 #000 / #333 / gray (0.2145ms)\n✔ Q8 视觉基线：解码正确、指纹容忍 1px 位移、且对真实改动敏感 (67.374ms)\nℹ tests 111\nℹ suites 0\nℹ pass 111\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 234.5886","e2e":"> convict-fitness-miniapp@0.1.8 e2e\n> node e2e/run.js\n\n→ 连接小程序自动化服务…\n→ 没有可用的自动化服务（Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled），正在启动…\n→ 正在执行 cli auto 启动自动化服务（输出如下）…\nnode.exe : - initialize\nAt line:1 char:1\n+ & \"C:\\Program Files\\nodejs/node.exe\" \"C:\\Program Files\\nodejs/node_mo ...\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : NotSpecified: (- initialize:String) [], RemoteException\n    + FullyQualifiedErrorId : NativeCommandError\n \n\n(node:35256) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative inste\nad.\n(Use `微信开发者工具 --trace-deprecation ...` to show where the warning was created)\n√ IDE server has started, listening on http://127.0.0.1:63512\n- preparing\n- Fetching AppID () permissions\n√ Using AppID: wx················\n√ auto\n→ cli auto 退出码 0，等待自动化服务就绪…\n→ 自动化服务已就绪（等待 3s）\n→ App 就绪（当前页 pages/index/index）\n\n▸ 首页：推荐与六艺卡片\n  ✓ 推荐卡片指向 俯卧撑 第 1 式\n  ✓ 推荐文案说明了原因\n  ✓ 全新用户看到的是「开始训练」而不是「接着练」\n  ✓ 六艺卡片渲染 6 张\n  ✓ 六个进度条都存在\n  ✓ 俯卧撑显示\"图 10/10\"（回归：曾经 9/10）\n  ✓ 全新用户六个艺都显示\"未开始\"\n  ✓ 卡片状态文案够短（半个卡片宽不折行）\n  ✓ 六艺十式图已全部画全（60 张）\n  ✓ 存储走的是真 storage（非内存降级）\n\n▸ 首页 → 俯卧撑十式列表（触发真实 goArt）\n  ✓ 跳到十式列表页\n  ✓ 进度为 第 1 / 10 式\n  ✓ 第 1 式 = 进行中\n  ✓ 第 2–10 式 = 未解锁（锁定式推进：不能跳级）\n  ✓ 列表渲染 10 行\n  ✓ 表头进度条 0%\n\n▸ 列表 → 墙壁俯卧撑详情（触发真实 goStep）\n  ✓ 跳到详情页\n  ✓ 动作名 = 墙壁俯卧撑\n  ✓ 详情页顶部横幅说明\"当前在练\"\n  ✓ 三档标准渲染 3 行\n  ✓ 标准文案 = 初级 1×10 / 中级 2×25 / 升级 3×50\n  ✓ 示意图已渲染\n  ✓ 图指向 mov-pushup-01\n  ✓ 示意图按比例占满宽度（mode=widthFix，不再被固定高度压小）\n  ✓ 示意图上有\"点击看大图\"提示\n  ✓ 点示意图打开全屏大图\n  ✓ 大图里真的渲染了图片\n  ✓ 再点一下关闭大图（遮罩消失）\n\n▸ 记录两组 25 次 → 看判定文案\n  ✓ 记录了两组\n  ✓ 判定为【中级】\n  ✓ 算出\"还差 3 组 × 50次\"\n  ✓ 页面上真的显示了这句（渲染层）\n\n▸ 做满升级标准 → 弹达标框 → 下一式自动解锁（回归：访谈发现\"达标后列表里没有进行中\"）\n  ✓ 达成【升级】\n  ✓ canAdvance = true\n  ✓ 训练记录写入本地存储\n  ✓ 这一式被记为\"已通过\"\n  ✓ 训练记录挂在第 1 式上\n  ✓ 达标后第 1 式 = 已通过\n  ✓ 达标后第 2 式 = 进行中（回归：访谈里这里一个\"进行中\"都没有）\n  ✓ 列表里\"进行中\"只有 1 个（锁定式推进的必然结果）\n\n▸ 第十式做满 → 通关（回归：曾经无法通关、进度卡 90%）\n  ✓ 识别为最后一式\n  ✓ 显示\"最后一式\"提示条\n  ✓ 达成【升级】\n  ✓ 已标记通关\n  ✓ 首次通关时间已记录\n  ✓ 通关记录已落库（第 10 式）\n  ✓ 弹窗确认后请求返回上一页\n\n▸ 回首页 → 推荐顺延（回归：曾经仍推荐俯卧撑第 10 式）\n  ✓ 推荐顺延到 深蹲 第 1 式\n  ✓ 推荐原因 = 已通关 1 艺\n  ✓ 未进入全通关态\n  ✓ 已通关计数 = 1\n  ✓ 俯卧撑卡片显示\"已通关\"（渲染层）\n  ✓ 未通关的艺不显示\"已通关\"\n  ✓ 俯卧撑进度条 100%\n\n▸ 六艺全通关 → 首页完成态\n  ✓ 进入全部通关态\n  ✓ 推荐卡片被替换（main 为空）\n  ✓ 六艺全部 100%\n  ✓ 计数 6 / 6\n  ✓ 显示\"全部通关\"标题\n\n▸ 未达标就\"完成本次训练\" → 明确反馈（回归：真机上曾像点击无反应）\n  ✓ 页面留下\"上一次记录\"结果\n  ✓ 结果写明达成档位\n  ✓ 结果写明还差多少\n  ✓ 记录已落库（1 条）\n  ✓ 组数已清空，可继续记录\n  ✓ \"上一次记录\"卡片已渲染\n  ✓ 列表：当前式显示\"进行中\"（可练）\n  ✓ 列表：副文案短到\"已练 1 次\"（回归①：曾经看不出练过；②：曾经太长挤折左侧）\n  ✓ 列表：未达标的下一式 = 未解锁（没通过就不解锁）\n  ✓ 列表：未解锁的行不再重复\"先通过第 N 式\"（同一句重复 8 遍是噪音）\n  ✓ 列表：副文案都很短（半宽卡片里不跟左侧抢位置）\n  ✓ 重进详情页能看到历史记录（回归：曾完全看不到）\n  ✓ 历史记录内容正确\n  ✓ 历史卡片已渲染\n\n▸ 快捷档位：点「中级」→ 直接变成 2 组 × 25（回归：访谈说\"要手输次数，太麻烦\"）\n  ✓ 快捷档位按钮渲染 3 个\n  ✓ 一键填入 = 2 组 × 25\n  ✓ 判定立刻变成【中级】\n  ✓ 组标签已渲染 2 个\n\n▸ 锁定：未解锁的式只能看，不能记录（只有在练的那一式能记）\n  ✓ 第 3 式显示为未解锁\n  ✓ 顶部横幅说明未解锁\n  ✓ 页面写明先通过哪一式\n  ✓ 动作图与三档标准照常可见（\"仅支持查看\"）\n  ✓ 未解锁时不出现记录按钮\n\n▸ 锁定：点「下一式」只是查看，不会把当前式带走\n  ✓ 存储里已不再有 currentNo 字段（改成推导）\n  ✓ 翻页后当前式仍是第 1 式（只是\"查看\"第 2 式）\n\n▸ 第二批：器械说明 / 极简入口 / 分享（回应访谈里的\"没器械\"\"没时间\"\"没人陪\"）\n  ✓ 列表页透出器械说明（引体向上 = 一根单杠）\n  ✓ 器械说明行已渲染到页面上\n  ✓ 首页说\"不用专业器械\"而不是\"零器械\"（引体要单杠、倒立撑要墙）\n  ✓ 首页有\"今天只有 10 分钟\"的极简入口\n  ✓ 分享按钮已渲染（必须是 button + open-type=share）\n  ✓ 首页分享标题带当前艺与式号\n  ✓ 首页分享路径直达当前式\n  ✓ 极简入口落在同一式上，且带上极简标记\n  ✓ 详情页显示极简模式提示\n  ✓ 极简模式不降低达标标准（仍是 1×10 / 2×25 / 3×50）\n  ✓ 详情页分享路径锁在这一式，不带 quick 参数\n\n▸ 上线前收口：调试信息只在开发版、版本号在所有环境可见\n  ✓ 自动化跑的是开发版，调试开关是开的\n  ✓ 诊断条印出了当前环境（用来实证\"预览码算哪个环境\"）\n  ✓ 首页底部版本号 = package.json 的版本（验收时靠它认包）\n  ✓ 列表页出现\"长按造进度\"提示行（只有开发版才有）\n  ✓ 十式列表 10 行里没有任何一行出现\"待校对\"\n  ✓ 详情页备注用中性 note-line，说的是\"公开资料…前后矛盾\"而不是内部话术\n\n▸ 收尾：还原成\"全新用户\"（不污染手动测试数据）\n  ✓ 已还原：推荐回到俯卧撑第 1 式\n\n────────────────────────────────────────────────────────\nE2E：102 / 102 通过\n截图：e2e/shots/（0 张）","shots":"> convict-fitness-miniapp@0.1.8 e2e:shots\n> node e2e/shots.js\n\n→ 连接自动化服务…\n→ 已连接现有自动化服务 ws://127.0.0.1:9420\n  01-home-fresh  首页 · 全新用户 … ✓\n  02-art-fresh  十式列表 · 全新（第 1 式进行中，其余未解锁） … ✓\n  03-art-practiced  十式列表 · 第 1 式已通过（练过 2 次）+ 第 2 式进行中（有未提交的组） … ✓\n  04-art-passed  十式列表 · 前三式已通过（第 4 式进行中，其余未解锁） … ✓\n  05-step-current  详情页 · 当前在练（有历史记录） … ✓\n  06-step-passed  详情页 · 已通过（横幅应为绿色） … ✓\n  07-step-draft  详情页 · 有未提交的组（草稿恢复提示） … ✓\n  08-step-last  详情页 · 第十式（九个已通过） … ✓\n  09-home-progress  首页 · 俯卧撑已通关，推荐顺延到深蹲 … ✓\n  10-home-all-done  首页 · 六艺全部通关 … ✓\n  11-step-locked  详情页 · 未解锁的式（只能看，不能记） … ✓\n  12-step-quick-tier  详情页 · 一键按【中级】填入 2 组 × 25 … ✓\n  13-step-pose-big  详情页 · 点示意图看全屏大图（tap 触发） … ✓\n  14-art-gear  十式列表 · 器械说明行（引体向上：需要一根单杠） … ✓\n  15-step-quick  详情页 · 极简模式（从首页\"今天只有 10 分钟\"进来） … ✓\n  16-art-note-rows  十式列表滚到底 · 第 8/10 行不再有「数据待校对」红字（验收 36） … ✓\n  17-home-bottom  首页滚到底 · 版本号（所有环境都显示，验收 19） … ✓\n  18-step-note  详情页 · 数据备注改成中性琥珀色（验收 36） … ✓\n  19-pullup-no-note  详情页 · 引体第 8 式：来源笔误已核对，备注已撤（验收 36） … ✓\n\n截图：19 / 19 张成功 → e2e/shots/\n\n视觉基线比对（基线 2026-10-09 04:14，裁掉顶部 48 行 + 容忍 1px 位移）：\n  ✓ 19 张全部与基线一致（页面没被意外改动）"},"logMeta":{}}</script>
 <!-- DATA:END -->
 
 <script>
 (function(){
-  /* ---------------- 数据 ---------------- */
+  /* ---------- 读数据 ---------- */
   var data = {node:{files:[],total:0},e2e:{scenarios:[],total:0},shots:{states:[],total:0},logs:{}};
   try { data = JSON.parse(document.getElementById('testdata').textContent); } catch(e){ console.error('数据解析失败', e); }
 
-  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-  /* 用例名里的「（回归：…）」用黄绿高亮 —— 表示这是原文里的标注 */
-  function markRegression(name){
-    return esc(name).replace(/（回归[^）]*）/g, function(m){ return '<span class="hl">'+m+'</span>'; });
-  }
+  var PLAY = {node:null, e2e:null, shots:null};
 
-  /* ---------------- 条形图 ---------------- */
-  function renderBars(id, rows, maxRef){
-    var box = document.getElementById(id);
-    if(!box) return;
-    var max = maxRef || Math.max.apply(null, rows.map(function(r){ return r.value; })) || 1;
-    box.innerHTML = rows.map(function(r){
-      var pct = Math.max((r.value / max) * 100, 1.5);
-      var cls = r.alt ? 'alt' : (r.lime ? 'lime' : '');
-      return '<div class="bar-row">' +
-        '<span class="lab"' + (r.title ? ' title="' + esc(r.title) + '"' : '') + '>' +
-          r.label + (r.hint ? ' <em>' + r.hint + '</em>' : '') + '</span>' +
-        '<span class="bar-track"><i class="bar-fill ' + cls + '" style="width:' + pct.toFixed(1) + '%"></i></span>' +
-        '<span class="num">' + r.text + '</span></div>';
-    }).join('');
-  }
+  /* ---------- 数字滚动 ---------- */
+  /* 数字是静态写死的（截图/打印/关掉 JS 都正确）；出场只做一点弹跳动画 */
+  document.querySelectorAll('.num b').forEach(function(el, i){
+    el.classList.add('pop');
+    el.style.animationDelay = (i * 70) + 'ms';
+  });
 
-  var LAYER_TITLES = {
-    L1:'L1 数据完整性', L1b:'L1b 数据来源', L2:'L2 判定逻辑',
-    L3:'L3 本地存储', L4:'L4 页面流程', L4b:'L4b 界面质量'
-  };
-  renderBars('chart-layers', (data.node.files||[]).map(function(f){
-    return { label: LAYER_TITLES[f.layer] || f.layer, value: f.tests.length, text: f.tests.length + ' 条' };
-  }));
-  renderBars('chart-cost', [
-    { label: 'npm test', value: 0.22, text: '0.2 秒' },
-    { label: 'npm run e2e', value: 90, text: '约 90 秒', alt: true },
-    { label: 'npm run e2e:shots', value: 60, text: '约 60 秒', alt: true }
-  ], 90);
-  renderBars('chart-scenes', (data.e2e.scenarios||[]).map(function(s, i){
-    // 场景名较长，标签只放序号，完整名字放 title（悬停可见），数字只在右列出现一次
-    return { label: '场景 ' + (i + 1), title: s.name, value: s.checks.length, text: s.checks.length + ' 条' };
-  }));
-
-  /* ---------------- 阶段内容 ---------------- */
+  /* ---------- 阶段内容 ---------- */
   var STAGES = {
     node: {
       title:'Node 断言', cmd:'npm test', file:'node --test（Node 内置测试器）',
       dur:'约 0.2 秒', who:'纯 Node，无框架、无依赖、无 npm ci',
       steps:[
-        ['扫描并发现测试文件','<code>node --test</code> 递归扫描仓库，自动匹配所有 <code>*.test.js</code>（本项目 6 个文件），不需要任何配置。'],
-        ['加载被测模块','每个测试文件直接 <code>require</code> 真实业务代码：<code>data/arts.js</code>、<code>utils/progress.js</code>、<code>utils/store.js</code> 与页面脚本。'],
-        ['给页面代码装"插座"','页面测试先加载 <code>tests/helpers/miniapp-stub.js</code>：装上全局 <code>wx</code>（storage 用内存实现）与 <code>Page/App</code> 收集器 —— 于是真实页面代码能在 Node 里被驱动。'],
-        ['逐条执行断言','111 条 <code>node:assert</code> 断言依次执行；任何一条抛出 → 该文件标红、进程退出码 1。'],
-        ['输出汇总','打印 TAP 风格汇总（tests / pass / fail / duration），本地与 CI 都读它。']
+        ['扫描并发现测试文件','<span class="code">node --test</span> 递归扫描仓库，自动匹配所有 <span class="code">*.test.js</span>（本项目 6 个文件）。不需要任何配置。'],
+        ['加载被测模块','每个测试文件直接 <span class="code">require</span> 真实业务代码：<span class="code">data/arts.js</span>、<span class="code">utils/progress.js</span>、<span class="code">utils/store.js</span>、页面 <span class="code">.js</span>。'],
+        ['给页面代码装"插座"','页面测试先加载 <span class="code">tests/helpers/miniapp-stub.js</span>：装上全局 <span class="code">wx</span>（storage 用内存实现）和 <span class="code">Page/App</span> 收集器 —— 于是<b>真实页面代码能在 Node 里被驱动</b>。'],
+        ['逐条执行断言','111 条 <span class="code">node:assert</span> 断言依次跑；任何一条抛出 → 该文件标红、进程退出码 1。'],
+        ['输出汇总','打印 TAP 风格汇总（tests / pass / fail / duration），CI 与本地都读它。']
       ],
-      pipe:['node --test','发现 6 个 *.test.js','require 被测代码','装 wx/Page 打桩','执行 111 条断言','汇总 + 退出码']
+      pipe:['node --test','发现 6 个 *.test.js','require 被测代码','装 wx/Page 打桩','跑 111 条断言','汇总 + 退出码']
     },
     e2e: {
       title:'E2E（真实运行时）', cmd:'npm run e2e', file:'e2e/run.js → 微信开发者工具里的小程序运行时',
       dur:'1–2 分钟', who:'Node 脚本 + 官方 miniprogram-automator（WebSocket :9420）',
       steps:[
-        ['连自动化服务','先连 <code>ws://127.0.0.1:9420</code>；连不上就自动执行 <code>cli auto</code>（开发者工具 CLI）拉起服务，再等待就绪。'],
-        ['每个场景先复位','<code>mp.reLaunch(页面路径)</code> 直达目标页 → 等页面栈就绪 → 用 <code>page.data()</code> 作探针重试（避免"固定 sleep 不够"导致的偶发失败）。'],
-        ['调用真实事件处理函数','在 App 侧用 <code>getCurrentPages()</code> 取到页面实例，直接调用其真实处理函数（<code>addSet</code> / <code>finish</code> / <code>onShow</code> 等）。<br>为何不点坐标：<code>element.tap()</code> 在自动化实例里点不到 <code>bindtap</code>；调用处理函数走的是同一段代码，只是不经过手指。'],
-        ['逐条断言（两个视角）','<code>check(名称, 实际, 期望)</code>：既断言页面 <code>data()</code>，也断言渲染层可见文本 —— 以"用户看得见什么"为准。'],
-        ['失败也要记账','场景异常时在 <code>catch</code> 中补记一条失败，最后用 <code>EXPECTED_CHECKS = 102</code> 校验总条数，防止"跑一半崩溃却报全绿"。'],
-        ['收尾还原','把存储写回"全新用户"，不污染手动测试的数据。']
+        ['连自动化服务','先连 <span class="code">ws://127.0.0.1:9420</span>；连不上就自动执行 <span class="code">cli auto</span>（开发者工具 CLI）把服务拉起来，再等就绪。'],
+        ['每个场景先复位','<span class="code">mp.reLaunch(\'/pages/...\')</span> 直达目标页 → 等页面栈就绪 → 用 <span class="code">page.data()</span> 当探针重试（避免"固定 sleep 不够"）。'],
+        ['调真实事件处理函数','在 App 侧用 <span class="code">getCurrentPages()</span> 取到页面实例，<b>直接调用它的真实处理函数</b>（<span class="code">addSet</span> / <span class="code">finish</span> / <span class="code">onShow</span> …）。<br>为什么不点坐标：<span class="code">element.tap()</span> 在自动化实例里点不到 <span class="code">bindtap</span>；调处理函数走的是<b>同一段代码</b>，只是不经过手指。'],
+        ['逐条断言（两个视角）','<span class="code">check(名, 实际, 期望)</span>：既断言页面 <span class="code">data()</span>，也断言<b>渲染层看得见的文本</b>（"用户看得见什么"）。'],
+        ['失败也要记账','场景抛异常时 <span class="code">catch</span> 里补记一条失败，最后用 <span class="code">EXPECTED_CHECKS = 102</span> 校验总条数 —— 防"跑一半崩了却报全绿"。'],
+        ['收尾还原','把存储写回"全新用户"，不污染你手动测试的数据。']
       ],
-      pipe:['连 ws:9420','（必要时）cli auto','reLaunch 目标页','evaluate 调用真实处理函数','check 逐条断言','收尾还原为新用户']
+      pipe:['连 ws:9420','（必要时）cli auto','reLaunch 目标页','evaluate 调真实处理函数','check 逐条断言','收尾还原成新用户']
     },
     shots: {
       title:'截图 + 视觉基线', cmd:'npm run e2e:shots', file:'e2e/shots.js + e2e/shots-baseline.json',
       dur:'约 1 分钟', who:'19 个状态的截图 → 行暗度指纹比对',
       steps:[
-        ['逐状态预置数据','每个状态先写 <code>wx.storage</code>：全新用户 / 已通过三式 / 有草稿 / 九个已通过等，再 <code>reLaunch</code> 到目标页。'],
-        ['等渲染 + 可选交互','等 ≥0.2 秒让视图层绘制完成；需要时滚动到页面下方（<code>pageScrollTo</code>）或点击元素（例如打开图片大图）。'],
-        ['截图落盘','<code>mp.screenshot()</code> 写入 <code>e2e/shots/状态名.png</code>。空白守卫：体积过小视为空白，只对空白补拍一次。'],
-        ['先查尺寸（几何守卫）','尺寸与基线不一致 → 判定"环境变化、不可比"并单独提示（例如 363×785 → 377×813），不逐张报红。'],
-        ['行暗度指纹比对','裁掉顶部 48 行（避开状态栏时钟与电量）→ 每行统计暗像素个数 → 逐行比较：单行差 ≤8 视为同一行；坏行占比 >0.8% 且坏行 ≥5 判定为"已变化"。<br>为何不用整图哈希：时钟与 1px 渲染位移会让它每次都"全部变化"。'],
-        ['汇总结论','输出"19/19 成功 + 与基线一致"，或列出变化的图，交由人工看图决定 approve（<code>--update-baseline</code>）还是回滚。']
+        ['逐状态预置数据','每个状态先写 <span class="code">wx.storage</span>：全新用户 / 已过三式 / 有草稿 / 九个已通过 …再 <span class="code">reLaunch</span> 到目标页。'],
+        ['等渲染 + 可选交互','等 ≥0.2 秒让视图层画完；需要时滚动到页面下方（<span class="code">pageScrollTo</span>）或点击（如图片大图）。'],
+        ['截图落盘','<span class="code">mp.screenshot()</span> → <span class="code">e2e/shots/&lt;状态名&gt;.png</span>。<b>空白守卫</b>：体积过小视为空白，只对空白补拍一次。'],
+        ['先查尺寸（几何守卫）','尺寸与基线不一致 → 直接判定<b>"环境变了、不可比"</b>并单独提示（比如 363×785 → 377×813），不逐张刷屏。'],
+        ['行暗度指纹比对','裁掉顶部 48 行（躲开状态栏时钟/电量）→ 每行统计"暗像素个数"→ 逐行比：单行差 ≤8 算同一行；<b>坏行占比 &gt;0.8% 且坏行 ≥5</b> 判"变了"。<br>为什么不用整图哈希：时钟、1px 渲染位移都会让它每次都"全变"。'],
+        ['汇总结论','打印"19/19 成功 + 与基线一致"，或列出哪几张变了，交给人看图决定 approve（<span class="code">--update-baseline</span>）还是回滚。']
       ],
-      pipe:['预置 storage','reLaunch','等渲染 / 滚动','screenshot 落盘','尺寸守卫 → 指纹比对','汇总（人工看图）']
+      pipe:['预置 storage','reLaunch','等渲染/滚动','screenshot 落盘','尺寸守卫 → 指纹比对','汇总（人看图）']
     }
   };
+
+  /* ---------- 渲染一个阶段 ---------- */
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function reg(rn){ return String(rn).replace(/（回归[^）]*）/g, function(m){ return '<span class="rn">'+m+'</span>'; }); }
 
   function caseGroups(stage){
     if(stage === 'node'){
@@ -430,7 +363,7 @@
     }
     return (data.shots.states||[]).map(function(s){
       return {tag:'截图', name:s.name, note:s.desc, count:(s.steps||[]).length,
-              cases:(s.steps && s.steps.length ? s.steps : ['直接截图']).map(function(x){ return {n:x, reg:false}; })};
+              cases:(s.steps&&s.steps.length? s.steps : ['直接截图']).map(function(x){ return {n:x, reg:false}; })};
     });
   }
 
@@ -439,55 +372,56 @@
     if(!S || !box || box.dataset.done) return;
 
     var groups = caseGroups(stage);
-    var total = groups.reduce(function(n,g){ return n+g.count; }, 0);
+    var totalCases = groups.reduce(function(n,g){ return n+g.count; }, 0);
     var logText = (data.logs||{})[stage] || '（未采集到日志）';
 
     box.innerHTML =
-      '<div class="card pad">' +
-        '<div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap">' +
-          '<strong style="font-size:15px;color:var(--ink-strong)">'+esc(S.title)+'</strong>' +
-          '<span class="chip k">'+esc(S.cmd)+'</span>' +
-          '<span class="chip">'+esc(S.dur)+'</span>' +
+      '<div class="card">' +
+        '<div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:10px">' +
+          '<h3 style="margin:0;font-size:19px;font-weight:900">'+esc(S.title)+'</h3>' +
+          '<span class="chip c">'+esc(S.cmd)+'</span>' +
+          '<span class="chip l">'+esc(S.dur)+'</span>' +
           '<span class="chip">'+esc(S.who)+'</span>' +
         '</div>' +
-        '<div class="pipe" style="margin-top:12px">' + S.pipe.map(function(p,i){
-            return (i? '<span class="arw">→</span>' : '') +
-              '<span class="chip'+(i===0?' k':'')+'">'+esc(p)+'</span>';
+        '<div class="pipe">' + S.pipe.map(function(p,i){
+            var cls = ['c','l','','o','p','u'][i%6];
+            return (i? '<span class="arw">➜</span>':'') + '<span class="chip '+cls+'">'+esc(p)+'</span>';
           }).join('') + '</div>' +
       '</div>' +
 
-      '<div class="card pad" style="margin-top:12px">' +
-        '<div class="chart-title" style="margin-bottom:10px">触发之后，逐步做了什么</div>' +
+      '<div class="card">' +
+        '<h3 style="margin:0 0 10px;font-size:17px;font-weight:900">触发之后，逐步做了什么</h3>' +
         '<div class="steps">' + S.steps.map(function(st){
           return '<div class="step"><div class="idx"></div><div><b>'+st[0]+'</b><p>'+st[1]+'</p></div></div>';
         }).join('') + '</div>' +
       '</div>' +
 
-      '<div class="card pad" style="margin-top:12px">' +
-        '<div class="toolbar" style="margin-bottom:10px">' +
-          '<div class="chart-title" style="margin:0">用例明细 <span style="font-weight:600;color:var(--muted)">'+total+' 条</span></div>' +
-          '<input type="search" placeholder="搜索用例名或场景名（例如：未解锁、通关、对比度）" data-search="'+stage+'">' +
+      '<div class="card">' +
+        '<div class="tools">' +
+          '<h3 style="margin:0;font-size:17px;font-weight:900">用例清单 <span style="font-size:13px;font-weight:800;background:var(--lime);border:2px solid var(--ink);border-radius:999px;padding:2px 10px">'+totalCases+' 条</span></h3>' +
+          '<input type="search" placeholder="搜用例名 / 场景名（比如：未解锁、通关、对比度）" data-search="'+stage+'">' +
           '<button class="btn" data-expand="'+stage+'">全部展开</button>' +
           '<button class="btn" data-collapse="'+stage+'">全部收起</button>' +
         '</div>' +
         '<div data-groups="'+stage+'">' + groups.map(function(g,i){
           return '<details class="grp"'+(i<2?' open':'')+' data-name="'+esc(g.name)+'">' +
             '<summary><span class="tag">'+esc(g.tag)+'</span><span class="gname">'+esc(g.name)+'</span>' +
-            (g.note? '<span class="gnote">'+esc(g.note)+'</span>':'') +
-            '<span class="gcount">'+g.count+' 条</span></summary>' +
+            (g.note? '<span style="font-size:12.5px;color:#5b5470">'+esc(g.note)+'</span>':'') +
+            '<span class="gcount">'+g.count+'</span></summary>' +
             '<div class="cases">' + g.cases.map(function(c){
-              return '<div class="case'+(c.reg?' reg':'')+'"><i>'+(c.reg?'▲':'·')+'</i><span>'+markRegression(c.n)+'</span></div>';
+              return '<div class="case'+(c.reg?' reg':'')+'"><i>✓</i><span>'+reg(esc(c.n))+'</span></div>';
             }).join('') + '</div></details>';
         }).join('') + '</div>' +
       '</div>' +
 
-      '<div style="margin-top:12px">' +
-        '<div class="chart-title" style="margin-bottom:8px">实际运行日志 <span style="font-weight:400;color:var(--faint)">（真实输出，非示例）</span></div>' +
-        '<div class="logcard">' +
-          '<div class="logbar"><span class="fname">'+esc(S.file)+'</span>' +
+      '<div class="card" style="padding:0;border:none;box-shadow:none;background:transparent">' +
+        '<h3 style="margin:0 0 10px;font-size:17px;font-weight:900">真实日志 <span style="font-size:13px;font-weight:800;color:#5b5470">（实际运行的输出）</span></h3>' +
+        '<div class="logbox">' +
+          '<div class="logbar"><span class="dots"><i></i><i></i><i></i></span>' +
+            '<span class="fname">'+esc(S.file)+'</span>' +
             '<span class="sp"><span class="spd" data-spd="'+stage+'"></span>' +
             '<button class="btn" data-play="'+stage+'">▶ 重播</button>' +
-            '<button class="btn" data-all="'+stage+'">全部显示</button></span></div>' +
+            '<button class="btn" data-all="'+stage+'">⏩ 全部显示</button></span></div>' +
           '<pre class="log" data-log="'+stage+'"></pre>' +
         '</div>' +
       '</div>';
@@ -499,19 +433,21 @@
     input.addEventListener('input', function(){
       var q = input.value.trim().toLowerCase();
       box.querySelectorAll('.grp').forEach(function(gr){
-        var groupHit = !q || gr.dataset.name.toLowerCase().indexOf(q) >= 0;
+        var hit = !q || gr.dataset.name.toLowerCase().indexOf(q) >= 0;
         var shown = 0;
         gr.querySelectorAll('.case').forEach(function(c){
           var m = !q || c.textContent.toLowerCase().indexOf(q) >= 0;
           c.style.display = m ? '' : 'none';
           if(m) shown++;
         });
-        var visible = groupHit || shown > 0;
-        gr.style.display = visible ? '' : 'none';
-        if(q && visible) gr.open = true;
-        gr.querySelector('.gcount').textContent = (q && shown ? shown : gr.querySelectorAll('.case').length) + ' 条';
+        var inGroup = hit || shown > 0;
+        gr.style.display = inGroup ? '' : 'none';
+        if(q && inGroup) gr.open = true;
+        gr.querySelector('.gcount').textContent = q && shown ? shown : gr.querySelectorAll('.case').length;
       });
     });
+
+    /* 展开/收起 */
     box.querySelector('[data-expand]').addEventListener('click', function(){
       box.querySelectorAll('.grp').forEach(function(g){ g.open = true; });
     });
@@ -519,56 +455,64 @@
       box.querySelectorAll('.grp').forEach(function(g){ g.open = false; });
     });
 
-    /* 日志：着色 + 重播 */
+    /* 日志：高亮 + 重播 */
     var pre = box.querySelector('pre.log');
     var lines = logText.split('\n');
     function colorize(line){
       var e = esc(line);
-      if(/✗|失败|Error|error|not found|超时|timeout/.test(line)) return '<span class="bad">'+e+'</span>';
+      if(/✗|失败|Error|error|not found|超时|timeout|报警/.test(line)) return '<span class="bad">'+e+'</span>';
       if(/✓|✔|通过|成功|全部与基线一致/.test(line)) return '<span class="ok">'+e+'</span>';
-      if(/^#|^▸|→/.test(line)) return '<span class="hd">'+e+'</span>';
-      if(/^>|^npm|^node /.test(line)) return '<span class="dim">'+e+'</span>';
+      if(/^#|^▸|^\s*·|→/.test(line)) return '<span class="hd">'+e+'</span>';
+      if(/^\$|^>|^npm|^node /.test(line)) return '<span class="dim">'+e+'</span>';
       return e;
     }
-    var timer = null, i = 0;
-    function stop(){ if(timer){ clearInterval(timer); timer = null; } }
     function showAll(){
       stop();
       pre.innerHTML = lines.map(colorize).join('\n');
-      pre.scrollTop = 0;
+      pre.scrollTop = 0;   // 从头看（底部是汇总，滚下去或点「重播」都行）
       box.querySelector('[data-spd]').textContent = '共 '+lines.length+' 行';
     }
+    var timer = null, i = 0;
+    function stop(){ if(timer){ clearInterval(timer); timer = null; PLAY[stage] = null; } }
     function play(){
       stop();
       pre.innerHTML = ''; i = 0;
+      var per = 45; // ms/行
       var t0 = Date.now();
       timer = setInterval(function(){
-        if(i >= lines.length){
-          stop();
-          box.querySelector('[data-spd]').textContent = '播完 '+lines.length+' 行';
-          return;
-        }
-        pre.insertAdjacentHTML('beforeend', lines.slice(i, i+3).map(colorize).join('\n') + '\n');
+        if(i >= lines.length){ stop(); box.querySelector('[data-spd]').textContent = '播完 '+lines.length+' 行'; return; }
+        var chunk = lines.slice(i, i+3);
+        pre.insertAdjacentHTML('beforeend', chunk.map(colorize).join('\n') + '\n');
         i += 3;
         pre.scrollTop = pre.scrollHeight;
-        box.querySelector('[data-spd]').textContent = Math.round(i/lines.length*100)+'% · '+((Date.now()-t0)/1000).toFixed(1)+'s';
-      }, 45);
+        var sec = ((Date.now()-t0)/1000).toFixed(1);
+        box.querySelector('[data-spd]').textContent = Math.round(i/lines.length*100)+'% · '+sec+'s';
+      }, per);
+      PLAY[stage] = {stop:stop};
     }
     box.querySelector('[data-play]').addEventListener('click', play);
     box.querySelector('[data-all]').addEventListener('click', showAll);
+
+    /* 默认：直接把日志铺满（不自动播放，避免三个面板同时跑） */
     showAll();
   }
 
-  /* ---------------- Tab ---------------- */
+  /* ---------- Tab 切换 ---------- */
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var runs = Array.prototype.slice.call(document.querySelectorAll('.run'));
   function select(stage){
     tabs.forEach(function(t){ t.setAttribute('aria-selected', String(t.dataset.tab === stage)); });
     document.querySelectorAll('.panel').forEach(function(p){ p.hidden = (p.dataset.panel !== stage); });
+    runs.forEach(function(r){ r.dataset.on = String(r.dataset.go === stage); });
     renderPanel(stage);
   }
   tabs.forEach(function(t){ t.addEventListener('click', function(){ select(t.dataset.tab); }); });
+  runs.forEach(function(r){ r.addEventListener('click', function(){
+    select(r.dataset.go);
+    document.getElementById('stage').scrollIntoView({behavior:'smooth', block:'start'});
+  }); });
 
-  /* 三个面板一次性渲染：切 tab 只是显示/隐藏，打印与导 PDF 也完整 */
+  /* 三个面板一次性渲染好：切 tab 只是显示/隐藏 —— 这样打印与导 PDF 也是完整的 */
   ['node', 'e2e', 'shots'].forEach(renderPanel);
 })();
 </script>
