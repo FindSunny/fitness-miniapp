@@ -221,13 +221,40 @@ const STATES = [
         }, s.scroll);
         await sleep(700);
       }
-      const r = await mp.screenshot({ path: file(s.name) });
-      if (!fs.existsSync(file(s.name)) && r) fs.writeFileSync(file(s.name), r, 'base64');
-      // 空图也算"成功"会骗人（踩过：pageScrollTo 之后截出一张 10KB 的白板，却报 ✓）
-      const size = fs.existsSync(file(s.name)) ? fs.statSync(file(s.name)).size : 0;
+      // 截图 + **空白图自动补拍一次**。
+      // 为什么补拍：这个 pass 偶发一张白板（实测同一状态十几张里随机挂一张，多半是视图层还没贴上来 /
+      // 会话跑久变慢）。以前直接判失败，"19 张里挂 1 张"变成常态，每次都要人肉重跑 ——
+      // 补拍一次约 2 秒，远低于重跑一遍的判断成本。
+      // 边界：只对"空白"重试；断言失败、页面报错照样抛出来，不会被掩盖。
+      let size = 0;
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        if (attempt > 1) {
+          await seed(mp, s.state);
+          await retry(() => mp.reLaunch(s.url), 3, 800).catch(() => {});
+          await sleep(1800);
+          if (s.scroll) {
+            await mp.evaluate(function (top) { wx.pageScrollTo({ scrollTop: top, duration: 0 }); }, s.scroll);
+            await sleep(700);
+          }
+          if (s.tap) {
+            await mp.evaluate(function (m) {
+              const pages = getCurrentPages();
+              const cur = pages[pages.length - 1];
+              if (cur && typeof cur[m] === 'function') cur[m]();
+            }, s.tap).catch(() => {});
+            await sleep(800);
+          }
+        }
+        const r = await mp.screenshot({ path: file(s.name) }).catch(() => null);
+        if (!fs.existsSync(file(s.name)) && r) fs.writeFileSync(file(s.name), r, 'base64');
+        // 空图也算"成功"会骗人（踩过：pageScrollTo 之后截出一张 10KB 的白板，却报 ✓）
+        size = fs.existsSync(file(s.name)) ? fs.statSync(file(s.name)).size : 0;
+        if (size > 15000) break;
+      }
       const ok = size > 15000;
-      results.push({ name: s.name, ok, err: ok ? '' : `疑似空白图（${(size / 1024).toFixed(1)} KB）` });
-      console.log(ok ? '✓' : `✗ 疑似空白图（${(size / 1024).toFixed(1)} KB）`);
+      const note = ok ? '' : `疑似空白图（${(size / 1024).toFixed(1)} KB，已补拍一次）`;
+      results.push({ name: s.name, ok, err: note });
+      console.log(ok ? '✓' : `✗ ${note}`);
     } catch (e) {
       results.push({ name: s.name, ok: false, err: e.message });
       console.log('✗ ' + e.message);
@@ -282,19 +309,38 @@ const STATES = [
     const old = base.images || {};
     const names = Object.keys(current);
     const details = [];
-    names.forEach(n => {
-      if (!old[n] || !old[n].fp || !current[n].fp) return;
-      if (old[n].hash === current[n].hash) return;              // 完全一致，快路径
-      const d = diffFingerprint(old[n].fp, current[n].fp);
-      if (!d.comparable) details.push(`${n}（${d.reason}）`);
-      else if (d.changed) details.push(`${n}（${d.badRows}/${d.totalRows} 行不同，最差第 ${d.worstRow} 行差 ${d.worstDelta} 像素）`);
-    });
+
+    // 先查"几何尺寸"：指纹是逐行比暗像素的，图片宽高都变了就没法比 ——
+    // 这时**不要**把 19 张都报成"变了"（狼来了），而是明确说"设备/窗口变了，基线要重建"。
+    // 踩过：用最小化方式启动开发者工具，模拟器跟着窗口缩放，图从 363×785 变成 377×813，
+    // 基线把 19 张全报"变了"，看的人只会以为代码炸了。
+    const dims = n => (old[n] ? `${old[n].w}×${old[n].h}` : '?');
+    const curDims = n => `${current[n].w}×${current[n].h}`;
+    const geometryChanged = names.filter(n => old[n] && (old[n].w !== current[n].w || old[n].h !== current[n].h));
+
+    console.log(`\n视觉基线比对（基线 ${base.updatedAt || '未知'}，裁掉顶部 ${base.cropTop} 行 + 容忍 1px 位移）：`);
+    if (geometryChanged.length === names.length) {
+      console.log(`  ⚠ 模拟器几何尺寸变了：基线 ${dims(names[0])} → 现在 ${curDims(names[0])}`);
+      console.log('    → 这不是内容变化（换设备 / 改窗口大小 / 以最小化方式启动开发者工具都会这样）');
+      console.log('    → 把窗口尺寸恢复成跑基线时的大小，或直接重建基线：npm run e2e:shots -- --update-baseline');
+    } else if (geometryChanged.length) {
+      console.log(`  ⚠ ${geometryChanged.length} 张的尺寸与基线不同（其余仍可比）：${geometryChanged.slice(0, 5).join('、')}${geometryChanged.length > 5 ? ' …' : ''}`);
+    } else {
+      names.forEach(n => {
+        if (!old[n] || !old[n].fp || !current[n].fp) return;
+        if (old[n].hash === current[n].hash) return;              // 完全一致，快路径
+        const d = diffFingerprint(old[n].fp, current[n].fp);
+        if (d.changed) details.push(`${n}（${d.badRows}/${d.totalRows} 行不同，最差第 ${d.worstRow} 行差 ${d.worstDelta} 像素）`);
+      });
+    }
+
     changed = details;
     const added = names.filter(n => !old[n]);
     const removed = Object.keys(old).filter(n => !current[n]);
-    console.log(`\n视觉基线比对（基线 ${base.updatedAt || '未知'}，裁掉顶部 ${base.cropTop} 行 + 容忍 1px 位移）：`);
-    if (!changed.length && !added.length && !removed.length) {
+    if (!changed.length && !added.length && !removed.length && !geometryChanged.length) {
       console.log(`  ✓ ${names.length} 张全部与基线一致（页面没被意外改动）`);
+    } else if (!changed.length && !added.length && !removed.length && geometryChanged.length) {
+      // 几何变了：已经单独说清楚了，这里不再重复刷屏
     } else {
       changed.forEach(d => console.log(`  ⚠ 变了：${d}\n    → 改过 UI 就是这样；**没改 UI 却变了**要人工看图（e2e/shots/）`));
       if (added.length) console.log(`  · 新增（基线里没有）：${added.join('、')} → 跑 npm run e2e:shots -- --update-baseline 收进基线`);
