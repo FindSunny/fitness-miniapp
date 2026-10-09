@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小程序测试方法论 · 从开发主旨到断言设计</title>
+<style>
+  :root{
+    --ink:#111827; --soft:#334155; --gray:#64748b; --light:#94a3b8;
+    --panel:#f8fafc; --border:#e2e8f0; --line:#f1f5f9;
+    --blue:#2563eb; --blue-bg:#eff6ff; --blue-bd:#bfdbfe;
+    --green:#16a34a; --green-dk:#15803d; --green-bg:#f0fdf4; --green-bd:#86efac;
+    --amber:#c2410c; --amber-bg:#fff7ed; --amber-bd:#fed7aa;
+    --red:#dc2626; --red-bg:#fef2f2; --red-bd:#fecaca;
+    --purple:#7c3aed; --purple-bg:#f5f3ff;
+    --shadow:0 1px 2px rgba(15,23,42,.04), 0 8px 24px -12px rgba(15,23,42,.12);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:#f1f5f9;color:var(--ink);
+    font:15px/1.7 'Segoe UI','Microsoft YaHei','PingFang SC',sans-serif}
+  .page{max-width:1060px;margin:0 auto;padding:0 20px 64px}
+
+  /* 封面 */
+  .hero{margin:0 -20px 26px;padding:44px 40px 40px;
+    background:linear-gradient(160deg,#101d33 0%,#0d1626 55%,#0a1220 100%);color:#e2e8f0}
+  .hero .kicker{display:inline-block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    color:#7dd3fc;border:1px solid rgba(125,211,252,.35);border-radius:999px;padding:3px 12px;margin-bottom:18px}
+  .hero h1{margin:0 0 10px;font-size:30px;line-height:1.35;letter-spacing:-.01em;color:#fff}
+  .hero p{margin:0;max-width:64ch;color:#94a3b8;font-size:14.5px}
+  .hero .thesis{margin-top:22px;padding:14px 18px;border-left:3px solid #38bdf8;
+    background:rgba(56,189,248,.08);border-radius:0 10px 10px 0;color:#e0f2fe;font-size:15px;font-weight:600}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+  .stat{background:rgba(255,255,255,.05);border:1px solid rgba(148,163,184,.22);border-radius:14px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:#fff;line-height:1.2;letter-spacing:-.02em}
+  .stat span{display:block;font-size:12px;color:#94a3b8;margin-top:4px}
+  .stat em{font-style:normal;color:#7dd3fc}
+
+  /* 通用 */
+  section{margin-top:34px}
+  h2{font-size:19px;margin:0 0 6px;display:flex;align-items:center;gap:10px}
+  h2 .n{flex:none;width:26px;height:26px;line-height:26px;text-align:center;border-radius:8px;
+    background:var(--blue);color:#fff;font-size:13px;font-weight:700}
+  h3{font-size:15px;margin:18px 0 8px}
+  .lead{color:var(--gray);font-size:13.5px;margin:0 0 16px}
+  .card{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+  .pad{padding:18px 20px}
+  .muted{color:var(--gray)}
+  .tiny{font-size:12.5px}
+  code{font-family:ui-monospace,Consolas,'Courier New',monospace;font-size:12.5px;
+    background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:1px 5px;color:#0f172a}
+  .pill{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:999px;font-weight:600;white-space:nowrap}
+  .pill.b{background:var(--blue-bg);color:#1d4ed8}
+  .pill.g{background:var(--green-bg);color:var(--green-dk)}
+  .pill.a{background:var(--amber-bg);color:var(--amber)}
+  .pill.r{background:var(--red-bg);color:var(--red)}
+  .pill.p{background:var(--purple-bg);color:var(--purple)}
+  .pill.n{background:var(--panel);color:var(--gray)}
+
+  /* 结论盒 */
+  .take3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+  .take3 .t{background:#fff;border:1px solid var(--border);border-left:4px solid var(--blue);
+    border-radius:12px;padding:14px 16px}
+  .take3 .t b{display:block;font-size:13.5px;margin-bottom:4px}
+  .take3 .t span{font-size:12.5px;color:var(--gray)}
+
+  /* 分层 */
+  .layers{display:flex;flex-direction:column;gap:8px}
+  .layer{display:grid;grid-template-columns:64px 1fr 168px;gap:14px;align-items:center;background:#fff;
+    border:1px solid var(--border);border-left:5px solid var(--light);border-radius:12px;padding:12px 16px}
+  .layer.l1{border-left-color:#0ea5e9}
+  .layer.l1b{border-left-color:#2dd4bf}
+  .layer.l2{border-left-color:var(--blue)}
+  .layer.l3{border-left-color:#6366f1}
+  .layer.l4{border-left-color:#8b5cf6}
+  .layer.l4b{border-left-color:#a855f7}
+  .layer.l5{border-left-color:var(--amber)}
+  .layer.l6{border-left-color:var(--green)}
+  .layer.l6b{border-left-color:#65a30d}
+  .layer .tag{font-size:12px;font-weight:700;color:var(--gray);text-align:center;background:var(--panel);
+    border-radius:8px;padding:6px 0;line-height:1.25}
+  .layer .what b{font-size:14.5px}
+  .layer .what div{font-size:12.5px;color:var(--gray);margin-top:2px}
+  .layer .right{text-align:right}
+  .layer .right .cnt{font-size:15px;font-weight:700}
+  .layer .right .ms{font-size:12px;color:var(--gray)}
+  .bar{height:5px;border-radius:999px;background:var(--line);margin-top:7px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:999px;background:var(--blue)}
+  .bar i.cool{background:#0ea5e9}
+  .bar i.warm{background:var(--amber)}
+
+  /* 主张 → 不变量 → 断言 */
+  .map{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:0;border:1px solid var(--border);
+    border-radius:14px;overflow:hidden;background:#fff}
+  .map .row{display:contents}
+  .map .h{background:var(--panel);font-size:12px;font-weight:700;color:var(--gray);padding:10px 14px;
+    border-bottom:1px solid var(--border)}
+  .map .c{padding:13px 14px;border-bottom:1px solid var(--line);font-size:13px}
+  .map .c:not(:nth-child(3n)){border-right:1px solid var(--line)}
+  .map .c b{font-size:13.5px}
+  .map .c em{font-style:normal;display:block;margin-top:5px;color:var(--gray);font-size:12.5px}
+  .map .c code{font-size:11.5px}
+
+  /* 成分分布 */
+  .split{display:flex;height:36px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+  .split div{display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#fff}
+  .split .a{background:var(--purple);flex:68}
+  .split .c{background:var(--blue);flex:28}
+  .split .b{background:var(--green);flex:15}
+
+  /* 代码 */
+  .codes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .codewrap{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff}
+  .codewrap .hd{padding:9px 14px;font-size:12.5px;font-weight:700;border-bottom:1px solid var(--border);
+    background:var(--panel);color:var(--soft)}
+  .codewrap.bad .hd{background:var(--red-bg);color:var(--red);border-bottom-color:var(--red-bd)}
+  .codewrap.good .hd{background:var(--green-bg);color:var(--green-dk);border-bottom-color:var(--green-bd)}
+  pre{margin:0;padding:14px;overflow-x:auto;background:#0f172a;color:#e2e8f0;
+    font-family:ui-monospace,Consolas,'Courier New',monospace;font-size:12.5px;line-height:1.65}
+  pre .c{color:#64748b}
+  pre .k{color:#7dd3fc}
+  pre .s{color:#86efac}
+  pre .hl{color:#fca5a5}
+
+  /* 表 */
+  .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;color:var(--gray);font-weight:700;background:var(--panel)}
+  tr:last-child td{border-bottom:none}
+
+  /* 图 */
+  .svgwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .svgwrap svg{display:block;min-width:900px;width:100%;height:auto}
+  .pyramid{display:flex;flex-direction:column;gap:6px}
+  .pyramid .p{display:grid;grid-template-columns:1fr 120px;gap:14px;align-items:center;
+    border-radius:10px;padding:10px 14px;color:#0f172a;font-size:13px}
+  .pyramid .p b{font-size:13.5px}
+  .pyramid .p .r{text-align:right;font-size:12.5px;color:var(--soft)}
+
+  details{border:1px solid var(--border);border-radius:14px;background:#fff;overflow:hidden}
+  details+details{margin-top:10px}
+  summary{cursor:pointer;padding:13px 18px;font-weight:700;font-size:14px;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";color:var(--blue)}
+  details[open] summary::before{content:"▾ "}
+  details .body{padding:0 18px 16px}
+
+  .takeaway{margin-top:34px;background:linear-gradient(160deg,#101d33,#0a1220);color:#e2e8f0;
+    border-radius:18px;padding:26px 28px}
+  .takeaway h2{color:#fff}
+  .takeaway h2 .n{background:#38bdf8;color:#06263a}
+  .takeaway ol{margin:10px 0 0;padding-left:22px}
+  .takeaway li{margin:10px 0;font-size:14.5px;color:#cbd5e1}
+  .takeaway b{color:#fff}
+  .crosslink{margin-top:14px;font-size:13px;color:var(--gray);text-align:center}
+  footer{margin-top:26px;font-size:12.5px;color:var(--light);text-align:center}
+
+  @media (max-width:820px){
+    .hero{padding:32px 22px 30px;margin:0 -20px 22px}
+    .hero h1{font-size:23px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .take3,.codes,.map{grid-template-columns:1fr}
+    .map .c:not(:nth-child(3n)){border-right:none}
+    .layer{grid-template-columns:56px 1fr;gap:10px}
+    .layer .right{grid-column:2;text-align:left;display:flex;gap:14px;align-items:baseline}
+    .split{height:auto;flex-direction:column}
+    .split div{padding:8px 0}
+    .split .a,.split .b,.split .c{flex:none}
+    .tscroll table{min-width:560px}
+  }
+  @media print{
+    body{background:#fff}
+    .page{max-width:none;padding:0}
+    .hero{background:#fff;color:#111827;border-bottom:2px solid #111827;padding:0 0 18px;margin:0 0 20px}
+    .hero h1,.takeaway h2{color:#111827}
+    .hero p,.hero .thesis,.takeaway li{color:#334155}
+    .hero .thesis{background:var(--panel);border-left-color:#111827}
+    .stat{border-color:#cbd5e1;background:#fff}
+    .stat b,.stat span{color:#111827}
+    .takeaway{background:#fff;border:2px solid #111827;color:#111827}
+    section{break-inside:avoid}
+    details .body{display:block!important}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ==================== 封面 ==================== -->
+<header class="hero">
+  <span class="kicker">微信小程序 · 测试方法论</span>
+  <h1>从「开发主旨」推出「测试断言」<br>—— 一个原生小程序项目的测试方法论</h1>
+  <p>以「六艺十式」（六类徒手动作 × 每类十式的晋级记录小程序，零后端、数据只存本机）为例，
+     讲清一件事：<b>断言不是从代码里补出来的，是从设计主张里推出来的</b>。上半篇讲原则，下半篇讲实现。</p>
+  <div class="thesis">能算出来的别靠眼睛 ｜ 能在低层抓住的别留到高层 ｜ 证明不了"看得见"的别写成断言</div>
+  <div class="stats">
+    <div class="stat"><b>111</b><span>Node 断言 · <em>0.15 秒</em> · 零运行时依赖</span></div>
+    <div class="stat"><b>102</b><span>E2E 断言 · 15 个场景</span></div>
+    <div class="stat"><b>19</b><span>截图 ＋ 视觉基线</span></div>
+    <div class="stat"><b>61%</b><span>断言是<b style="display:inline">领域定制</b>的</span></div>
+  </div>
+</header>
+
+<!-- ==================== 三句话拿走 ==================== -->
+<section id="take3">
+  <h2><span class="n">0</span>只看开头的话，三句话拿走</h2>
+  <div class="take3">
+    <div class="t"><b>① 断言要从主张推导</b><span>先写"状态只有一个真相""不能跳级"这类主张，再把它变成可测的不变量，最后才写成断言。反过来（照着实现补测试）只能证明"代码和昨天一样"。</span></div>
+    <div class="t"><b>② 定制化不是缺点</b><span>本项目 61% 的断言是领域定制的 —— 这正是价值来源（它们守住的是产品语义）。代价是必须绑"依据"，否则会随需求腐化。</span></div>
+    <div class="t"><b>③ 越低越便宜</b><span>同一类问题，纯函数层 1 毫秒、E2E 层 2 分钟、真机验收 10 分钟。所以问题尽量在低层拦住；剩下的才交给人和真机。</span></div>
+  </div>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:34px 0 0">
+
+<!-- ==================== 上半篇：原则 ==================== -->
+<section id="main-idea">
+  <h2><span class="n">1</span>开发主旨：六条主张，各排除一种错误做法</h2>
+  <p class="lead">这一节解决：<b>为什么先谈开发主旨？</b>—— 因为主张决定了哪些不变量存在，不变量才决定了断言该写什么。</p>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:26%">设计主张</th><th style="width:36%">一句话解释</th><th>它排除了什么错误做法</th></tr></thead>
+    <tbody>
+      <tr><td><b>状态只有一个真相</b></td><td>进度真相 = 每一式的"已通过"时间戳；"当前式"是<b>推导</b>出来的（第一个没通过的式），不是存储字段</td><td>❌ 再存一个"用户选中的式"→ 达标了但没点按钮，状态就不动（这个 bug 真实发生过）</td></tr>
+      <tr><td><b>锁定式推进（不能跳级）</b></td><td>只有"已通过的式"和"当前式"能记录，后面的只能看</td><td>❌ 允许跳级 → 动作变形、也退化成"动作库"，且"多个进行中"这类说不清的状态会出现</td></tr>
+      <tr><td><b>一份数据驱动全部页面</b></td><td>60 式（含三档标准、单位、每侧、示意图、要点、器械）全在一个 <code>arts.js</code> 里</td><td>❌ 把文案与标准写进页面 → 改一处要翻十个文件，且页面之间会互相打架</td></tr>
+      <tr><td><b>零后端 · 数据只存本机</b></td><td>无 <code>wx.login</code>、无用户信息 API、零网络请求；进度存 <code>wx.storage</code></td><td>❌ 为了"排行榜"先上后端 → 立刻背上隐私声明、域名备案、冲突合并（这些是 v2 的事）</td></tr>
+      <tr><td><b>自撰内容，版权红线</b></td><td>示意图自绘、动作要点自撰；只用公开的动作名称与标准数据</td><td>❌ 搬运原书文字与插图 → 版权风险；也❌ 把自撰要点说成"权威教材"</td></tr>
+      <tr><td><b>文案不能说做不到的事</b></td><td>首页写"不用<b>专业</b>器械"而不是"零器械"（引体要单杠、倒立撑要墙）</td><td>❌ 用夸张宣传语 → 用户第一次就发现被忽悠（我们真的差点写"零器械"）</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="card pad" style="margin-top:14px">
+    <b style="font-size:14px">为什么这一节要放在最前面</b>
+    <p class="tiny muted" style="margin:6px 0 0">
+      如果主张只是"我们打算这么写"，那它跟测试无关。但只要主张被写成<b>不变量</b>（"存储里不能再出现 currentNo""未解锁的式不能写入记录"），
+      它就变成可执行、可复算、可回归的东西 —— 这就是下一节的枢纽。
+    </p>
+  </div>
+</section>
+
+<section id="pivot">
+  <h2><span class="n">2</span>枢纽：主张 → 不变量 → 断言</h2>
+  <p class="lead">这一节解决：<b>每条断言到底该从哪儿来？</b>左列是主张，中列是能自动检查的不变量，右列是本项目里真实存在的断言。</p>
+  <div class="map">
+    <div class="h">设计主张</div><div class="h">可测的不变量</div><div class="h">落到哪个断言</div>
+
+    <div class="c"><b>状态只有一个真相</b><em>当前式是推导的</em></div>
+    <div class="c">存储里<b>不能</b>再出现 <code>currentNo</code> 字段；"当前式 = 第一个没通过的式"必须与列表显示一致</div>
+    <div class="c"><code>L3</code> 断言存储里无该字段<br><code>L4</code> 断言"点下一式只是查看，当前式不变"<br><em>对应真实 bug：达标后列表里一个"进行中"都没有</em></div>
+
+    <div class="c"><b>不能跳级</b><em>锁定式推进</em></div>
+    <div class="c">对未解锁的式调用"记录/提交"，<b>不得产生任何写入</b></div>
+    <div class="c"><code>L4</code> 未解锁式 <code>addSet()</code> 后 <code>pendingSets() === 0</code><br><code>L6</code> 未解锁页不渲染记录按钮<br><em>这是本项目最典型的"领域定制断言"</em></div>
+
+    <div class="c"><b>数据可追溯</b></div>
+    <div class="c">60 式标准必须逐条对得上来源快照；任何差异都要有在案说明</div>
+    <div class="c"><code>L1</code> 逐条对齐 + 反查"修正记录不许过期"<br><em>抓的是"抄错一个数字，界面完全看不出来"</em></div>
+
+    <div class="c"><b>达标即解锁</b><em>不依赖用户点按钮</em></div>
+    <div class="c">达成【升级】档后，"当前式"必须自动前进 1；"进行中"的行<b>恒为 1 行</b></div>
+    <div class="c"><code>L4/L6</code> 达成升级 → 第 N+1 式自动"进行中"；<br>断言"进行中只有 1 个"</div>
+
+    <div class="c"><b>数据驱动</b></div>
+    <div class="c">60 式完整性：式号连续、id 唯一、三档标准单调、单位/每侧标记正确、引用的图片必须真实存在</div>
+    <div class="c"><code>L1</code> 结构与引用完整性（这类断言换个项目直接能用）</div>
+
+    <div class="c"><b>文案不能说做不到的事</b></div>
+    <div class="c">用户界面不出现内部话术（"待校对""以原书核对"）；不承诺做不到的事（"进度照样算"）</div>
+    <div class="c"><code>L4</code> 扫 WXML：列表不许出现 <code>item.note</code>；关键字黑名单</div>
+
+    <div class="c"><b>看得清、点得到</b></div>
+    <div class="c">正文字号 ≥22rpx、装饰 ≥20rpx；文字与背景对比度 ≥4.5:1；主操作有效点按高度 ≥88rpx</div>
+    <div class="c"><code>L4b</code> 从真实 WXSS 读色值复算 WCAG（43 组）、字号、点按区</div>
+
+    <div class="c"><b>界面不能被意外改坏</b></div>
+    <div class="c">19 个状态的截图，除了"人认可过的样子"之外不该变化</div>
+    <div class="c"><code>L6b</code> 行暗度指纹比对（容忍环境漂移，见第 8 节）</div>
+  </div>
+</section>
+
+<section id="mix">
+  <h2><span class="n">3</span>断言的三种成分：定制化断言为什么值钱</h2>
+  <p class="lead">这一节解决一个反问：<b>"你的断言都是为这个项目定制的，别人怎么用？"</b>—— 先把事实摆出来，再说它的代价与出路。</p>
+  <div class="card pad">
+    <div class="split">
+      <div class="a">A 领域定制 68 条（61%）</div>
+      <div class="c">C 混合/工具 28 条（25%）</div>
+      <div class="b">B 通用工程 15 条（14%）</div>
+    </div>
+    <p class="tiny muted" style="margin:10px 0 0">
+      统计口径：111 条 Node 断言按"这条断言换个项目还能不能直接用"分类。
+      其中 <code>page-flow</code>（47 条）里 38 条是领域定制 —— <b>页面层几乎是纯定制的</b>，这符合直觉：页面层守的就是产品语义。
+    </p>
+  </div>
+
+  <div class="tscroll" style="margin-top:14px">
+  <table>
+    <thead><tr><th style="width:16%">成分</th><th style="width:30%">例子</th><th>特点与对策</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pill p">A 领域定制</span></td>
+        <td>"未解锁的式不能写入记录"、"达标后'进行中'恒为 1 行"、"三档标准必须单调递增"</td>
+        <td><b>最值钱，也最短命</b>：它们守住的是产品语义（真正的差异化），但只要产品改语义就会失效。<br>
+            <b>对策 = 绑依据</b>：每条定制断言都要能指回一份"上游真相"——<code>ACCEPTANCE.md</code> 的状态表、来源快照、或某个真实 bug 的编号。</td>
+      </tr>
+      <tr>
+        <td><span class="pill g">B 通用工程</span></td>
+        <td>WCAG 对比度、字号下限、点按区、禁用纯黑纯灰、PNG 解码确定性、视觉基线稳定性</td>
+        <td><b>最可迁移</b>：这 15 条里 10 条是"界面质量 + 图片工具"类，任何前端项目可以直接抄。
+            <br>它们的共同点：判据是<b>算出来的</b>（公式/阈值），不是"我觉得"。</td>
+      </tr>
+      <tr>
+        <td><span class="pill b">C 混合 / 工具链</span></td>
+        <td>晋级判定边界（组数够数值不够 / 乱序 / 非法值）、存储重置语义、E2E 条数守卫</td>
+        <td><b>抽象一下就能复用</b>：把"领域对象"换成参数即可。比如判定边界那组，本质是"多维阈值判定"的通用测试法。</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>抽象路径：定制断言 → 参数化 → 模板化</h3>
+  <div class="codes">
+    <div class="codewrap bad">
+      <div class="hd">① 定制态（本项目里真实的样子）</div>
+<pre><span class="c">// 只有这个产品读得懂：把"囚徒健身"的语义写死在断言里</span>
+assert.strictEqual(
+  store.pendingSets(), 0,
+  <span class="s">'未解锁的式不该写入训练记录'</span>
+);</pre>
+    </div>
+    <div class="codewrap good">
+      <div class="hd">② 抽象态：状态机守卫断言（可直接复用的形态）</div>
+<pre><span class="c">// 把"谁能操作谁"抽成数据，断言变成一条通用规则</span>
+<span class="k">const</span> guards = [
+  { when: <span class="s">'locked'</span>,   action: <span class="s">'record'</span>, allowed: <span class="hl">false</span> },
+  { when: <span class="s">'current'</span>,  action: <span class="s">'record'</span>, allowed: <span class="hl">true</span>  },
+  { when: <span class="s">'passed'</span>,   action: <span class="s">'record'</span>, allowed: <span class="hl">true</span>  }
+];
+<span class="c">// 任何"只有处于状态 A 才能做 X"的产品都能套这张表</span></pre>
+    </div>
+  </div>
+  <p class="tiny muted" style="margin:10px 0 0">
+    这条路我们只走了一半：<b>已经参数化</b>（三档标准、每侧、计时/计次都是数据），
+    但"领域语义"仍然写在断言名字与预期里。诚实地说：<b>领域断言不可能完全通用</b> ——
+    能通用的是"如何组织它们"（一张状态×动作的守卫表、一份上游真相、一条回归留痕），而不是它们的字面内容。
+  </p>
+</section>
+
+<section id="principles">
+  <h2><span class="n">4</span>方法论总结：八条可迁移的原则</h2>
+  <p class="lead">这一节解决：<b>把上面的做法压缩成能带走的东西</b>。每条都是"一句话结论 + 本项目证据 + 边界"。</p>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:4%">#</th><th style="width:28%">原则</th><th style="width:34%">本项目证据</th><th>边界 / 反例</th></tr></thead>
+    <tbody>
+      <tr><td><b>1</b></td><td><b>先写语义，再写测试，最后改代码</b></td><td>访谈给的是现象（"列表没反应"），先翻译成状态表（<code>ACCEPTANCE.md</code> 第一节），再写测试，最后才动代码</td><td>语义没定就写测试 = 把猜测固化下来</td></tr>
+      <tr><td><b>2</b></td><td><b>断言"用户看得见什么"，不是"实现返回了什么"</b></td><td>早期断言 <code>stateText === '未开始'</code>（照着当时的实现写）→ 改成语义断言后，同一类 bug 立刻暴露</td><td>纯函数层仍要断言返回值 —— 但那是"其中一层"，不是全部</td></tr>
+      <tr><td><b>3</b></td><td><b>必须测"往返"：操作 → 离开 → 回来</b></td><td>真机验收发现"记录丢失/历史看不见/状态不跟随"都出在这条缝里</td><td>同一页面实例上断言再多也抓不到</td></tr>
+      <tr><td><b>4</b></td><td><b>低层能抓的，别留到高层</b></td><td>111 条 Node 断言 0.15 秒；102 条 E2E 要 2 分钟。数据错一个数字，界面完全看不出来 —— 只有 L1 能拦</td><td>反过来：真实渲染、手势、原生组件行为，只有 E2E/真机能看到</td></tr>
+      <tr><td><b>5</b></td><td><b>定制断言要绑"上游真相"</b></td><td>来源快照 + 差异必须在案；验收清单编号写进测试名（"验收 36"）</td><td>不绑依据的定制断言，半年后没人敢改</td></tr>
+      <tr><td><b>6</b></td><td><b>先怀疑测试，再怀疑代码</b></td><td>三个"测试在撒谎"：场景崩溃报通过、空图算成功、断言全绿但东西是坏的（详见第 9 节）</td><td>光加断言不够，还要给"断言本身"加守卫（条数、产物有效性）</td></tr>
+      <tr><td><b>7</b></td><td><b>量出来再定阈值，别拍</b></td><td>视觉基线的容忍度是 7 组对照量出来的（噪声 0.41%–0.54% vs 真变化 1.63%–54.7%）</td><td>事后给噪声加白名单 = 掩盖，不是解决</td></tr>
+      <tr><td><b>8</b></td><td><b>明确写下"自动化覆盖不了什么"</b></td><td><code>TESTING.md</code> 第七节：真机手感、跨进程持久性、审美、内容正确性 → 交给验收清单与真人</td><td>把"只有人能验的"混进通过率，等于自己骗自己</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="checklist">
+  <h2><span class="n">5</span>照搬清单：按投入从低到高</h2>
+  <p class="lead">这一节解决：<b>我现在就要用，先做哪个？</b>（P0 一天的投入就能覆盖大部分判断类 bug）</p>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:8%">优先级</th><th style="width:34%">做什么</th><th style="width:12%">投入</th><th>收益</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill r">P0</span></td><td><b>把业务逻辑抽成纯函数 + Node 内置测试器</b></td><td>1 天</td><td>最大。快、稳、零依赖，覆盖绝大多数"判断类"bug</td></tr>
+      <tr><td><span class="pill a">P1</span></td><td><b>断言改成"用户/调用方看得见什么"</b></td><td>0（改写法）</td><td>把"自己给自己打分"的假绿变成真绿</td></tr>
+      <tr><td><span class="pill a">P1</span></td><td>补"往返"用例（操作 → 离开 → 回来）</td><td>半天</td><td>专抓"存下去了但界面上看不到"这一类</td></tr>
+      <tr><td><span class="pill b">P2</span></td><td>页面/组件层打桩（或前端组件测试）</td><td>半天–1 天</td><td>抓"页面把数据拼错了"</td></tr>
+      <tr><td><span class="pill b">P2</span></td><td>从真实样式文件算界面质量（对比度/字号/点按区）</td><td>半天</td><td>把"设计规范"变成零噪声断言，且不依赖截图</td></tr>
+      <tr><td><span class="pill b">P2</span></td><td>E2E 稳定化三件套</td><td>1 天</td><td>① 调真实处理函数而非坐标点击 ② 探针+重试 ③ 期望条数常量</td></tr>
+      <tr><td><span class="pill n">P3</span></td><td>截图视觉基线</td><td>1 天</td><td>挡住"界面被意外改坏"；注意噪声与阈值要先量（第 8 节）</td></tr>
+      <tr><td><span class="pill n">P3</span></td><td>验收清单驱动补测试</td><td>半天</td><td>让测试和"用户会验什么"对齐</td></tr>
+      <tr><td><span class="pill n">P3</span></td><td>CI（Node 层 + 编译；E2E 需图形环境，酌情）</td><td>1–2 天</td><td>防回归；注意小程序 E2E 进不了托管 CI</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>诚实边界：这套东西覆盖不了什么</h3>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:30%">覆盖不了</th><th style="width:40%">为什么</th><th>谁来做</th></tr></thead>
+    <tbody>
+      <tr><td>真机手感、性能、滚动流畅度</td><td>自动化跑在开发者工具的模拟运行时里</td><td>人工</td></tr>
+      <tr><td><b>跨进程持久性</b>（退出小程序再进数据还在吗）</td><td>环境行为，模拟器里造不出来</td><td><b>只能真机验收</b></td></tr>
+      <tr><td>"好不好看 / 一眼能不能懂"</td><td>审美与理解力</td><td>人工</td></tr>
+      <tr><td><b>内容对不对</b>（动作要点是否准确）</td><td>只能验"一式不落、句式合规、没有医疗词"，验不了"这句话对不对"</td><td>人工 + 找教练过一遍</td></tr>
+      <tr><td>视觉基线回答"变没变"，不回答"变好没变好"</td><td>像素没有审美</td><td>人工看图后再 approve</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:34px 0 0">
+
+<!-- ==================== 下半篇：实现 ==================== -->
+<section id="layers">
+  <h2><span class="n">6</span>实现：八层测试，各管一段</h2>
+  <p class="lead">这一节解决：<b>怎么分层、每层跑多快、什么时候跑？</b>"越往下越便宜"决定了问题该在哪一层被抓住。</p>
+  <div class="layers">
+    <div class="layer l1">
+      <div class="tag">L1<br>数据</div>
+      <div class="what"><b>内容与合规完整性</b><div>60 式完整性 · id 唯一 · 标准单调 · 单位/每侧 · <b>引用的图片必须存在</b> · 每式必须有要点 · 每艺必须写明器械条件</div></div>
+      <div class="right"><div class="cnt">17 项</div><div class="ms">~50ms</div><div class="bar"><i class="cool" style="width:6%"></i></div></div>
+    </div>
+    <div class="layer l1b">
+      <div class="tag">L1b<br>来源</div>
+      <div class="what"><b>数据与来源逐条对齐</b><div>来源抄成快照 → 111 条里 5 条专门比这个：58/60 一字不差，2 处修正在案，反向断言防止"改快照让数据看起来对齐"</div></div>
+      <div class="right"><div class="cnt">5 项</div><div class="ms">~30ms</div><div class="bar"><i class="cool" style="width:4%"></i></div></div>
+    </div>
+    <div class="layer l2">
+      <div class="tag">L2<br>逻辑</div>
+      <div class="what"><b>纯函数：判定 / 推导 / 推荐</b><div>三档判定边界（组数够数值不够 / 乱序 / 非法值 / 计时 / 每侧）· 当前式推导 · 解锁判定 · 首页推荐</div></div>
+      <div class="right"><div class="cnt">29 项</div><div class="ms">~50ms</div><div class="bar"><i class="cool" style="width:8%"></i></div></div>
+    </div>
+    <div class="layer l3">
+      <div class="tag">L3<br>存储</div>
+      <div class="what"><b>本地状态读写</b><div>进度/通关/草稿落盘 · 记录上限 · 重置语义 · 调试备份还原（内存 storage 打桩）</div></div>
+      <div class="right"><div class="cnt">8 项</div><div class="ms">~50ms</div><div class="bar"><i class="cool" style="width:5%"></i></div></div>
+    </div>
+    <div class="layer l4">
+      <div class="tag">L4<br>页面</div>
+      <div class="what"><b>直接驱动真实页面代码</b><div><code>onLoad/onShow/finish/addSet</code> 都能在 Node 里调 —— 抓"页面把数据拼错了"（本层 81% 是领域定制断言）</div></div>
+      <div class="right"><div class="cnt">47 项</div><div class="ms">~80ms</div><div class="bar"><i class="cool" style="width:12%"></i></div></div>
+    </div>
+    <div class="layer l4b">
+      <div class="tag">L4b<br>界面质量</div>
+      <div class="what"><b>从真实 WXSS 算出来的数字项</b><div>WCAG 对比度（43 组配对）· 字号下限 · 点按区 ≥88rpx · 禁用纯黑纯灰 · 截图基线工具自身的确定性</div></div>
+      <div class="right"><div class="cnt">5 项</div><div class="ms">~5ms</div><div class="bar"><i class="cool" style="width:4%"></i></div></div>
+    </div>
+    <div class="layer l5">
+      <div class="tag">L5<br>编译</div>
+      <div class="what"><b>微信开发者工具 CLI</b><div>真实编译 / 上传 / 出真机预览码 / 包体积体检 / 发布卫生检查（分支·版本号·工作区）</div></div>
+      <div class="right"><div class="cnt">—</div><div class="ms">30–60s</div><div class="bar"><i class="warm" style="width:45%"></i></div></div>
+    </div>
+    <div class="layer l6">
+      <div class="tag">L6<br>集成 E2E</div>
+      <div class="what"><b>真实运行时集成断言</b><div><code>miniprogram-automator</code> → 开发者工具里的小程序运行时（<b>非物理真机</b>）· 15 个场景 102 条</div></div>
+      <div class="right"><div class="cnt">102 条</div><div class="ms">1–2 min</div><div class="bar"><i class="warm" style="width:100%"></i></div></div>
+    </div>
+    <div class="layer l6b">
+      <div class="tag">L6b<br>截图基线</div>
+      <div class="what"><b>19 个状态的视觉基线</b><div>行暗度指纹比对 + 空白补拍 + 几何守卫 + approve 流程（独立 pass，不写图到断言里）</div></div>
+      <div class="right"><div class="cnt">19 张</div><div class="ms">~1 min</div><div class="bar"><i class="warm" style="width:60%"></i></div></div>
+    </div>
+  </div>
+  <div class="card pad" style="margin-top:14px">
+    <b style="font-size:14px">两个刻意的设计决定</b>
+    <ul class="tiny muted" style="margin:8px 0 0;padding-left:20px">
+      <li><b>L4b 单独成层</b>：它不跑页面，只读样式文件算数 —— 所以是"零噪声"的，能当门禁。</li>
+      <li><b>E2E 与截图拆成两个 pass</b>：断言 pass 稳定、结论以它为准；截图 pass 单跑，某张失败不影响结论。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="e2e">
+  <h2><span class="n">7</span>实现：E2E 怎么驱动真实小程序</h2>
+  <p class="lead">这一节解决：<b>没有浏览器、没有 DevTools 插件的情况下，怎么在真实运行时里断言、又怎么稳定下来？</b></p>
+  <div class="svgwrap">
+  <svg viewBox="0 0 960 420" role="img" aria-label="E2E 架构时序图" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+        <path d="M0,0 L7,3 L0,6 z" fill="#475569"></path>
+      </marker>
+      <marker id="arb" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+        <path d="M0,0 L7,3 L0,6 z" fill="#2563eb"></path>
+      </marker>
+    </defs>
+    <g font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="13">
+      <!-- participants -->
+      <g>
+        <rect x="10" y="10" width="170" height="46" rx="10" fill="#eff6ff" stroke="#bfdbfe"></rect>
+        <text x="95" y="30" text-anchor="middle" fill="#1d4ed8" font-weight="700">测试脚本 (Node)</text>
+        <text x="95" y="46" text-anchor="middle" fill="#64748b" font-size="11">e2e/run.js · e2e/shots.js</text>
+      </g>
+      <g>
+        <rect x="205" y="10" width="170" height="46" rx="10" fill="#f8fafc" stroke="#e2e8f0"></rect>
+        <text x="290" y="30" text-anchor="middle" fill="#334155" font-weight="700">automator SDK</text>
+        <text x="290" y="46" text-anchor="middle" fill="#64748b" font-size="11">WebSocket :9420</text>
+      </g>
+      <g>
+        <rect x="400" y="10" width="170" height="46" rx="10" fill="#f8fafc" stroke="#e2e8f0"></rect>
+        <text x="485" y="30" text-anchor="middle" fill="#334155" font-weight="700">开发者工具</text>
+        <text x="485" y="46" text-anchor="middle" fill="#64748b" font-size="11">cli auto --auto-port</text>
+      </g>
+      <g>
+        <rect x="595" y="10" width="175" height="46" rx="10" fill="#f0fdf4" stroke="#86efac"></rect>
+        <text x="682" y="30" text-anchor="middle" fill="#15803d" font-weight="700">小程序运行时</text>
+        <text x="682" y="46" text-anchor="middle" fill="#64748b" font-size="11">App + 页面实例</text>
+      </g>
+      <g>
+        <rect x="795" y="10" width="155" height="46" rx="10" fill="#fff7ed" stroke="#fed7aa"></rect>
+        <text x="872" y="30" text-anchor="middle" fill="#c2410c" font-weight="700">本机存储</text>
+        <text x="872" y="46" text-anchor="middle" fill="#64748b" font-size="11">wx.storage</text>
+      </g>
+      <!-- lifelines -->
+      <g stroke="#cbd5e1" stroke-dasharray="4 4">
+        <line x1="95" y1="56" x2="95" y2="380"></line>
+        <line x1="290" y1="56" x2="290" y2="380"></line>
+        <line x1="485" y1="56" x2="485" y2="380"></line>
+        <line x1="682" y1="56" x2="682" y2="380"></line>
+        <line x1="872" y1="56" x2="872" y2="380"></line>
+      </g>
+      <!-- messages -->
+      <g stroke="#2563eb" stroke-width="1.6" marker-end="url(#arb)">
+        <line x1="95" y1="82" x2="282" y2="82"></line>
+        <line x1="95" y1="150" x2="674" y2="150"></line>
+        <line x1="95" y1="196" x2="674" y2="196"></line>
+        <line x1="95" y1="286" x2="674" y2="286"></line>
+      </g>
+      <g stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#ar)">
+        <line x1="282" y1="108" x2="103" y2="108"></line>
+        <line x1="674" y1="174" x2="103" y2="174"></line>
+        <line x1="674" y1="230" x2="103" y2="230"></line>
+        <line x1="674" y1="330" x2="103" y2="330"></line>
+      </g>
+      <g stroke="#16a34a" stroke-width="1.6" marker-end="url(#ar)">
+        <line x1="674" y1="262" x2="864" y2="262"></line>
+      </g>
+      <!-- labels -->
+      <g fill="#334155" font-size="12">
+        <text x="105" y="76">connect(ws://127.0.0.1:9420)</text>
+        <text x="110" y="102" fill="#64748b">连不上才起：cli auto</text>
+        <text x="105" y="144">reLaunch('/pages/step/step?artId=pushup&amp;no=1')</text>
+        <text x="110" y="168" fill="#64748b">onLoad / onShow 真实执行</text>
+        <text x="105" y="190">evaluate(handler) ★ 调真实事件处理函数</text>
+        <text x="110" y="212" fill="#64748b">不是坐标点击（element.tap() 点不到 bindtap）</text>
+        <text x="105" y="256" fill="#15803d">setData → 视图层重绘</text>
+        <text x="700" y="256" fill="#15803d">写/读进度</text>
+        <text x="105" y="280">page.data() / 元素文本 断言</text>
+        <text x="110" y="304" fill="#64748b">check(名, 实际, 期望)</text>
+        <text x="105" y="324">screenshot()（独立 pass）</text>
+        <text x="110" y="348" fill="#64748b">19 张状态图 → 与基线指纹比对</text>
+      </g>
+      <text x="480" y="392" text-anchor="middle" fill="#64748b" font-size="11.5">实线 = 请求　虚线 = 返回 / 可选路径　★ = 与"模拟点击"最本质的差别：走的是同一段事件处理代码</text>
+    </g>
+  </svg>
+  </div>
+
+  <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+    <div class="card pad">
+      <b style="font-size:14px">为什么不用坐标点击</b>
+      <p class="tiny muted" style="margin:6px 0 0">
+        <code>element.tap()</code> 在自动化实例里点不到 <code>bindtap</code>（试过多轮）；
+        <code>page.callMethod()</code> 也取不到页面方法。
+        最后改成：在 App 侧用 <code>getCurrentPages()</code> 拿到页面实例，直接调它的处理函数 ——
+        <b>代码路径完全一样，只是不经过手指坐标</b>。
+      </p>
+    </div>
+    <div class="card pad">
+      <b style="font-size:14px">稳定化三件套</b>
+      <ul class="tiny muted" style="margin:6px 0 0;padding-left:20px">
+        <li><b>调真实处理函数</b>（而不是点坐标）</li>
+        <li><b>探针 + 重试</b>：<code>data()</code> 当探针，节点没就绪就重试；页面切换先等 <code>waitForPage</code></li>
+        <li><b>期望条数常量</b>：<code>EXPECTED_CHECKS = 102</code>，条数对不上直接报警（防"中途崩了却报全绿"）</li>
+      </ul>
+    </div>
+  </div>
+
+  <details style="margin-top:14px">
+    <summary>工具坑清单（Windows + 微信开发者工具，实测踩出来的 6 条）</summary>
+    <div class="body">
+      <div class="tscroll"><table>
+        <thead><tr><th style="width:26%">坑</th><th style="width:38%">现象</th><th>对策</th></tr></thead>
+        <tbody>
+          <tr><td><code>element.tap()</code></td><td>点不到 <code>bindtap</code></td><td>改用 <code>evaluate</code> + <code>getCurrentPages()</code> 调真实处理函数</td></tr>
+          <tr><td><code>evaluate</code> 里写 <code>setData</code></td><td><code>timeout waiting for automator response</code></td><td>用 SDK 的 <code>page.setData()</code>，且每次重新取栈顶页面</td></tr>
+          <tr><td>页面跳转时序</td><td><code>reLaunch</code> 后固定 <code>sleep</code> 不够，偶发 <code>page node not found</code></td><td><code>data()</code> 做探针 + 重试；先 <code>waitForPage</code> 再操作</td></tr>
+          <tr><td>跑 E2E 时改项目文件</td><td>工具重编译 → App 重启 → 页面栈清空，测试随机红</td><td><code>compileHotReLoad:false</code> + 每个场景自己 <code>reLaunch</code> + <b>跑之前别动文件</b></td></tr>
+          <tr><td><b>会话长跑退化</b></td><td>失败点<b>固定</b>（同一场景、同样报错），或 step 页截图全白但断言照样通过</td><td><code>cli close</code> → <code>npm run e2e:serve</code> → 重跑。<b>失败点固定 = 环境问题；随机 = 时序竞争</b></td></tr>
+          <tr><td>Windows 路径</td><td><code>spawnSync(cli, args, {shell:true})</code> 在含空格路径下把参数传坏</td><td>改走 PowerShell 调用（<code>&amp; "路径" args...</code>）</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </details>
+</section>
+
+<section id="visual-baseline">
+  <h2><span class="n">8</span>实现：截图能做"视觉回归"，但要先量噪声</h2>
+  <p class="lead">这一节解决：<b>能不能用截图对比盯住界面？</b>能，但最朴素的方案（整图哈希）一定失败 —— 我们是量出来才定方案的。</p>
+
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:24%">噪声源</th><th style="width:38%">实测现象</th><th>解法</th></tr></thead>
+    <tbody>
+      <tr><td>状态栏<b>实时时钟 + 电量</b></td><td>同一状态隔 70 秒截两张，<b>整文件哈希必不同</b>（12:17→12:19，还多出一个 "100"）</td><td>裁掉顶部 <b>48 行</b>（实测 40/60/80/120 都稳定）</td></tr>
+      <tr><td><b>重启工具后渲染位移约 1px</b></td><td>导航栏标题字形整体下移 1 行、最大通道差 <b>255</b>；纯哈希会报"19 张全变了"（狼来了）</td><td>改用<b>行暗度指纹</b>（每行暗像素个数）：黑像素只在相邻行间挪一点，指纹几乎不变</td></tr>
+      <tr><td><b>模拟器几何尺寸变化</b></td><td>以最小化方式启动工具，图从 363×785 变成 <b>377×813</b>，指纹逐行比就失效</td><td>比对前先查尺寸：几何变了就单独提示"这不是内容变化，恢复窗口或重建基线"</td></tr>
+      <tr><td><b>空白截图</b></td><td>一张 10KB 白板被当成 ✓（"产物存在即成功"）</td><td>体积下限 + <b>空白自动补拍一次</b>（只对空白补拍，断言失败照旧抛出来）</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="card pad" style="margin-top:14px">
+    <b style="font-size:14px">阈值是量出来的，不是拍的</b>
+    <div class="tscroll" style="margin-top:8px"><table>
+      <thead><tr><th>对照（7 组真实实验）</th><th style="width:22%">坏行占比</th><th style="width:16%">判定</th></tr></thead>
+      <tbody>
+        <tr><td>跨 IDE 会话（同页面，含 1px 位移）</td><td>3–4 / 737 = <b>0.41%–0.54%</b></td><td>没变 ✓</td></tr>
+        <tr><td>大面积线稿的全屏大图，跨会话</td><td>3 / 737 = 0.41%</td><td>没变 ✓</td></tr>
+        <tr><td>同一页面换状态（只差一行文案）</td><td>12 / 737 = <b>1.63%</b></td><td><b>变了</b> ✓</td></tr>
+        <tr><td>完全不同的页面</td><td>403 / 737 = 54.7%</td><td>变了 ✓</td></tr>
+      </tbody>
+    </table></div>
+    <p class="tiny muted" style="margin:10px 0 0">
+      → 取"坏行占比 &gt; 0.8% 且坏行 ≥ 5"判定为变了。
+      另一个实测：同代码、同尺寸、隔几天换会话跑两次，<b>指纹逐字节完全一致的 0 / 19</b>，
+      但按阈值判定 <b>19 / 19 都"没变"</b> —— 这说明<b>门禁只能靠"容忍环境漂移的指纹"，像素 diff 只能当给人看的证据</b>。
+      （⚠️ 也说明现有余量偏薄：噪声已摸到 5 行，触发线是 6 行，建议提到 8。）
+    </p>
+  </div>
+
+  <div class="card pad" style="margin-top:14px">
+    <b style="font-size:14px">顺带一条方法论：基线的语义是"被认可"，不是"通过"</b>
+    <p class="tiny muted" style="margin:6px 0 0">
+      视觉基线记录的是"上次<b>有人看过并认可</b>的样子"（对应截图工具的 <code>--update-baseline</code>，BackstopJS 里叫 <code>approve</code>），
+      不是"测试通过的样子"。它保证"之后没变"，不保证"这样是对的"。而且要清楚：本项目这 19 张是
+      <b>"测试夹具 + 开发版"</b>的样子（图里有开发版才显示的诊断条、脚本启动时刻的时间戳、造出来的进度），
+      只适合内部回归，不能当设计走查或作品集素材。
+    </p>
+  </div>
+</section>
+
+<section id="self-lying">
+  <h2><span class="n">9</span>实现：比业务 bug 更危险的，是测试自己在撒谎</h2>
+  <p class="lead">这一节解决：<b>怎么防止"全绿但其实没测"？</b>三种撒谎方式我们都踩过，也都留了守卫。</p>
+  <div class="codes">
+    <div class="codewrap bad">
+      <div class="hd">坑 A：场景崩了，却报"全部通过"</div>
+<pre><span class="c">$ npm run e2e</span>
+▸ ...（只跑了前 3 个场景）
+<span class="s">E2E：19 / 19 通过</span>
+<span class="c">$ echo $?</span>
+<span class="s">0</span>
+<span class="c">// 原因：场景异常被外层 try/catch 吞掉，
+// 通过率只统计 check()</span></pre>
+    </div>
+    <div class="codewrap good">
+      <div class="hd">对策：条数守卫 + 崩溃记一条失败</div>
+<pre><span class="c">// 每次增删断言都要改这个常量 —— 值得，
+// 这是唯一能发现"测试没跑完"的办法</span>
+<span class="k">const</span> EXPECTED_CHECKS = <span class="hl">102</span>;
+
+<span class="k">catch</span> (e) {
+  check(<span class="s">`场景「${scenario}」执行完成`</span>, <span class="hl">false</span>, e.message);
+}
+<span class="c">// 条数对不上 → 报警 + exit 1</span></pre>
+    </div>
+  </div>
+
+  <div class="codes" style="margin-top:14px">
+    <div class="codewrap bad">
+      <div class="hd">坑 B：空截图算成功</div>
+<pre><span class="c">// 截图前试着滚页面 → 截出 10KB 白板</span>
+<span class="s">✓ 12/12</span>   <span class="c">// 脚本照样报成功</span>
+<span class="c">教训：凡是"产物存在即成功"的断言，都等于没断言</span></pre>
+    </div>
+    <div class="codewrap bad">
+      <div class="hd">坑 C：断言全绿，但东西是坏的</div>
+<pre><span class="c">// 断言只证明"遮罩在、图片渲染了"</span>
+<span class="s">✓ 点示意图打开全屏大图</span>
+<span class="c">// 截图一看：黑色线稿在深色遮罩上几乎看不见</span>
+<span class="c">// 另一例：文案写"进度照样算"，其实不会推进 —— 测试也全绿</span></pre>
+    </div>
+  </div>
+  <p class="tiny muted" style="margin:10px 0 0">
+    对策：① 崩溃补记失败 + 期望条数常量；② 产物有效性校验（体积下限 + 空白补拍）；
+    ③ <b>保留一道人工看图关口</b>（改 UI 的轮次必过），并把文案的语义也写成断言（含糊的话不给过）。
+    <b>能算出来的交给脚本，读不读得懂只能靠人。</b>
+  </p>
+</section>
+
+<section id="code">
+  <h2><span class="n">10</span>附录：五段真实代码</h2>
+  <p class="lead">这一节解决：<b>上面讲的原则，落到代码长什么样。</b>全部取自本节目的真实文件。</p>
+
+  <div class="codes">
+    <div class="codewrap">
+      <div class="hd">① 主张"状态只有一个真相" → 当前式是推导的</div>
+<pre><span class="c">// utils/progress.js</span>
+<span class="k">function</span> currentNo(art, opts) {
+  <span class="k">const</span> o = opts || {};
+  <span class="k">if</span> (o.completed) <span class="k">return</span> <span class="hl">null</span>;
+  <span class="k">const</span> passedMap = o.passed || {};
+  <span class="k">const</span> first = art.steps.find(s =&gt; !passedMap[s.id]);
+  <span class="k">return</span> first ? first.no : <span class="hl">null</span>;
+}
+<span class="c">// 达标即自动解锁下一式：不需要任何一步额外操作</span></pre>
+    </div>
+    <div class="codewrap">
+      <div class="hd">② 主张"不能跳级" → 守卫 + 断言</div>
+<pre><span class="c">// utils/progress.js：谁能记录</span>
+<span class="k">function</span> canPractice(art, step, opts) {
+  <span class="k">const</span> o = opts || {};
+  <span class="k">if</span> (o.completed || (o.passed || {})[step.id]) <span class="k">return</span> <span class="hl">true</span>;
+  <span class="k">const</span> cur = currentNo(art, o);
+  <span class="k">return</span> cur !== <span class="hl">null</span> &amp;&amp; step.no &lt;= cur;
+}
+
+<span class="c">// tests/page-flow.test.js：对未解锁的式动手，必须什么都没发生</span>
+lockedQuick.setData({ input: <span class="s">'50'</span> });
+lockedQuick.addSet(); lockedQuick.finish();
+assert.strictEqual(store.pendingSets(), <span class="hl">0</span>);</pre>
+    </div>
+  </div>
+
+  <div class="codes" style="margin-top:14px">
+    <div class="codewrap">
+      <div class="hd">③ 主张"数据可追溯" → 来源快照逐条对齐</div>
+<pre><span class="c">// tests/data-source.test.js</span>
+ARTS.forEach(a =&gt; a.steps.forEach((s, i) =&gt; {
+  <span class="k">const</span> src = SRC.arts[a.id].steps[i];
+  <span class="k">if</span> (sameStd(s.std, src)) <span class="k">return</span>;
+  <span class="k">const</span> doc = CORRECTIONS.get(s.id);
+  <span class="k">if</span> (doc &amp;&amp; sameStd(s.std, doc.ourStd) &amp;&amp; sameStd(src, doc.sourceStd)) <span class="k">return</span>;
+  mismatches.push(<span class="s">`${s.id}：数据 ${...} ≠ 来源 ${...}`</span>);
+}));
+<span class="c">// 差异只允许是"在案的那 2 处"；反向还断言记录不许过期</span></pre>
+    </div>
+    <div class="codewrap">
+      <div class="hd">④ 主张"看得清点得到" → 从 WXSS 算 WCAG</div>
+<pre><span class="c">// tests/ui-quality.test.js</span>
+<span class="k">function</span> luminance(hex) {
+  <span class="k">const</span> [r,g,b] = srgb(hex).map(v =&gt; v &lt;= <span class="hl">0.03928</span>
+    ? v / <span class="hl">12.92</span> : Math.pow((v + <span class="hl">0.055</span>) / <span class="hl">1.055</span>, <span class="hl">2.4</span>));
+  <span class="k">return</span> <span class="hl">0.2126</span>*r + <span class="hl">0.7152</span>*g + <span class="hl">0.0722</span>*b;
+}
+<span class="k">function</span> contrast(fg, bg) {
+  <span class="k">const</span> a = luminance(fg), b = luminance(bg);
+  <span class="k">return</span> (Math.max(a,b) + <span class="hl">0.05</span>) / (Math.min(a,b) + <span class="hl">0.05</span>);
+}
+<span class="c">// 43 组"文字×背景"配对全部 ≥4.5:1，颜色改浅了测试直接红</span></pre>
+    </div>
+  </div>
+
+  <div class="codewrap" style="margin-top:14px">
+    <div class="hd">⑤ 视觉基线的"容忍度"：阈值是量出来的（含踩坑记录）</div>
+<pre><span class="c">// tools/lib/screenshot-hash.js —— 注释就是实验记录</span>
+<span class="c">// 阈值是量出来的（不是拍的）—— 用真实截图跑了 7 组对照：</span>
+<span class="c">//   跨 IDE 会话（整体位移 1px，含大面积线稿的全屏大图）：3–4 行坏行 = 0.41%–0.54%</span>
+<span class="c">//   同一页面换状态（详情页"有记录"vs"有草稿"，只差横幅一行字 + 几个标签）：12 行 = 1.63%</span>
+<span class="c">//   完全不同的页面（首页 vs 列表）：403 行 = 54.7%</span>
+<span class="c">// 所以取 0.8% 作为分界，两侧都有余量。</span>
+<span class="k">function</span> diffFingerprint(aHex, bHex,
+    rowTolerance = <span class="hl">8</span>, ratioLimit = <span class="hl">0.008</span>, minBadRows = <span class="hl">5</span>) { ... }</pre>
+  </div>
+</section>
+
+<section id="index">
+  <h2><span class="n">11</span>附录：111 条断言的分层索引</h2>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th style="width:22%">文件</th><th style="width:8%">条数</th><th style="width:40%">管什么（摘要）</th><th>A/B/C 成分</th></tr></thead>
+    <tbody>
+      <tr><td><code>tests/data.test.js</code></td><td>17</td><td>60 式完整性、标准单调、单位/每侧、图片必须存在、存疑必须写说明、禁用医疗表述、每式必须有要点、每艺必须写明器械</td><td>9 / 3 / 5</td></tr>
+      <tr><td><code>tests/data-source.test.js</code></td><td>5</td><td>60 式标准与来源快照逐条对齐；每侧标记；计时/计次单位；修正记录不许过期</td><td>0 / <b>5</b> / 0</td></tr>
+      <tr><td><code>tests/progress.test.js</code></td><td>29</td><td>三档判定边界、当前式推导、解锁判定、进度换算、首页推荐规则</td><td>17 / 1 / 11</td></tr>
+      <tr><td><code>tests/store.test.js</code></td><td>8</td><td>进度/通关、首次通关时间不被复习覆盖、草稿即时落盘、记录上限、重置语义</td><td>4 / 1 / 3</td></tr>
+      <tr><td><code>tests/page-flow.test.js</code></td><td>47</td><td>直接驱动真实页面：首页推荐、往返、通关流程、列表三态、<b>锁定不可记录</b>、一键档位、极简模式不降标准、分享路径、文案语义红线</td><td><b>38</b> / 0 / 9</td></tr>
+      <tr><td><code>tests/ui-quality.test.js</code></td><td>5</td><td>WCAG 对比度（43 组）、字号下限、点按区、禁用纯黑纯灰、截图工具确定性</td><td>0 / <b>5</b> / 0</td></tr>
+      <tr><td><code>e2e/run.js</code></td><td>102</td><td>15 个场景的真实运行时断言（含 5 个场景明确标注"回归"）</td><td>—</td></tr>
+      <tr><td><code>e2e/shots.js</code></td><td>19 张</td><td>状态截图 + 与基线指纹比对 + 空白补拍 + 几何守卫</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="tiny muted" style="margin:10px 0 0">
+    A/B/C 口径见第 3 节：A 领域定制（只有这个产品才有）｜ B 通用工程（任何前端项目可抄）｜ C 混合/工具（参数化后可用）。
+  </p>
+</section>
+
+<!-- ==================== 收尾 ==================== -->
+<div class="takeaway">
+  <h2><span class="n">★</span>可以直接写进汇报的四句话</h2>
+  <ol>
+    <li><b>断言从设计主张推导，不从代码补写。</b>"存储里不能有 currentNo""未解锁不能写入记录"这类不变量，才是测试真正的输入。</li>
+    <li><b>定制化的断言是价值来源，不是缺点。</b>它守住的是产品语义；代价是必须绑"上游真相"（状态表 / 来源快照 / bug 编号），否则会腐化。</li>
+    <li><b>越低越便宜，且"便宜的那层"覆盖的是最贵的一类 bug。</b>数据错一个数字，界面完全看不出来 —— 只有纯函数层能拦；而真实渲染与手感，只能交给真机验收。</li>
+    <li><b>先怀疑测试，再怀疑代码。</b>崩溃报通过、空图算成功、断言全绿但东西是坏的 —— 这三类"测试在撒谎"比业务 bug 更危险，必须给测试自己的输出也加断言。</li>
+  </ol>
+</div>
+
+<div class="crosslink">
+  配套阅读：<a href="./TESTING-REPORT.html">《测试方案复盘（可视化版）》</a> —— 讲这个项目测试是怎么长出来的、踩了哪些坑、做过哪些选型；
+  逐项验收清单见仓库 <code>ACCEPTANCE.md</code>，测试细节见 <code>TESTING.md</code>。
+</div>
+
+<footer>
+  六艺十式 · 小程序测试方法论 ｜ 生成于项目 <code>v0.1.8</code>（build 2026-09-30.3）｜ 数字随每次提交更新<br>
+  本篇与《测试方案复盘》配套：本篇讲"怎么设计与迁移"，复盘讲"我们具体做了什么"
+</footer>
+
+</div>
+</body>
+</html>
