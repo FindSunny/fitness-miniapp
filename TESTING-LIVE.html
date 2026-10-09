@@ -12,8 +12,8 @@
   --card-2:#F4F5F0;
   --ink:#242830;
   --ink-soft:#4B515C;
-  --muted:#707784;
-  --faint:#9BA1AB;
+  --muted:#6B7280;
+  --faint:#868D97;
   --border:#E3E4DD;
   --line:#EDEEE8;
 
@@ -128,15 +128,15 @@ input[type=search]:focus{border-color:#C3C7BC;box-shadow:0 0 0 3px rgba(120,130,
   background:var(--card-2)}
 .grp>summary::-webkit-details-marker{display:none}
 .grp[open]>summary{background:var(--card)}
-.grp .tag{background:var(--slate-soft);color:var(--muted);font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:6px;
+.grp .tag{background:var(--slate-soft);color:#565C64;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:6px;
   font-family:ui-monospace,Consolas,monospace}
 .grp .gname{font-weight:620;font-size:14.5px;color:var(--ink)}
-.grp .gcount{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--faint);font-variant-numeric:tabular-nums}
+.grp .gcount{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
 .cases{padding:4px 15px 13px}
 .case{display:grid;grid-template-columns:16px 1fr;gap:8px;padding:5px 0;font-size:13.5px;color:var(--ink-soft);
   border-bottom:1px solid var(--line)}
 .case:last-child{border-bottom:none}
-.case i{font-style:normal;color:#95A08E;font-weight:600}
+.case i{font-style:normal;color:#6F7A69;font-weight:600}
 .case.reg i{color:#B9764A}
 .case .rn{background:#F7F0DC;color:#7A6122;border-radius:4px;padding:0 4px}
 
@@ -173,14 +173,22 @@ pre.log .hd{color:#D9C87A;font-weight:600}
 .fail3 .f code{background:#F2F3EE;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12.5px}
 
 /* 页脚：浅色卡，不再整块深色 */
-.foot{margin-top:34px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);
-  color:var(--ink-soft);padding:18px 20px;box-shadow:var(--shadow)}
-.foot h3{margin:0 0 8px;font-size:14.5px;font-weight:640;color:var(--ink)}
-.foot code{background:#F2F3EE;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:12.5px;color:#3C424A}
-.foot .fl{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.foot a{color:var(--ink-soft);background:var(--card);border:1px solid var(--border);border-radius:999px;
-  padding:6px 13px;font-size:13px;font-weight:600;text-decoration:none}
-.foot a:hover{border-color:#C6CABF;color:var(--ink)}
+.foot{margin-top:34px;border:1px solid var(--border);border-left:3px solid #B9C4BB;border-radius:var(--radius);
+  background:var(--card);padding:20px 22px;box-shadow:var(--shadow)}
+.foot h3{margin:0 0 14px;font-size:16.5px;font-weight:660;color:var(--ink)}
+
+/* 页脚改成"标签 + 说明"两列，字号与对比度都提上来 */
+.foot-row{display:grid;grid-template-columns:76px 1fr;gap:14px;align-items:start;padding:9px 0;border-top:1px solid var(--line)}
+.foot-row:first-of-type{border-top:none;padding-top:0}
+.foot-k{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.02em;padding-top:2px}
+.foot-v{font-size:14.5px;line-height:1.7;color:var(--ink)}
+.foot .cmds{display:flex;gap:8px;flex-wrap:wrap}
+.foot code{background:#EDEFE9;border:1px solid #DCDED6;border-radius:6px;padding:4px 9px;
+  font-family:ui-monospace,Consolas,monospace;font-size:13px;font-weight:600;color:#2C323A}
+.foot a{color:var(--ink);background:var(--card);border:1px solid #D3D6CC;border-radius:999px;
+  padding:7px 14px;font-size:13.5px;font-weight:600;text-decoration:none}
+.foot a:hover{border-color:#B4BAB0;background:#F5F6F1}
+.links{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
 
 .float{animation:none}
 @keyframes pop{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
@@ -273,19 +281,37 @@ pre.log .hd{color:#D9C87A;font-weight:600}
   <!-- ===================== 页脚 ===================== -->
   <div class="foot">
     <h3>在你机器上怎么跑</h3>
-    <p style="margin:0 0 4px;font-size:14px;color:#D8D8F0">
-      前置：Node ≥ 20（本机 24）＋ 微信开发者工具（E2E 与截图需要它，且是 Windows 图形环境）。
-    </p>
-    <div class="fl">
-      <code>npm test</code><code>npm run e2e:serve</code><code>npm run e2e</code><code>npm run e2e:shots</code>
+
+    <div class="foot-row">
+      <span class="foot-k">前置</span>
+      <span class="foot-v">Node ≥ 20（本机 24）＋ 微信开发者工具 —— E2E 与截图需要它，且需 Windows 图形环境。</span>
     </div>
-    <p style="margin:12px 0 0;font-size:13px;color:#B9BCE0">
-      跑 E2E 期间不要改项目文件（会触发重编译、清空页面栈）。E2E 不进 CI：它需要图形环境，
-      跑不了就不假装绿 —— CI 只跑 <code>npm test</code>。
-    </p>
-    <p style="margin:10px 0 0;font-size:13px;color:#B9BCE0">
-      数据来源：用例名与日志由 <code>tools/collect-test-data.mjs</code> 从仓库与真实运行中采集，随每次提交更新。
-    </p>
+
+    <div class="foot-row">
+      <span class="foot-k">命令</span>
+      <span class="foot-v">
+        <span class="cmds">
+          <code>npm test</code><code>npm run e2e:serve</code><code>npm run e2e</code><code>npm run e2e:shots</code>
+        </span>
+      </span>
+    </div>
+
+    <div class="foot-row">
+      <span class="foot-k">注意</span>
+      <span class="foot-v">跑 E2E 期间不要修改项目文件（会触发重编译、清空页面栈）。E2E 不进 CI：它需要图形环境，跑不了就不假装绿，CI 只跑 <code>npm test</code>。</span>
+    </div>
+
+    <div class="foot-row">
+      <span class="foot-k">数据来源</span>
+      <span class="foot-v">用例名与日志由 <code>tools/collect-test-data.mjs</code> 从仓库与真实运行中采集（日志已脱敏），随每次提交更新。</span>
+    </div>
+
+    <div class="links">
+      <a href="./TESTING-STACK.html">测试技术栈 · 一页纸</a>
+      <a href="./TESTING-METHOD.html">小程序测试方法论</a>
+      <a href="./TESTING-REPORT.html">测试方案复盘</a>
+      <a href="./ACCEPTANCE.md">验收清单（36 项）</a>
+    </div>
   </div>
 
 </div>
