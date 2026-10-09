@@ -115,6 +115,18 @@ h2 .badge{background:var(--card);color:var(--muted);font-size:12px;padding:4px 1
 .chip.u{background:var(--purple-soft);border-color:#E0DCF0;color:#564C86}
 .arw{color:var(--faint);font-weight:500}
 
+/* 技术栈表 */
+.tech-block{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.tech-title{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin-bottom:9px}
+.tech{width:100%;border-collapse:collapse;font-size:13px}
+.tech th{text-align:left;font-size:11.5px;font-weight:600;color:var(--muted);padding:0 12px 7px 0;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+.tech td{padding:7px 12px 7px 0;border-bottom:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+.tech tr:last-child td{border-bottom:none}
+.tech td.role{color:var(--muted);white-space:nowrap;font-size:12.5px}
+.tech td.lib{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:#2F3540;white-space:nowrap}
+.tech td.note{color:var(--ink-soft)}
+
 /* 用例明细 */
 .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 input[type=search]{flex:1;min-width:220px;background:var(--card);border:1px solid var(--border);border-radius:9px;
@@ -348,7 +360,16 @@ pre.log .hd{color:#D9C87A;font-weight:600}
         ['逐条执行断言','111 条 <span class="code">node:assert</span> 断言依次跑；任何一条抛出 → 该文件标红、进程退出码 1。'],
         ['输出汇总','打印 TAP 风格汇总（tests / pass / fail / duration），CI 与本地都读它。']
       ],
-      pipe:['node --test','发现 6 个 *.test.js','require 被测代码','装 wx/Page 打桩','跑 111 条断言','汇总 + 退出码']
+      pipe:['node --test','发现 6 个 *.test.js','require 被测代码','装 wx/Page 打桩','跑 111 条断言','汇总 + 退出码'],
+      tech:[
+        ['运行器','node:test','Node 20+ 内置测试运行器，零第三方框架（没有 Jest / Mocha / Vitest）'],
+        ['断言','node:assert','内置断言库；一条断言抛出即判该文件失败、进程退出码 1'],
+        ['发现机制','node --test','按约定自动匹配仓库里的 *.test.js，不需要任何配置文件'],
+        ['模块体系','CommonJS（require）','与小程序侧源码一致，测试可直接 require 真实业务代码'],
+        ['页面层打桩','tests/helpers/miniapp-stub.js','自写：装全局 wx（storage 用内存实现）、Page / App 收集器、getCurrentPages、getAccountInfoSync；load() 后返回页面实例，可直接调 onLoad / onShow / addSet'],
+        ['被测代码','miniprogram/**','真实页面脚本与纯函数模块，非复制品'],
+        ['依赖规模','dependencies = {}','运行时依赖 0 个；测试链只在下游 E2E 用到 1 个官方包']
+      ]
     },
     e2e: {
       title:'E2E（真实运行时）', cmd:'npm run e2e', file:'e2e/run.js → 微信开发者工具里的小程序运行时',
@@ -361,7 +382,17 @@ pre.log .hd{color:#D9C87A;font-weight:600}
         ['失败也要记账','场景抛异常时 <span class="code">catch</span> 里补记一条失败，最后用 <span class="code">EXPECTED_CHECKS = 102</span> 校验总条数 —— 防"跑一半崩了却报全绿"。'],
         ['收尾还原','把存储写回"全新用户"，不污染你手动测试的数据。']
       ],
-      pipe:['连 ws:9420','（必要时）cli auto','reLaunch 目标页','evaluate 调真实处理函数','check 逐条断言','收尾还原成新用户']
+      pipe:['连 ws:9420','（必要时）cli auto','reLaunch 目标页','evaluate 调真实处理函数','check 逐条断言','收尾还原成新用户'],
+      tech:[
+        ['自动化 SDK','miniprogram-automator ^0.12.1','微信官方小程序自动化 SDK（本项目唯一 devDependency）；用 automator.connect() 连已开的自动化端口'],
+        ['连接方式','WebSocket ws://127.0.0.1:9420','端口可用 E2E_PORT / E2E_WS 覆盖；连不上会自动拉起服务'],
+        ['不用 launch()','原因记录在 e2e/lib.js','automator.launch() 在 Windows 上执行 cli.bat 会失败（Failed to launch wechat web DevTools），因此改为自己调 CLI'],
+        ['拉起工具','微信开发者工具 CLI（cli auto）','child_process.spawn 调 cli.bat，路径可用 WECHAT_DEVTOOLS_CLI 覆盖'],
+        ['页面驱动','mp.reLaunch / currentPage / setData','真实运行时里的页面级 API；配合 evaluate 在 App 侧取 getCurrentPages() 调真实事件处理函数'],
+        ['断言','自写 check(名, 实际, 期望)','不引断言库：既比 page.data()，也比渲染层文本；EXPECTED_CHECKS = 102 做条数守卫'],
+        ['稳定化','e2e/lib.js：sleep / waitForPage / retry / waitReady','探针式等待 + 重试，替代固定 sleep'],
+        ['平台注意','Windows + PowerShell 调 CLI','Node spawn(shell:true) 在含空格路径（Program Files (x86)）下会把参数解析坏，改由 PowerShell 调用']
+      ]
     },
     shots: {
       title:'截图 + 视觉基线', cmd:'npm run e2e:shots', file:'e2e/shots.js + e2e/shots-baseline.json',
@@ -374,7 +405,17 @@ pre.log .hd{color:#D9C87A;font-weight:600}
         ['行暗度指纹比对','裁掉顶部 48 行（躲开状态栏时钟/电量）→ 每行统计"暗像素个数"→ 逐行比：单行差 ≤8 算同一行；<b>坏行占比 &gt;0.8% 且坏行 ≥5</b> 判"变了"。<br>为什么不用整图哈希：时钟、1px 渲染位移都会让它每次都"全变"。'],
         ['汇总结论','打印"19/19 成功 + 与基线一致"，或列出哪几张变了，交给人看图决定 approve（<span class="code">--update-baseline</span>）还是回滚。']
       ],
-      pipe:['预置 storage','reLaunch','等渲染/滚动','screenshot 落盘','尺寸守卫 → 指纹比对','汇总（人看图）']
+      pipe:['预置 storage','reLaunch','等渲染/滚动','screenshot 落盘','尺寸守卫 → 指纹比对','汇总（人看图）'],
+      tech:[
+        ['截图来源','mp.screenshot()（automator）','保存为 e2e/shots/<状态名>.png，363×785 视口'],
+        ['状态预置','mp.callWxMethod(setStorageSync)','直接写 cf_state_v1，构造全新 / 已通过 / 有草稿 / 已通关等 19 种状态'],
+        ['滚动截屏','wx.pageScrollTo + 等待','滚动后等 ≥0.2 秒再截，抓首屏以下的内容'],
+        ['图像解码','自写零依赖 PNG 解码器（tools/lib/screenshot-hash.js）','只用 node:zlib（inflate）+ node:crypto（sha256）；支持 8bit 非隔行、颜色类型 0/2/4/6，不支持的格式显式报错'],
+        ['比对算法','行暗度指纹（每行暗像素计数 → hex）','裁掉顶部 48 行躲开状态栏时钟；单行容差 8，坏行占比 >0.8% 且坏行 ≥5 判"变了"'],
+        ['基线存储','e2e/shots-baseline.json','记录 cropTop、每张图的 hash / 宽高 / 体积 / 指纹，入库随代码走'],
+        ['守卫','体积下限 + 空白补拍 + 几何守卫','空白只补拍一次；尺寸不一致时单独提示"环境变化、不可比"'],
+        ['为何不用图像库','刻意选型','为算个指纹引 sharp / jimp 不划算；遇到不支持的 PNG 宁可报错也不静默算错']
+      ]
     }
   };
 
@@ -421,6 +462,15 @@ pre.log .hd{color:#D9C87A;font-weight:600}
             var cls = ['c','l','','o','p','u'][i%6];
             return (i? '<span class="arw">➜</span>':'') + '<span class="chip '+cls+'">'+esc(p)+'</span>';
           }).join('') + '</div>' +
+        (S.tech ? '<div class="tech-block">' +
+          '<div class="tech-title">技术栈（给技术同学看的清单）</div>' +
+          '<table class="tech"><thead><tr><th style="width:104px">角色</th><th style="width:224px">技术 / 框架</th><th>说明</th></tr></thead><tbody>' +
+          S.tech.map(function(t){
+            return '<tr><td class="role">'+esc(t[0])+'</td>' +
+                   '<td class="lib">'+esc(t[1])+'</td>' +
+                   '<td class="note">'+t[2]+'</td></tr>';
+          }).join('') +
+          '</tbody></table></div>' : '') +
       '</div>' +
 
       '<div class="card">' +
