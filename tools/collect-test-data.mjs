@@ -8,10 +8,14 @@
  *   5) --inject：把数据写进 TESTING-LIVE.html 的 DATA 标记之间（页面是本文件的快照）
  *
  * 用法：
- *   npm test > release/report/log-node.txt          # 先跑出真实日志
- *   npm run e2e > release/report/log-e2e.txt
- *   npm run e2e:shots > release/report/log-shots.txt
+ *   cmd /c "npm test > release\report\log-node.txt 2>&1"      ← 用 cmd 重定向才是 UTF-8
+ *   cmd /c "npm run e2e > release\report\log-e2e.txt 2>&1"
+ *   cmd /c "npm run e2e:shots > release\report\log-shots.txt 2>&1"
  *   node tools/collect-test-data.mjs --inject
+ *
+ * ⚠️ 踩过的坑：PowerShell 的 `>` / `*>` 默认写 **UTF-16LE（带 BOM）**，
+ *    之前按 UTF-8 读，页面里的日志全是 \u0000 交错的乱码。
+ *    本工具现在会自动识别 BOM 并正确解码，而且读到乱码/空内容会直接报错。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,6 +37,36 @@ const LAYERS = {
   'tests/page-flow.test.js': { layer: 'L4', name: '页面流程', note: '驱动真实页面代码跑一遍' },
   'tests/ui-quality.test.js': { layer: 'L4b', name: '界面质量', note: '从真实样式文件算出来的数字' }
 };
+
+/** 按 BOM 自动识别编码读文本：PowerShell 重定向出的 UTF-16LE 也能正确读 */
+function readTextAuto(file) {
+  const buf = fs.readFileSync(file);
+  let text, encoding;
+  if (buf[0] === 0xff && buf[1] === 0xfe) { text = buf.toString('utf16le'); encoding = 'UTF-16LE'; }
+  else if (buf[0] === 0xfe && buf[1] === 0xff) {
+    // UTF-16BE：交换字节后按 LE 解
+    const swapped = Buffer.from(buf.slice(2));
+    swapped.swap16();
+    text = swapped.toString('utf16le');
+    encoding = 'UTF-16BE';
+  } else {
+    text = buf.toString('utf8').replace(/^\uFEFF/, '');
+    encoding = 'UTF-8';
+  }
+  return { text, encoding };
+}
+
+/** 读到乱码 / 空内容就报错，别把垃圾悄悄嵌进页面（上次就是这么翻车的） */
+function assertSane(name, text, encoding) {
+  const nuls = (text.match(/\u0000/g) || []).length;
+  const broken = (text.match(/\uFFFD/g) || []).length;
+  const han = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+  if (!text.trim()) throw new Error(`日志 ${name} 是空的 —— 先跑对应命令并重定向到 release/report/${name}`);
+  if (nuls > 0) throw new Error(`日志 ${name} 解出来含 ${nuls} 个 \\u0000（编码没对上，当前识别为 ${encoding}）`);
+  if (broken > 5) throw new Error(`日志 ${name} 解出来含 ${broken} 个替换符 U+FFFD（编码/脱敏有问题）`);
+  if (han < 10) console.warn(`  ⚠️ 日志 ${name}（${encoding}）里只有 ${han} 个汉字，确认一下是不是抓错了？`);
+  return { encoding, nuls, broken, han, lines: text.split('\n').length };
+}
 
 /** 日志脱敏：不把 AppID 与你本机的绝对路径写进要分享的页面里 */
 function scrub(text) {
@@ -76,17 +110,22 @@ function collectNames() {
     e2e: { total: scenarios.reduce((n, s) => n + s.checks.length, 0), expected: expected ? Number(expected) : null, scenarios },
     shots: { total: states.length, cropTop: 48, states },
     logs: {
-      node: scrub(readLog('log-node.txt')),
-      e2e: scrub(readLog('log-e2e.txt')),
-      shots: scrub(readLog('log-shots.txt'))
-    }
+      node: loadLog('log-node.txt'),
+      e2e: loadLog('log-e2e.txt'),
+      shots: loadLog('log-shots.txt')
+    },
+    logMeta: {}
   };
 }
 
-function readLog(f) {
+/** 读一份日志：识别编码 → 校验没有乱码 → 脱敏。编码信息会打印出来备查 */
+function loadLog(f) {
   const p = path.join(ROOT, 'release/report', f);
-  if (!fs.existsSync(p)) return `（未找到 ${f}：先跑对应命令并把输出重定向到这个文件）`;
-  return fs.readFileSync(p, 'utf8');
+  if (!fs.existsSync(p)) throw new Error(`找不到 release/report/${f} —— 先跑对应命令并重定向`);
+  const { text, encoding } = readTextAuto(p);
+  const meta = assertSane(f, text, encoding);
+  console.log(`  · ${f}：${meta.encoding}，${meta.lines} 行，汉字 ${meta.han} 个，乱码 0 ✓`);
+  return scrub(text);
 }
 
 /** 解析 e2e/shots.js 里 STATES 的每个状态：摆什么数据、开哪页、滚动还是点击 */
