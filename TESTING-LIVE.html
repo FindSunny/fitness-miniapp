@@ -127,6 +127,18 @@ h2 .badge{background:var(--card);color:var(--muted);font-size:12px;padding:4px 1
 .tech td.lib{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:#2F3540;white-space:nowrap}
 .tech td.note{color:var(--ink-soft)}
 
+/* 环境准备：命令清单块 + 分档标签 */
+.cmdblock{background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:13px 15px;
+  font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.95;color:#2F3540;
+  overflow-x:auto;white-space:pre}
+.cmdblock .c{color:var(--muted)}
+.cmdblock .k{color:#2F6C81;font-weight:600}
+.env-note{margin:11px 0 0;font-size:12.5px;color:var(--muted)}
+.tier{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:6px;
+  background:var(--slate-soft);color:#565C64;white-space:nowrap}
+.tier.need{background:var(--lime-soft);color:#5F7630}
+.tier.opt{background:var(--card-2);color:var(--muted)}
+
 /* 用例明细 */
 .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 input[type=search]{flex:1;min-width:220px;background:var(--card);border:1px solid var(--border);border-radius:9px;
@@ -267,9 +279,138 @@ pre.log .hd{color:#D9C87A;font-weight:600}
     <div class="panel" data-panel="shots" hidden></div>
   </section>
 
+  <!-- ===================== 本地环境准备 ===================== -->
+  <section id="env">
+    <h2><span class="badge">②</span>本地跑测试需要装什么</h2>
+    <p class="hint">
+      分三档：<b>跑 Node 断言只需要 Node</b>；跑 E2E 与截图还要微信开发者工具 + 自己的小程序 AppID；
+      其余（Chrome、上传自检等）都是可选。下面每一条都写了"装在哪个环节必需"和怎么验证。
+    </p>
+
+    <div class="card">
+      <div class="tech-title">环境与工具清单</div>
+      <table class="tech">
+        <thead><tr><th style="width:132px">工具 / 环境</th><th style="width:78px">必需性</th><th>用途与说明</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="lib">Node.js</td>
+            <td><span class="tier need">必需</span></td>
+            <td class="note">跑 111 条 Node 断言与全部脚本。本机 v24；<code>node:test</code> 自 Node 18 起可用、20 起稳定，建议 ≥20。
+              <b>无需 npm install</b>（Node 层零依赖）。验证：<code>node -v</code></td>
+          </tr>
+          <tr>
+            <td class="lib">Git</td>
+            <td><span class="tier need">必需</span></td>
+            <td class="note">拉代码、切分支。仓库带 pre-push 钩子（拦截向 main / prod 的直接 push），需一次性设置：
+              <code>git config core.hooksPath .githooks</code>。验证：<code>git --version</code></td>
+          </tr>
+          <tr>
+            <td class="lib">微信开发者工具</td>
+            <td><span class="tier">仅 E2E</span></td>
+            <td class="note">E2E 与 19 张截图跑在它里面的真实小程序运行时。要求：<b>已扫码登录</b> +
+              <b>设置 → 安全设置 → 开启服务端口</b>；需要图形界面，<b>不能纯命令行 / CI</b>。</td>
+          </tr>
+          <tr>
+            <td class="lib">小程序 AppID</td>
+            <td><span class="tier">仅 E2E</span></td>
+            <td class="note">编译、真机预览码与 E2E 起项目都要它。用自己的 16 位 AppID：
+              <code>npm run set-appid -- wx你的AppID</code>（仓库若为 touristappid 状态则跑不了上传）。</td>
+          </tr>
+          <tr>
+            <td class="lib">miniprogram-automator</td>
+            <td><span class="tier">仅 E2E</span></td>
+            <td class="note">微信官方自动化 SDK，<b>本项目唯一的 devDependency</b>（<code>^0.12.1</code>）。
+              用 <code>npm i</code> 装一次；<code>npm test</code> 完全不需要它。</td>
+          </tr>
+          <tr>
+            <td class="lib">本地端口 9420</td>
+            <td><span class="tier">仅 E2E</span></td>
+            <td class="note">测试脚本 ↔ 开发者工具之间的自动化服务通道，由 <code>npm run e2e:serve</code> 拉起。
+              端口被占用时用 <code>E2E_PORT</code> 换一个。</td>
+          </tr>
+          <tr>
+            <td class="lib">Chrome（可选）</td>
+            <td><span class="tier opt">可选</span></td>
+            <td class="note">只用于把文档（HTML）渲成 PNG / PDF，<b>与测试无关</b>。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="tech-title">检查清单（按顺序跑，每步都有期望结果）</div>
+      <div class="cmdblock"><span class="c"># 1. 基础环境</span>
+node -v            <span class="c"># 期望 v20 以上（本机 v24.14.1）</span>
+git --version
+git config core.hooksPath .githooks   <span class="c"># 只做一次：启用仓库自带的 pre-push 钩子</span>
+
+<span class="c"># 2. Node 层：这一步不需要 npm install</span>
+npm test           <span class="c"># 期望 tests 111 / pass 111 / fail 0</span>
+
+<span class="c"># 3. 只有要跑 E2E / 截图才需要下面几步</span>
+npm i                                   <span class="c"># 装唯一的官方依赖 miniprogram-automator</span>
+npm run e2e:serve                       <span class="c"># 起自动化服务，看到 √ auto 即就绪（窗口保持打开）</span>
+npm run e2e                             <span class="c"># 期望 E2E：102 / 102 通过（1–2 分钟）</span>
+npm run e2e:shots                       <span class="c"># 期望 19 / 19 张成功 + 与视觉基线一致</span></div>
+      <p class="env-note">
+        开发者工具的 CLI 默认按 Windows 常见路径查找（<code>C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat</code>，
+        以及 <code>Program Files</code> 下的同名路径）；装在别处就设 <code>WECHAT_DEVTOOLS_CLI</code> 指向它。
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="tech-title">环境变量（脚本真实读取的这几个）</div>
+      <table class="tech">
+        <thead><tr><th style="width:224px">变量</th><th style="width:196px">默认值</th><th>作用</th></tr></thead>
+        <tbody>
+          <tr><td class="lib">WECHAT_DEVTOOLS_CLI</td><td class="note">两个常见安装路径</td><td class="note">指定开发者工具 CLI（cli.bat）的位置</td></tr>
+          <tr><td class="lib">E2E_PORT</td><td class="note">9420</td><td class="note">自动化服务端口</td></tr>
+          <tr><td class="lib">E2E_WS</td><td class="note">ws://127.0.0.1:9420</td><td class="note">直接指定自动化服务地址（优先级高于端口）</td></tr>
+          <tr><td class="lib">CF_SKIP_RELEASE_CHECK</td><td class="note">未设置（即默认自检）</td><td class="note">上传前跳过 release 自检，仅排查问题时用</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="tech-title">第一次搭环境最容易卡住的六个地方</div>
+      <div class="fail3" style="grid-template-columns:1fr 1fr;margin-top:4px">
+        <div class="f">
+          <span class="who">服务端口没开</span>
+          <h4>连不上 9420</h4>
+          <p>开发者工具 → 设置 → 安全设置 → 打开服务端口；不开的话 <code>npm run qr</code> 也会超时。</p>
+        </div>
+        <div class="f">
+          <span class="who">工具没登录</span>
+          <h4>自动化服务拉不起来</h4>
+          <p>开发者工具需要先扫码登录，脚本再执行 <code>cli auto</code> 才起得来。</p>
+        </div>
+        <div class="f">
+          <span class="who">会话跑久了</span>
+          <h4>失败点固定在同一个场景</h4>
+          <p>这是工具会话退化（不是 flake）。处置：<code>cli close</code> → <code>npm run e2e:serve</code> → 重跑。</p>
+        </div>
+        <div class="f">
+          <span class="who">跑测试时改文件</span>
+          <h4>随机失败</h4>
+          <p>工具会重编译、清空页面栈。跑 E2E 期间不要改项目文件。</p>
+        </div>
+        <div class="f">
+          <span class="who">安装位置特殊</span>
+          <h4>找不到 cli.bat</h4>
+          <p>设 <code>WECHAT_DEVTOOLS_CLI</code> 指向你的 cli.bat 路径即可。</p>
+        </div>
+        <div class="f">
+          <span class="who">端口被占用</span>
+          <h4>9420 被别的进程占了</h4>
+          <p>用 <code>E2E_PORT</code> 换一个端口（测试脚本与工具同时生效），或先关掉占用进程。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===================== 失败怎么读 ===================== -->
   <section id="fail">
-    <h2><span class="badge">②</span>红了怎么读</h2>
+    <h2><span class="badge">③</span>红了怎么读</h2>
     <p class="hint">测试自己的输出也要能被判读 —— 这三种情况最容易误判。</p>
     <div class="fail3">
       <div class="f">
