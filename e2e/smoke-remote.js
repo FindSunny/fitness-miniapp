@@ -15,8 +15,12 @@
  *
  * 用法：
  *   1) npm run e2e:serve      # 已有自动化服务可跳过（脚本检测不到会自动拉起，约 30–90s）
- *   2) npm run e2e:remote     # 打印操作清单 → 你在工具里连真机 → 自动检测后跑完
+ *   2) npm run e2e:remote     # 默认引导式：打印操作清单 → 你在工具里连真机 → 自动检测后跑完
  *
+ *   可选：--auto 免扫码推送（2026-10-14 实测成立）——脚本直接推送到设备，工具会自动
+ *   打开手机上的小程序并建立调试会话（Tool.enableRemoteDebug {auto:true}，返回 {} 无码）。
+ *   **前提：手机上未打开本项目的小程序**（挂着会推不进来，连接事件不触发）；
+ *   且设备此前至少扫码连接过一次（已建立调试信任）。推送成功后手机上会自动打开小程序。
  *   可选：--qr 走「脚本出码」模式（二维码存 e2e/remote-qr.png 供扫码；
  *   不用 mp.remote() 是因为它把码打到终端 ASCII，扫码不方便，这里存成 PNG）；
  *   仅当确认「工具当前平台选择 = 目标手机平台」时使用，否则会假连接。
@@ -39,7 +43,9 @@ const SHOT_PATH = path.join(ROOT, 'e2e', 'remote-shot.png');
 const STORAGE_KEY = 'cf_state_v1';
 const WAIT_TIMEOUT = 300000;   // [引导式] 等真机会话就绪超时（5 分钟）
 const SCAN_TIMEOUT = 240000;   // [--qr] 等扫码超时（4 分钟）
-const USE_QR = process.argv.includes('--qr');   // 走「脚本出码」模式（默认是引导式）
+const AUTO_TIMEOUT = 60000;    // [--auto] 等推送连接事件超时（1 分钟）
+const USE_AUTO = process.argv.includes('--auto');   // 免扫码推送模式（优先于 --qr）
+const USE_QR = process.argv.includes('--qr');       // 脚本出码模式（默认是引导式）
 
 const results = [];
 let scenario = '(启动)';
@@ -137,13 +143,38 @@ async function waitForRemoteDevice(mp, timeoutMs) {
 (async () => {
   console.log('→ 连接自动化服务（连不上会自动 cli auto 拉起工具，约 30–90s）…');
   const mp = await getMiniProgram();
-  const readyPath = await waitReady(mp);
+  // 就绪等待给 30s 就够（出现过工具中间态拖满 90s 的情况；后续各步自带重试兜底）
+  const readyPath = await waitReady(mp, 30000);
   console.log(`→ 工具侧 App 就绪（当前页 ${readyPath || '未知'}）`);
 
   let sys = null;
   try {
+    // 跑前卫生：--auto / --qr 先清掉可能残留的调试会话（上一轮异常退出时可能留下，
+    // 留着会阻塞推送/扫码——踩过：残留会话导致「推送事件触发但目标不切换到真机」）。
+    // 引导式不能这么做：它的前提就是用户已在 GUI 里连好了会话。
+    if (USE_AUTO || USE_QR) {
+      await mp.send('Tool.resetRemoteDebug').catch(() => {});
+      await sleep(800);
+    }
+
     // ============================================================ 0. 连接真机
-    if (USE_QR) {
+    if (USE_AUTO) {
+      step('连接（--auto）：免扫码推送到设备');
+      console.log('  → 推送中……（前提：手机上未打开本项目的小程序；若超时请关掉小程序后重跑）');
+      const t0 = Date.now();
+      const connected = new Promise(resolve => {
+        mp.connection.once('Tool.onRemoteDebugConnected', async () => {
+          await sleep(1500);
+          resolve(true);
+        });
+      });
+      await mp.send('Tool.enableRemoteDebug', { auto: true });   // 返回 {}（无码）
+      const ok = await Promise.race([connected, sleep(AUTO_TIMEOUT).then(() => false)]);
+      check(`免扫码推送成功（等待 ${Math.round((Date.now() - t0) / 1000)}s）`, ok,
+        ok ? '' : '未连上 —— 最常见原因：手机端还开着本项目的小程序（关掉后重跑）；也可能是设备的调试信任已过期（用引导式扫码一次即可续期）');
+      if (!ok) throw new Error('auto 推送超时，冒烟终止');
+      await waitReady(mp);   // 真机侧 AppService 就绪
+    } else if (USE_QR) {
       step('连接（--qr）：脚本出码 → 手机扫码');
       const { qrCode } = await mp.send('Tool.enableRemoteDebug', { auto: false });
       if (!qrCode) throw new Error('Tool.enableRemoteDebug 没有返回二维码（工具版本可能不支持真机自动化）');
@@ -195,6 +226,13 @@ async function waitForRemoteDevice(mp, timeoutMs) {
     check('运行环境是真机（platform 非 devtools）',
       sys && sys.platform !== 'devtools',
       `platform=${sys && sys.platform} model=${sys && sys.model} system=${sys && sys.system}`);
+    if (!sys || sys.platform === 'devtools') {
+      // 快速失败：推送/扫码看似成功但目标没切到真机（踩过：残留会话下平台仍是 devtools，
+      // 整轮会静默跑在模拟器上；断言能抓到，但没必要浪费旅程阶段的多次 reLaunch）。
+      throw new Error('自动化目标不是真机（platform=' + (sys && sys.platform) + '）——' +
+        '推送/扫码看似成功但目标未切换到真机。常见原因：手机端小程序开着、或工具里有残留调试会话。' +
+        '请关掉手机上的小程序后重跑（脚本已自动做过会话 reset）。');
+    }
     note(`systemInfo：platform=${sys.platform} · model=${sys.model} · ${sys.system} · SDKVersion=${sys.SDKVersion} · 微信 ${sys.version}`);
 
     await mp.callWxMethod('setStorageSync', '__smoke_probe', { t: 123 });
@@ -302,7 +340,17 @@ async function waitForRemoteDevice(mp, timeoutMs) {
     check(`场景「${scenario}」执行完成`, false, (e && e.message) || String(e));
     console.error(`\n✗ 场景「${scenario}」出错：${e && e.message}`);
   } finally {
-    await mp.close().catch(() => {});
+    // 收尾顺序（每一步都有踩坑背景，别调换）：
+    // ① App.exit 必须最先发——让真机上的小程序退出。必须趁调试通道还活着，
+    //    否则命令送不到手机（踩过：先 reset 再 close，手机上小程序一直开着不关）。
+    // ② Tool.resetRemoteDebug 关闭工具的调试会话（destroy + forceQuitRoom）——
+    //    残留会话会阻塞下一轮连接/推送（症状：一直等待、或推送成功但目标不切换）。
+    // ③ Tool.close + disconnect 结束自动化会话（等价 mp.close 的后半段）。
+    try { await mp.send('App.exit'); } catch (e) { /* 真机可能已断，忽略 */ }
+    await sleep(1000);
+    await mp.send('Tool.resetRemoteDebug').catch(() => {});
+    await mp.send('Tool.close').catch(() => {});
+    try { mp.disconnect(); } catch (e) { /* 忽略 */ }
   }
 
   const pass = results.filter(r => r.ok).length;
