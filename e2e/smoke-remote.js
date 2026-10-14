@@ -2,29 +2,30 @@
  * 真机冒烟（物理手机 · 最小验证）
  *
  * 目的：验证「物理手机 + 自动化通道」这条路通不通，不追求覆盖度。
- *   ① 连接：用 connect() 连自动化服务 → 发 Tool.enableRemoteDebug → 二维码存成 PNG → 手机扫码
+ *   ① 连接：默认「引导式」—— 你在开发者工具里完成真机调试（选平台 + 扫码），
+ *      脚本每 4 秒探测一次真机会话，连上后自动开跑（Android / iOS 通用）
  *   ② 探针：真机身份（platform/model）、storage、evaluate、mock、截图 五个通道能力
  *   ③ 旅程：首页 → 列表 → 详情记录 3 组 50 → 达标【升级】 → 第 2 式自动进行中（核心一条）
  *
- * 为什么不直接用 mp.remote()：
- *   它内部把二维码 turn 成终端 ASCII 码（qrcode-terminal），用户要对着终端扫，不方便；
- *   这里直接拿 Tool.enableRemoteDebug 返回的 qrCode（base64 PNG）存文件，用户打开图片扫码。
- *   事件等待逻辑与 SDK 源码 out/MiniProgram.js 的 remote() 一致（Tool.onRemoteDebugConnected）。
+ * 为什么默认引导式（而不是脚本出码）：
+ *   真机调试二维码按平台生成，工具的「平台选择」会被持久记忆（上次测 iOS、这次默认还是 iOS）；
+ *   脚本出码沿用的是工具当前选择——设备与码平台不匹配时会出现「假连接」：
+ *   扫码后连接事件触发，但自动化命令全部超时（曾把 iOS 误判成「不支持」）。
+ *   引导式把「选平台」交给你在弹窗里现场操作，所见即所得，从机制上绕开这个问题。
  *
  * 用法：
  *   1) npm run e2e:serve      # 已有自动化服务可跳过（脚本检测不到会自动拉起，约 30–90s）
- *   2) npm run e2e:remote     # 出二维码 → 手机微信扫码 → 自动跑完
+ *   2) npm run e2e:remote     # 打印操作清单 → 你在工具里连真机 → 自动检测后跑完
  *
- * 手工模式（--manual，用于 iOS 等需要先在 GUI 里选平台的场景）：
- *   1) 在工具里打开「真机调试」弹窗 → 底部选平台（如「iOS 系统」）→ 手机扫码，确认连上
- *   2) npm run e2e:remote -- --manual     # 跳过出码，直接连上现有会话跑断言
+ *   可选：--qr 走「脚本出码」模式（二维码存 e2e/remote-qr.png 供扫码；
+ *   不用 mp.remote() 是因为它把码打到终端 ASCII，扫码不方便，这里存成 PNG）；
+ *   仅当确认「工具当前平台选择 = 目标手机平台」时使用，否则会假连接。
+ *   （原 --manual 已并入默认的引导式行为，不需要再传。）
  *
- * 平台支持（实测，2026-10-14）：
- *   Android 真机：可用（IN2010 / Android 12 / 微信 8.0.78 / 基础库 3.17.4，连续两轮 20/20）
- *   iOS 真机：可用，但**必须走手工模式**（iPhone 16 Pro / iOS 26.7 / 微信 8.0.79，18/18）。
- *     关键：工具「真机调试」弹窗里选的平台必须与设备匹配（选「iOS 系统」再出码）。
- *     踩过：iOS 手机扫了 Android 平台的码（SDK 出码默认 Android）→ 连接事件会触发
- *     但首条命令 timeout，曾被误判为「iOS 不支持」。
+ * 平台支持（实测 2026-10-14）：
+ *   Android：IN2010 / Android 12 / 微信 8.0.78 / 基础库 3.17.4 —— 20/20（连续两轮）
+ *   iOS：iPhone 16 Pro / iOS 26.7 / 微信 8.0.79 —— 18/18（引导式路径）
+ *   两个平台五个通道（systemInfo/storage/evaluate/mockWxMethod/screenshot）都可用。
  *
  * 前提：手机微信的基础库 ≥ 2.7.3，且该微信号有本小程序的开发权限。
  */
@@ -36,8 +37,9 @@ const ROOT = path.resolve(__dirname, '..');
 const QR_PATH = path.join(ROOT, 'e2e', 'remote-qr.png');
 const SHOT_PATH = path.join(ROOT, 'e2e', 'remote-shot.png');
 const STORAGE_KEY = 'cf_state_v1';
-const SCAN_TIMEOUT = 240000;   // 等扫码超时（4 分钟）
-const MANUAL = process.argv.includes('--manual');   // 手工模式：跳过出码，连已有真机会话
+const WAIT_TIMEOUT = 300000;   // [引导式] 等真机会话就绪超时（5 分钟）
+const SCAN_TIMEOUT = 240000;   // [--qr] 等扫码超时（4 分钟）
+const USE_QR = process.argv.includes('--qr');   // 走「脚本出码」模式（默认是引导式）
 
 const results = [];
 let scenario = '(启动)';
@@ -102,19 +104,47 @@ async function recordSet(mp, value) {
   await sleep(250);
 }
 
+/**
+ * 引导式等待：轮询探测真机会话是否已就绪（platform 从 devtools 变为 ios/android）
+ * 期间打印心跳，让等待可感知；检测到即返回 systemInfo，超时返回 null。
+ */
+async function waitForRemoteDevice(mp, timeoutMs) {
+  console.log('\n' + '='.repeat(58));
+  console.log('  请在开发者工具中操作：');
+  console.log('    ① 点工具栏「真机调试」');
+  console.log('    ② 弹窗底部选平台（与你的手机匹配：Android/鸿蒙 或 iOS 系统）');
+  console.log('    ③ 手机微信扫码（需有本小程序的开发权限）');
+  console.log('  脚本每 4 秒自动检测，连上后立即开始断言 —— 不需要你回来汇报。');
+  console.log('='.repeat(58) + '\n');
+
+  const t0 = Date.now();
+  let lastBeat = -8;
+  while (Date.now() - t0 < timeoutMs) {
+    try {
+      const s = await mp.systemInfo();
+      if (s && s.platform && s.platform !== 'devtools') return s;
+    } catch (e) { /* 会话切换间隙偶发报错，忽略继续等 */ }
+    const waited = Math.floor((Date.now() - t0) / 1000);
+    if (waited - lastBeat >= 8) {
+      lastBeat = waited;
+      console.log(`  … 仍在等待真机会话（已等 ${waited}s）—— 若已扫码却一直停在这，检查弹窗里选的平台与手机是否一致`);
+    }
+    await sleep(4000);
+  }
+  return null;
+}
+
 (async () => {
   console.log('→ 连接自动化服务（连不上会自动 cli auto 拉起工具，约 30–90s）…');
   const mp = await getMiniProgram();
   const readyPath = await waitReady(mp);
   console.log(`→ 工具侧 App 就绪（当前页 ${readyPath || '未知'}）`);
 
+  let sys = null;
   try {
     // ============================================================ 0. 连接真机
-    if (MANUAL) {
-      step('手工模式：跳过出码（假定已在工具 GUI 完成真机调试）');
-      note('若探针的 platform 仍是 devtools，说明手工真机会话没有桥接到自动化通道');
-    } else {
-      step('真机连接：生成二维码 → 手机扫码');
+    if (USE_QR) {
+      step('连接（--qr）：脚本出码 → 手机扫码');
       const { qrCode } = await mp.send('Tool.enableRemoteDebug', { auto: false });
       if (!qrCode) throw new Error('Tool.enableRemoteDebug 没有返回二维码（工具版本可能不支持真机自动化）');
       fs.writeFileSync(QR_PATH, Buffer.from(qrCode, 'base64'));
@@ -123,7 +153,7 @@ async function recordSet(mp, value) {
       console.log('\n' + '='.repeat(52));
       console.log('  请打开这张图，用手机微信「扫一扫」：');
       console.log('  ' + QR_PATH);
-      console.log('  （微信号需有本小程序的开发权限；二维码有时效，过期重跑本脚本）');
+      console.log('  （平台必须与手机匹配；二维码有时效，过期重跑本脚本）');
       console.log('='.repeat(52) + '\n');
 
       const t0 = Date.now();
@@ -138,21 +168,29 @@ async function recordSet(mp, value) {
       check(`扫码连接成功（等待 ${Math.round((Date.now() - t0) / 1000)}s）`, scanned,
         scanned ? '' : `等 ${SCAN_TIMEOUT / 1000}s 未扫码（二维码可能已过期，重跑一次）`);
       if (!scanned) throw new Error('扫码超时，冒烟终止');
+      await waitReady(mp);   // 真机侧 AppService 就绪
+    } else {
+      step('连接（引导式）：等你在工具里完成真机调试');
+      const t0 = Date.now();
+      sys = await waitForRemoteDevice(mp, WAIT_TIMEOUT);
+      check(`检测到真机会话（等待 ${Math.round((Date.now() - t0) / 1000)}s）`, !!sys,
+        '超时未检测到 —— 排查：① 工具里点了「真机调试」吗 ② 手机扫码了吗 ③ 弹窗平台与手机是否一致');
+      if (!sys) throw new Error('等真机会话超时，冒烟终止');
+      note(`真机就绪：${sys.model} · ${sys.system}`);
     }
-
-    await waitReady(mp);   // 真机侧 AppService 就绪
 
     // 探针：真机身份 / storage / evaluate / mock / 截图
     step('探针：真机身份 / storage / evaluate / mock / 截图');
-    let sys;
-    try {
-      sys = await mp.systemInfo();
-    } catch (e) {
-      // 实测边界：iOS 设备扫码后，Tool.onRemoteDebugConnected 会触发（连接看似成功），
-      // 但自动化命令通道不通 —— 首条命令就在这里 timeout。给下一次跑的人一个明确指引。
-      throw new Error('真机命令通道无响应（' + ((e && e.message) || e) + '）。\n' +
-        '    已知边界：iOS 设备扫码会出现此现象（连接成功但自动化命令不通）；\n' +
-        '    本方案实测仅 Android 可用 —— 请改用 Android 手机重新扫码。');
+    if (!sys) {
+      try {
+        sys = await mp.systemInfo();
+      } catch (e) {
+        // 首条命令 timeout = 通道级故障。最常见的根因是「二维码平台与设备不匹配」，
+        // 而不是平台不支持（踩过：曾把 iOS 扫 Android 码误判成「iOS 不支持」）。
+        throw new Error('真机命令通道无响应（' + ((e && e.message) || e) + '）。\n' +
+          '    最常见原因：二维码/弹窗平台与手机不匹配（工具会记住上次的平台选择）。\n' +
+          '    请核对「真机调试」弹窗里的平台（Android 手机→Android/鸿蒙；iOS→iOS 系统）后重跑。');
+      }
     }
     check('运行环境是真机（platform 非 devtools）',
       sys && sys.platform !== 'devtools',
@@ -275,6 +313,6 @@ async function recordSet(mp, value) {
     console.log('\n失败项：');
     failed.forEach(f => console.log(`  ✗ ${f.name}  ← ${f.detail}`));
   }
-  console.log(`\n产物：二维码 e2e/remote-qr.png ｜ 截图 ${fs.existsSync(SHOT_PATH) ? 'e2e/remote-shot.png' : '（未生成）'}`);
+  console.log(`\n产物：${USE_QR ? '二维码 e2e/remote-qr.png ｜ ' : ''}截图 ${fs.existsSync(SHOT_PATH) ? 'e2e/remote-shot.png' : '（未生成）'}`);
   process.exit(failed.length ? 1 : 0);
 })();
