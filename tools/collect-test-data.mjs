@@ -2,15 +2,18 @@
  * 采集「真实在跑的测试」数据，供 TESTING-LIVE.html 嵌用。
  *
  *   1) 先从仓库里读用例清单（Node 6 个文件 / E2E 15 场景 / 截图 19 态）
- *   2) 再读三份真实日志（release/report/log-node.txt、log-e2e.txt、log-shots.txt）
+ *   2) 再从四份真实日志读（release/report/log-node.txt、log-e2e.txt、log-shots.txt、log-remote.txt）
+ *      —— 真机冒烟的用例清单直接从日志提取（▸ 分组 + ✓ 断言），清单 = 实际跑到的那些
  *   3) 脱敏：AppID、用户名绝对路径 → 打码
  *   4) 写出 release/report/testing-data.json（不入库）
  *   5) --inject：把数据写进 TESTING-LIVE.html 的 DATA 标记之间（页面是本文件的快照）
  *
- * 用法：
- *   cmd /c "npm test > release\report\log-node.txt 2>&1"      ← 用 cmd 重定向才是 UTF-8
- *   cmd /c "npm run e2e > release\report\log-e2e.txt 2>&1"
- *   cmd /c "npm run e2e:shots > release\report\log-shots.txt 2>&1"
+ * 用法（PowerShell，先设 OutputEncoding 再重定向写 UTF-8）：
+ *   [Console]::OutputEncoding=[Text.Encoding]::UTF8
+ *   npm test 2>&1 | Out-File release\report\log-node.txt -Encoding utf8
+ *   npm run e2e 2>&1 | Out-File release\report\log-e2e.txt -Encoding utf8
+ *   npm run e2e:shots 2>&1 | Out-File release\report\log-shots.txt -Encoding utf8
+ *   npm run e2e:remote -- --auto 2>&1 | Out-File release\report\log-remote.txt -Encoding utf8
  *   node tools/collect-test-data.mjs --inject
  *
  * ⚠️ 踩过的坑：PowerShell 的 `>` / `*>` 默认写 **UTF-16LE（带 BOM）**，
@@ -102,6 +105,14 @@ function collectNames() {
 
   const expected = (e2eSrc.match(/EXPECTED_CHECKS\s*=\s*(\d+)/) || [])[1];
 
+  const logs = {
+    node: loadLog('log-node.txt'),
+    e2e: loadLog('log-e2e.txt'),
+    shots: loadLog('log-shots.txt'),
+    remote: loadLog('log-remote.txt')
+  };
+  const remoteGroups = extractRemoteCases(logs.remote);
+
   return {
     version: JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version,
     stamp: require(path.join(ROOT, 'miniprogram/build-info.js')).stamp,
@@ -109,11 +120,8 @@ function collectNames() {
     node: { total: files.reduce((n, f) => n + f.tests.length, 0), files },
     e2e: { total: scenarios.reduce((n, s) => n + s.checks.length, 0), expected: expected ? Number(expected) : null, scenarios },
     shots: { total: states.length, cropTop: 48, states },
-    logs: {
-      node: loadLog('log-node.txt'),
-      e2e: loadLog('log-e2e.txt'),
-      shots: loadLog('log-shots.txt')
-    },
+    remote: { total: remoteGroups.reduce((n, g) => n + g.checks.length, 0), groups: remoteGroups },
+    logs,
     logMeta: {}
   };
 }
@@ -186,6 +194,23 @@ function parseShotStates(src) {
   });
 }
 
+/**
+ * 从真机冒烟日志提取用例清单（▸ 开分组 + ✓/✗ 收断言）。
+ * 为什么不解析 smoke-remote.js 源码：它有三种连接模式分支（--auto / --qr / 引导式），
+ * 静态解析会把没跑到的断言也算进来；日志提取天然就是"本次实际执行"。
+ */
+function extractRemoteCases(logText) {
+  const groups = [];
+  let cur = null;
+  for (const line of logText.split('\n')) {
+    const st = line.match(/^▸\s+(.+?)\s*$/);
+    if (st) { cur = { name: st[1], checks: [] }; groups.push(cur); continue; }
+    const ck = line.match(/^\s+[✓✗]\s+(.+)$/);
+    if (ck && cur) cur.checks.push(ck[1].split('   ←')[0].trim());
+  }
+  return groups.filter((g) => g.checks.length);
+}
+
 function inject(data) {
   const html = fs.readFileSync(PAGE, 'utf8');
   // 转义 < 以免 JSON 里出现 </script> 之类的序列破坏解析
@@ -200,10 +225,10 @@ function inject(data) {
 const data = collectNames();
 fs.writeFileSync(OUT_JSON, JSON.stringify(data, null, 2), 'utf8');
 
-console.log(`用例清单：Node ${data.node.total} ｜ E2E ${data.e2e.total}（期望 ${data.e2e.expected}）｜ 截图 ${data.shots.total}`);
+console.log(`用例清单：Node ${data.node.total} ｜ E2E ${data.e2e.total}（期望 ${data.e2e.expected}）｜ 截图 ${data.shots.total} ｜ 真机 ${data.remote.total}`);
 console.log('分层：' + data.node.files.map((f) => `${f.layer} ${f.tests.length}`).join(' ｜ '));
 const kb = (s) => Math.round(s.length / 1024) + 'KB';
-console.log(`日志：node ${kb(data.logs.node)} ｜ e2e ${kb(data.logs.e2e)} ｜ shots ${kb(data.logs.shots)}`);
+console.log(`日志：node ${kb(data.logs.node)} ｜ e2e ${kb(data.logs.e2e)} ｜ shots ${kb(data.logs.shots)} ｜ remote ${kb(data.logs.remote)}`);
 console.log(`数据已写出：release/report/testing-data.json`);
 
 if (process.argv.includes('--inject')) inject(data);
