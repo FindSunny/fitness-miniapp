@@ -4,7 +4,7 @@
  * 目的：验证「物理手机 + 自动化通道」这条路通不通，不追求覆盖度。
  *   ① 连接：默认「引导式」—— 你在开发者工具里完成真机调试（选平台 + 扫码），
  *      脚本每 4 秒探测一次真机会话，连上后自动开跑（Android / iOS 通用）
- *   ② 探针：真机身份（platform/model）、storage、evaluate、mock、截图 五个通道能力
+ *   ② 探针：真机身份（platform/model）、storage、evaluate、mock、截图、真实点击 六个通道能力
  *   ③ 旅程：首页 → 列表 → 详情记录 3 组 50 → 达标【升级】 → 第 2 式自动进行中（核心一条）
  *
  * 为什么默认引导式（而不是脚本出码）：
@@ -27,9 +27,10 @@
  *   （原 --manual 已并入默认的引导式行为，不需要再传。）
  *
  * 平台支持（实测 2026-10-14）：
- *   Android：IN2010 / Android 12 / 微信 8.0.78 / 基础库 3.17.4 —— 20/20（连续两轮）
- *   iOS：iPhone 16 Pro / iOS 26.7 / 微信 8.0.79 —— 18/18（引导式路径）
- *   两个平台五个通道（systemInfo/storage/evaluate/mockWxMethod/screenshot）都可用。
+ *   Android：IN2010 / Android 12 / 微信 8.0.78 / 基础库 3.17.4 —— 20/20（--auto 免扫码，含真实点击通道）
+ *   iOS：iPhone 16 Pro / iOS 26.7 / 微信 8.0.79 —— 18/18（引导式路径；当时还没有真实点击探针）
+ *   五个原通道（systemInfo/storage/evaluate/mockWxMethod/screenshot）两个平台都可用；
+ *   真实点击（element.tap）已在 Android 实测可用：tap 后约 1.8s 完成跳转（模拟器约 1s —— 真机链路更长）。
  *
  * 前提：手机微信的基础库 ≥ 2.7.3，且该微信号有本小程序的开发权限。
  */
@@ -138,6 +139,49 @@ async function waitForRemoteDevice(mp, timeoutMs) {
     await sleep(4000);
   }
   return null;
+}
+
+/**
+ * 真实点击探针（第六通道）：element.tap() 走"命中测试 → tap 事件 → bindtap"
+ * 背景：模拟器端 e2e/tap-probe.js 已实测 8/8 可用（导航类生效约 1 秒）；本例验证真机侧，
+ * 只点一个最稳的元素（首页「开始这一式」按钮 —— 位于视口上半部，任何机型都可见）→ 应跳详情页。
+ * tap 后用轮询等跳转（真机延迟未知，超时给 10s）；失败只报告、不阻塞后面的旅程。
+ */
+async function probeRealTap(mp) {
+  await mp.callWxMethod('clearStorageSync');
+  const idx = await retry(() => mp.reLaunch('/pages/index/index'), 3, 1500);
+  await idx.waitFor(1200);
+
+  // 等按钮渲染出来（真机首帧可能慢），最多查 4 轮
+  let btn = null;
+  for (let i = 0; i < 4 && !btn; i++) {
+    const p = await mp.currentPage();
+    btn = p ? await p.$('.btn.primary') : null;
+    if (!btn) await sleep(800);
+  }
+  if (!btn) return { ok: false, got: '首页没有找到 .btn.primary（渲染未就绪）' };
+
+  let off = null;
+  try { off = await btn.offset(); } catch (e) { off = 'offset 失败: ' + e.message; }
+  const t0 = Date.now();
+  try {
+    await btn.tap();
+  } catch (e) {
+    return { ok: false, got: 'element.tap 抛错：' + e.message, off };
+  }
+  let at = -1;
+  let where = '(读取失败)';
+  while (Date.now() - t0 < 10000) {
+    try {
+      const cur = await mp.currentPage();
+      where = cur && cur.path;
+      if (cur && /pages\/step\/step/.test(cur.path)) { at = Date.now() - t0; break; }
+    } catch (e) { /* 页面切换中，继续等 */ }
+    await sleep(300);
+  }
+  return at >= 0
+    ? { ok: true, got: '已跳到详情页', at, off }
+    : { ok: false, got: `10s 内未跳转（仍停在 ${where}）`, off };
 }
 
 (async () => {
@@ -260,6 +304,18 @@ async function waitForRemoteDevice(mp, timeoutMs) {
       shotOk = fs.existsSync(SHOT_PATH) && fs.statSync(SHOT_PATH).size > 15000;
     } catch (e) { /* 真机截图不支持属正常，仅报告 */ }
     note(`screenshot ${shotOk ? '可用 → ' + SHOT_PATH : '不可用（真机常见，不影响断言）'}`);
+
+    // ---- 第六通道：真实点击（element.tap）----
+    // 命中测试 → tap 事件 → bindtap 的完整链路；这是主交互（fire 调处理函数）覆盖不到的层 ——
+    // "按钮到底有没有绑事件"、真机触摸分发是否畅通，只有真点才能验证。
+    step('探针：真实点击通道（element.tap：首页按钮 → 详情页）');
+    const tapProbe = await probeRealTap(mp);
+    check('真实点击通道可用（element.tap 真实命中测试）', tapProbe.ok, tapProbe.got);
+    if (tapProbe.ok) {
+      note(`element.tap 生效延迟 ${tapProbe.at}ms（offset=${JSON.stringify(tapProbe.off)}）`);
+    } else {
+      note('真实点击探针失败 ≠ 绑定坏了：旅程仍由 fire 驱动，结论不受影响；首次失败可重跑确认');
+    }
 
     // ============================================================ 2. 旅程：全新用户 → 记录 → 达标 → 解锁
     step('旅程：首页推荐 → 列表三态');

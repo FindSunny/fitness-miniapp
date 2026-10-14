@@ -5,7 +5,7 @@
 > 我把它拆开讲，是因为里面有几条经验**跟小程序无关**，后端项目同样适用（见第五节）。
 
 **一句话总结**：用 Node 内置测试器覆盖 111 项逻辑/页面/界面质量断言（0.15 秒、零依赖），
-用微信官方自动化 SDK 覆盖 102 条真实运行时断言（1–2 分钟），再加 19 张界面证据图。
+用微信官方自动化 SDK 覆盖 109 条真实运行时断言（1–2 分钟），再加 19 张界面证据图。
 **能在低层抓住的问题，绝不留给高层。**
 
 > ⚠️ **先纠正一个术语**：下面表格里的"真机 E2E"是我沿用下来的旧叫法，**不严谨** ——
@@ -34,17 +34,17 @@
 | L4 页面 | 同上 + **自写 wx/Page 打桩** | **无** | **直接驱动真实页面代码**：onLoad/onShow/按钮处理函数（含极简模式、分享标题与路径、文案红线、运行环境三态） | 47 | ~80ms |
 | L4b 界面质量 | 同上，**从真实 WXSS 读色值/字号** | **无** | WCAG 对比度（43 组配对）、字号下限、点按区 ≥88rpx、禁用纯黑纯灰 | 4 | ~5ms |
 | L5 编译 | 微信开发者工具 CLI | — | 真实编译、上传、出预览码、包体积 | — | 30–60s |
-| L6 集成 E2E | `miniprogram-automator` **0.12.1** → WebSocket | 1 个 devDep | 真实小程序运行时里的集成断言（**非物理真机**） | **102 条 / 15 场景** | 1–2min |
+| L6 集成 E2E | `miniprogram-automator` **0.12.1** → WebSocket | 1 个 devDep | 真实小程序运行时里的集成断言（**非物理真机**） | **109 条 / 16 场景** | 1–2min |
 | L6b 截图 | 同 L6，**独立 pass** | 同上 | 状态证据图（每张互不依赖） | 15 | ~1min |
 
-**总计：111 项 Node 断言 + 102 条 E2E 断言 + 19 张界面证据图。运行环境 Node v24.14.1，运行时依赖 0 个。**
+**总计：111 项 Node 断言 + 109 条 E2E 断言 + 19 张界面证据图。运行环境 Node v24.14.1，运行时依赖 0 个。**
 
 **代码比例**：被测代码 **1398 行 JS**（另有 1021 行 WXML/WXSS），测试代码 **2817 行 JS**（≈2.0 : 1，另有 3399 行工具链）。
 
 ```bash
 npm test            # L1–L4b：111 项，0 依赖，0.15 秒
 npm run e2e:serve   # L6 前置：起自动化服务
-npm run e2e         # L6：102 条断言
+npm run e2e         # L6：109 条断言
 npm run e2e:shots   # L6b：19 张证据图
 npm run qr          # L5：真编译 + 出真机预览码
 ```
@@ -129,7 +129,7 @@ assert.match(lockHint, /达标标准【升级】3 组 × 50次/);          // �
 原因：场景异常被外层 `try/catch` 吞掉，只打印不计数，而"通过率"只统计 `check()`。
 修法两条：
 1. 崩溃时 `check('场景「X」执行完成', false, err)` **记一条失败**；
-2. 加一个 `EXPECTED_CHECKS = 102`，**实际条数对不上就报警 + exit 1**。
+2. 加一个 `EXPECTED_CHECKS` 常量（当前 109），**实际条数对不上就报警 + exit 1**。
    （代价：每次增删断言要改这个常量。值得 —— 这是唯一能发现"测试没跑完"的办法。）
 
 **坑 B：空截图算成功**
@@ -150,7 +150,7 @@ assert.match(lockHint, /达标标准【升级】3 组 × 50次/);          // �
 
 1. **不稳定层不得影响结论**（见决定 4）。
 2. **"失败点固定"和"失败点随机"是两类问题**：
-   本轮 E2E 连续两次挂在**同一个**场景（`page node not found`）→ 我判断不是 flake，是**环境状态退化**（开发者工具会话开了太久）→ 重启项目窗口即恢复，随后 102/102。
+   本轮 E2E 连续两次挂在**同一个**场景（`page node not found`）→ 我判断不是 flake，是**环境状态退化**（开发者工具会话开了太久）→ 重启项目窗口即恢复，随后重跑全绿。
    *失败点固定 = 环境状态问题；失败点随机 = 时序竞争。*
 3. **不要用"重跑一次就过了"糊过去** —— 那是在训练自己忽略红灯。
 
@@ -172,7 +172,7 @@ sequenceDiagram
     Note over A: onLoad / onShow 真实执行
     A->>W: 造状态 / 读状态（seed · getStorageSync）
     T->>A: evaluate(fn, 'addSet', {}) ★ 调真实事件处理函数
-    Note over T,A: 不是坐标点击 —— element.tap()<br/>在自动化实例里点不到 bindtap
+    Note over T,A: 主体不是坐标点击；element.tap() 真实点击在 §11 另跑<br/>（旧结论"点不到"已修正：导航类生效约 1 秒）
     A->>A: 页面 setData → 视图层渲染
     T->>S: page.setData({ input:'25' })　data() 探针 + 重试
     T->>A: page.data() 读回页面数据
@@ -190,7 +190,7 @@ sequenceDiagram
 
 | 坑 | 现象 | 对策 |
 |---|---|---|
-| `element.tap()` | 在自动化实例里点不到 `bindtap`（试过多轮） | 改用 `mp.evaluate` + `getCurrentPages()` **调真实处理函数**（代码路径一样，只是不经过手指坐标） |
+| ~~`element.tap()` 点不到 `bindtap`~~ | **旧结论已修正（2026-10）**：tap 可用，导航类生效约 1 秒 —— 当年"tap 完立即断言"才误判成点不动（探针 `e2e/tap-probe.js` 8/8） | 主体仍用 `mp.evaluate` + `getCurrentPages()` **调真实处理函数**（稳且快）；`run.js §11` 加 7 条真实点击防"绑定断了" |
 | `page.callMethod()` | 报 `this.goArt is not a function` | 同上绕过 |
 | `mp.evaluate` 里写 `setData` | `timeout waiting for automator response` | 用 SDK 的 `page.setData()`，且每次重新取栈顶页面 |
 | `mockWxMethod` 传函数 | 函数被序列化到 App 侧执行，**拿不到 Node 侧局部变量** | 用对象形式 `{confirm:true}`；弹窗文案改在 L4 断言（那里有打桩） |
@@ -198,7 +198,7 @@ sequenceDiagram
 | Windows 路径 | `spawnSync(cli, args, {shell:true})` 在 `Program Files (x86)` 下把 `--project` 参数传坏（报 `code 19`） | 改走 PowerShell 调用（`& "路径" args...`） |
 | PowerShell 写文件 | 带 UTF-8 BOM → `JSON.parse` 失败 | 读的时候 `.replace(/^\uFEFF/,'')`，写的时候显式 `UTF8Encoding($false)` |
 | 跑 E2E 时改项目文件 | 开发者工具重编译 → App 重启 → 页面栈清空，测试随机失败 | `compileHotReLoad: false` + 每个场景自己 `reLaunch` 复位 + **跑之前别动文件** |
-| 截图前滚页面 | `page.scrollTop()` 只对 `scroll-view` 有效；`wx.pageScrollTo` 会把页面滚成空白 | 放弃滚屏；**详情页下半部分的视觉证据交给人工验收** |
+| 截图前滚页面 | ~~`wx.pageScrollTo` 会把页面滚成空白~~ **旧结论已修正：那是"滚完立刻截图"，等 0.2 秒即可** | `e2e/shots.js` 的第 16/17 张就靠它拍成；`scrollTop: 0` 能精确回原 |
 
 ### 3.7 把"业务规则"也写进测试（不只是代码正确性）
 

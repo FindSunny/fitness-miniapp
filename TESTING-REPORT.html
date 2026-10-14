@@ -221,7 +221,7 @@
     </p>
     <div class="stats">
       <div class="stat"><b>111</b><span>Node 断言 · <em>0.15 秒</em></span></div>
-      <div class="stat"><b>102</b><span>E2E 断言 · 15 场景</span></div>
+      <div class="stat"><b>109</b><span>E2E 断言 · 16 场景</span></div>
       <div class="stat"><b>19</b><span>界面证据图</span></div>
       <div class="stat"><b>0</b><span>运行时依赖</span></div>
     </div>
@@ -265,7 +265,7 @@
       <div class="layer l6">
         <div class="tag">L6<br>集成</div>
         <div class="what"><b>真实运行时集成断言</b><div><code>miniprogram-automator</code> → 开发者工具里的小程序运行时（<b>非物理真机</b>）</div></div>
-        <div class="right"><div class="cnt">102 条</div><div class="ms">1–2 min</div><div class="bar"><i class="warm" style="width:100%"></i></div></div>
+        <div class="right"><div class="cnt">109 条</div><div class="ms">1–2 min</div><div class="bar"><i class="warm" style="width:100%"></i></div></div>
       </div>
     </div>
     <p class="tiny muted" style="margin-top:12px">
@@ -440,7 +440,7 @@ E2E：<span class="ok">19 / 19 通过</span>
         <ol style="margin:0;padding-left:20px;font-size:13.5px">
           <li><b>不稳定层不得影响结论</b> —— 截图独立成 pass，断言 pass 不写图。</li>
           <li><b>"失败点固定"和"失败点随机"是两类问题</b><br>
-            本轮 E2E 连续两次挂在<b>同一个</b>场景（<code>page node not found</code>）→ 不是 flake，是<b>环境状态退化</b>（开发者工具会话开太久）→ 重启项目窗口即恢复，随后 102/102。</li>
+            本轮 E2E 连续两次挂在<b>同一个</b>场景（<code>page node not found</code>）→ 不是 flake，是<b>环境状态退化</b>（开发者工具会话开太久）→ 重启项目窗口即恢复，随后重跑全绿。</li>
           <li><b>不要用"重跑一次就过了"糊过去</b> —— 那是在训练自己忽略红灯。</li>
         </ol>
       </div>
@@ -450,10 +450,10 @@ E2E：<span class="ok">19 / 19 通过</span>
   <!-- ================= 5. 流程 ================= -->
   <section>
     <h2><span class="n">5</span>E2E 是怎么跑起来的</h2>
-    <p class="lead">关键设计：不点坐标，直接调页面的真实事件处理函数 —— 代码路径一样，只是不经过手指。</p>
+    <p class="lead">关键设计：主体不点坐标，直接调页面的真实事件处理函数 —— 代码路径一样，只是不经过手指；另有少量 element.tap() 真点冒烟防"按钮没绑事件"。</p>
     <div class="card pad">
       <div class="flow">
-        <div class="node"><b>npm run e2e</b><span>e2e/run.js · 15 个场景</span></div>
+        <div class="node"><b>npm run e2e</b><span>e2e/run.js · 16 个场景</span></div>
         <div class="arrow">→</div>
         <div class="node"><b>automator.connect</b><span>ws://127.0.0.1:9420</span></div>
         <div class="arrow">→</div>
@@ -463,11 +463,11 @@ E2E：<span class="ok">19 / 19 通过</span>
         <div class="arrow">→</div>
         <div class="node"><b>evaluate + getCurrentPages()</b><span>调 onShow / addSet / finish</span></div>
         <div class="arrow">→</div>
-        <div class="node"><b>102 条断言</b><span>+ 独立截图 pass</span></div>
+        <div class="node"><b>109 条断言</b><span>+ 独立截图 pass</span></div>
       </div>
       <p class="tiny muted" style="margin:12px 0 0">
-        为什么不用 <code>element.tap()</code>：在自动化实例里点不到 <code>bindtap</code>（试过多轮）；
-        <code>page.callMethod()</code> 也取不到页面方法（报 <code>this.goArt is not a function</code>）。
+        主体为什么不用 <code>element.tap()</code>：调处理函数更稳更快。旧结论"坐标点击点不到 <code>bindtap</code>"<b>已修正（2026-10）</b>：
+        探针实测 tap 可用（导航类生效约 1 秒），现已加"真实点击冒烟"专防按钮没绑事件；<code>page.callMethod()</code> 仍然不行。
       </p>
     </div>
 
@@ -478,7 +478,7 @@ E2E：<span class="ok">19 / 19 通过</span>
         <table>
           <thead><tr><th style="width:26%">坑</th><th style="width:37%">现象</th><th>对策</th></tr></thead>
           <tbody>
-            <tr><td><code>element.tap()</code></td><td>点不到 <code>bindtap</code></td><td>改用 <code>evaluate</code> + <code>getCurrentPages()</code> 调真实处理函数</td></tr>
+            <tr><td><s><code>element.tap()</code> 点不到 <code>bindtap</code></s></td><td><b>旧结论已修正（2026-10）</b>：tap 可用，导航类生效约 1 秒 —— "tap 完立即断言"才被误判成点不动（探针 8/8）</td><td>主体仍用 <code>evaluate</code> + <code>getCurrentPages()</code> 调真实处理函数；另加 7 条真实点击防"绑定断了"</td></tr>
             <tr><td><code>page.callMethod()</code></td><td>报 <code>this.goArt is not a function</code></td><td>同上绕过</td></tr>
             <tr><td><code>evaluate</code> 里写 <code>setData</code></td><td><code>timeout waiting for automator response</code></td><td>用 SDK 的 <code>page.setData()</code>，每次重新取栈顶页面</td></tr>
             <tr><td><code>mockWxMethod</code> 传函数</td><td>函数被序列化到 App 侧，<b>拿不到 Node 局部变量</b></td><td>用对象形式 <code>{confirm:true}</code>；文案改在 L4 断言</td></tr>
@@ -486,7 +486,7 @@ E2E：<span class="ok">19 / 19 通过</span>
             <tr><td>Windows 含空格路径</td><td><code>spawnSync(cli,{shell:true})</code> 把 <code>--project</code> 传坏（<code>code 19</code>）</td><td>改走 PowerShell 调用</td></tr>
             <tr><td>PowerShell 写文件</td><td>带 UTF-8 BOM → <code>JSON.parse</code> 失败</td><td>读时 <code>.replace(/^\uFEFF/,'')</code></td></tr>
             <tr><td>跑 E2E 时改项目文件</td><td>重编译 → App 重启 → 页面栈清空</td><td><code>compileHotReLoad:false</code> + 场景自复位 + <b>跑之前别动文件</b></td></tr>
-            <tr><td>截图前滚页面</td><td>两条路都不可用，截出白板</td><td>放弃滚屏，<b>下半部分交给人工验收</b></td></tr>
+            <tr><td>截图前滚页面</td><td><s>两条路都不可用，截出白板</s> <b>旧结论已修正</b>：那是"滚完立刻截图"，等 0.2 秒即可</td><td><code>e2e/shots.js</code> 靠它拍第 16/17 张；<code>scrollTop: 0</code> 精确回原</td></tr>
           </tbody>
         </table>
         </div>
@@ -575,7 +575,7 @@ E2E：<span class="ok">19 / 19 通过</span>
             <!-- ⑥ 核心：evaluate 调真实处理函数 -->
             <line x1="100" y1="318" x2="682" y2="318" stroke="#2563eb" stroke-width="2" marker-end="url(#ah)"/>
             <text x="104" y="311" font-weight="700" fill="#1d4ed8">⑥ evaluate(fn, 'addSet', {})　★ 调页面的真实事件处理函数</text>
-            <text x="104" y="345" font-size="11.5" fill="#3b82f6">（不是坐标点击 —— element.tap() 在自动化实例里点不到 bindtap）</text>
+            <text x="104" y="345" font-size="11.5" fill="#3b82f6">（主体不是坐标点击；element.tap() 真点冒烟另设一节 —— 旧结论"点不到"已修正）</text>
 
             <!-- ⑦ 页面 setData 自调用 -->
             <path d="M690,378 h56 v22 h-56" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#ah)"/>

@@ -262,9 +262,9 @@ pre.log .hd{color:#D9C87A;font-weight:600}
 
     <div class="nums">
       <div class="num"><b>111</b><span>Node 断言</span></div>
-      <div class="num"><b>102</b><span>E2E 断言 / 15 场景</span></div>
+      <div class="num"><b>109</b><span>E2E 断言 / 16 场景</span></div>
       <div class="num"><b>19</b><span>截图基线</span></div>
-      <div class="num"><b>19</b><span>物理手机断言</span></div>
+      <div class="num"><b>20</b><span>物理手机断言</span></div>
       <div class="num"><b>0</b><span>运行时依赖</span></div>
     </div>
   </header>
@@ -364,7 +364,7 @@ npm test           <span class="c"># 期望 tests 111 / pass 111 / fail 0</span>
 <span class="c"># 3. 只有要跑 E2E / 截图才需要下面几步</span>
 npm i                                   <span class="c"># 装唯一的官方依赖 miniprogram-automator</span>
 npm run e2e:serve                       <span class="c"># 起自动化服务，看到 √ auto 即就绪（窗口保持打开）</span>
-npm run e2e                             <span class="c"># 期望 E2E：102 / 102 通过（1–2 分钟）</span>
+npm run e2e                             <span class="c"># 期望 E2E：109 / 109 通过（1–2 分钟）</span>
 npm run e2e:shots                       <span class="c"># 期望 19 / 19 张成功 + 与视觉基线一致</span>
 
 <span class="c"># 4. 可选：物理手机冒烟（需一台曾调试过的手机，跑前手机上关掉小程序）</span>
@@ -543,19 +543,19 @@ npm run e2e:remote -- --auto            <span class="c"># 期望 真机冒烟：
       steps:[
         ['连自动化服务','先连 <span class="code">ws://127.0.0.1:9420</span>；连不上就自动执行 <span class="code">cli auto</span>（开发者工具 CLI）把服务拉起来，再等就绪。'],
         ['每个场景先复位','<span class="code">mp.reLaunch(\'/pages/...\')</span> 直达目标页 → 等页面栈就绪 → 用 <span class="code">page.data()</span> 当探针重试（避免"固定 sleep 不够"）。'],
-        ['调真实事件处理函数','在 App 侧用 <span class="code">getCurrentPages()</span> 取到页面实例，<b>直接调用它的真实处理函数</b>（<span class="code">addSet</span> / <span class="code">finish</span> / <span class="code">onShow</span> …）。<br>为什么不点坐标：<span class="code">element.tap()</span> 在自动化实例里点不到 <span class="code">bindtap</span>；调处理函数走的是<b>同一段代码</b>，只是不经过手指。'],
+        ['调真实事件处理函数','在 App 侧用 <span class="code">getCurrentPages()</span> 取到页面实例，<b>直接调用它的真实处理函数</b>（<span class="code">addSet</span> / <span class="code">finish</span> / <span class="code">onShow</span> …）—— 稳、快，不依赖坐标与渲染时序。<br>另设一节真实点击冒烟：少量 <span class="code">element.tap()</span> 走真实命中测试（命中测试 → tap 事件 → bindtap），专防"按钮没绑事件"。<br>（旧结论"tap 点不到 bindtap"已修正：tap 是成功的，只是导航类生效约 1 秒 —— 当年 tap 完立即断言才误判。）'],
         ['逐条断言（两个视角）','<span class="code">check(名, 实际, 期望)</span>：既断言页面 <span class="code">data()</span>，也断言<b>渲染层看得见的文本</b>（"用户看得见什么"）。'],
-        ['失败也要记账','场景抛异常时 <span class="code">catch</span> 里补记一条失败，最后用 <span class="code">EXPECTED_CHECKS = 102</span> 校验总条数 —— 防"跑一半崩了却报全绿"。'],
+        ['失败也要记账','场景抛异常时 <span class="code">catch</span> 里补记一条失败，最后用 <span class="code">EXPECTED_CHECKS = 109</span> 校验总条数 —— 防"跑一半崩了却报全绿"。'],
         ['收尾还原','把存储写回"全新用户"，不污染你手动测试的数据。']
       ],
-      pipe:['连 ws:9420','（必要时）cli auto','reLaunch 目标页','evaluate 调真实处理函数','check 逐条断言','收尾还原成新用户'],
+      pipe:['连 ws:9420','（必要时）cli auto','reLaunch 目标页','evaluate 调真实处理函数','（§11）element.tap 真点冒烟','check 逐条断言','收尾还原成新用户'],
       tech:[
         ['自动化 SDK','miniprogram-automator ^0.12.1','微信官方小程序自动化 SDK（本项目唯一 devDependency）；用 automator.connect() 连已开的自动化端口'],
         ['连接方式','WebSocket ws://127.0.0.1:9420','端口可用 E2E_PORT / E2E_WS 覆盖；连不上会自动拉起服务'],
         ['不用 launch()','原因记录在 e2e/lib.js','automator.launch() 在 Windows 上执行 cli.bat 会失败（Failed to launch wechat web DevTools），因此改为自己调 CLI'],
         ['拉起工具','微信开发者工具 CLI（cli auto）','child_process.spawn 调 cli.bat，路径可用 WECHAT_DEVTOOLS_CLI 覆盖'],
         ['页面驱动','mp.reLaunch / currentPage / setData','真实运行时里的页面级 API；配合 evaluate 在 App 侧取 getCurrentPages() 调真实事件处理函数'],
-        ['断言','自写 check(名, 实际, 期望)','不引断言库：既比 page.data()，也比渲染层文本；EXPECTED_CHECKS = 102 做条数守卫'],
+        ['断言','自写 check(名, 实际, 期望)','不引断言库：既比 page.data()，也比渲染层文本；EXPECTED_CHECKS = 109 做条数守卫'],
         ['稳定化','e2e/lib.js：sleep / waitForPage / retry / waitReady','探针式等待 + 重试，替代固定 sleep'],
         ['平台注意','Windows + PowerShell 调 CLI','Node spawn(shell:true) 在含空格路径（Program Files (x86)）下会把参数解析坏，改由 PowerShell 调用']
       ]
@@ -585,22 +585,22 @@ npm run e2e:remote -- --auto            <span class="c"># 期望 真机冒烟：
     },
     remote: {
       title:'物理手机冒烟（L6c）', cmd:'npm run e2e:remote -- --auto', file:'e2e/smoke-remote.js → 一台真的 Android / iOS 手机',
-      dur:'约 2 分钟', who:'免扫码推送（Tool.enableRemoteDebug auto:true）→ 5 通道探针 + 关键旅程，19 条断言',
+      dur:'约 2 分钟', who:'免扫码推送（Tool.enableRemoteDebug auto:true）→ 6 通道探针 + 关键旅程，20 条断言',
       steps:[
         ['免扫码推送到设备','连上 9420 后发 <span class="code">Tool.enableRemoteDebug {auto:true}</span>（返回 {} 无码）—— 工具直接把项目推到手机上，<b>手机自动打开小程序</b>并建立调试会话（约 20s，零扫码）。前提：手机上没开着本项目的小程序、且设备此前扫码连过一次。'],
-        ['探针：五个通道','<span class="code">platform</span> 查身份（必须非 devtools，否则当场快速失败）；storage 读写回环；evaluate 往返；mockWxMethod 注入探针并验证生效；screenshot 落盘。'],
+        ['探针：六个通道','<span class="code">platform</span> 查身份（必须非 devtools，否则当场快速失败）；storage 读写回环；evaluate 往返；mockWxMethod 注入探针并验证生效；screenshot 落盘；<b>真实点击</b>（element.tap 走命中测试→bindtap 完整链路，2026-10-14 实测可用、生效约 1.8s）。'],
         ['旅程：关键链路','首页推荐 → 列表三态 → 详情记录 3 组 50 → 达标【升级】 → <b>第 2 式自动进行中</b>（核心回归）—— 与模拟器 E2E 同款断言，但跑在物理手机上。'],
         ['收尾清场（顺序即正确性）','<span class="code">App.exit</span>（趁通道活着让手机上的小程序退出）→ <span class="code">Tool.resetRemoteDebug</span>（关工具调试会话，防残留阻塞下一轮）→ <span class="code">Tool.close</span> + disconnect。启动时也会先 reset 一次兜底。'],
         ['失败快速定位','推送后若 platform 仍是 devtools（目标没切换）→ 当场终止并提示；连不上时提示"关掉手机上的小程序 / 用引导式续期"。']
       ],
-      pipe:['连 ws:9420','发 auto:true 推送','手机自动打开小程序','探针 5 通道','旅程 19 条断言','清场（App.exit + reset）'],
+      pipe:['连 ws:9420','发 auto:true 推送','手机自动打开小程序','探针 6 通道','旅程 20 条断言','清场（App.exit + reset）'],
       tech:[
         ['自动化 SDK','miniprogram-automator 同款','复用模拟器 E2E 的同一套连接与断言工具链（e2e/lib.js）'],
         ['连接方式','免扫码推送','Tool.enableRemoteDebug {auto:true}：返回 {}（无二维码），工具把项目直推到设备；扫码模式（--qr）与引导式保留为兜底'],
-        ['设备要求','Android / iOS 均可','实测 Android IN2010（微信 8.0.78）与 iPhone 16 Pro（微信 8.0.79）均 19/19；换平台后首次先用引导式建立信任'],
+        ['设备要求','Android / iOS 均可','实测 Android IN2010（微信 8.0.78）20/20（含真实点击）、iPhone 16 Pro（微信 8.0.79）18/18；换平台后首次先用引导式建立信任'],
         ['平台匹配','二维码/设置必须与设备一致','工具会记住上次平台选择；iOS 扫 Android 码会产生"假连接"（事件触发但命令超时）——引导式现场选平台可避免'],
         ['清场','Tool.resetRemoteDebug','工具内部关闭调试会话的正规协议（destroy + forceQuitRoom）；不留残留（残留会阻塞下一轮连接/推送）'],
-        ['断言','同款 check + 条数即清单','19 条断言直接从日志提取，清单 = 实际跑到的那些；含"真机身份"守卫（防推送成功但跑在模拟器上）']
+        ['断言','同款 check + 条数即清单','20 条断言直接从日志提取，清单 = 实际跑到的那些；含"真机身份"守卫（防推送成功但跑在模拟器上）']
       ]
     }
   };

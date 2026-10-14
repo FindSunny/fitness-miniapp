@@ -19,7 +19,8 @@
     "cards": "node tools/vendor/build-cards.mjs",
     "size": "node tools/size-report.mjs",
     "e2e:shots": "node e2e/shots.js",
-    "e2e:remote": "node e2e/smoke-remote.js"
+    "e2e:remote": "node e2e/smoke-remote.js",
+    "e2e:tap-probe": "node e2e/tap-probe.js"
   },
   "devDependencies": {
     "miniprogram-automator": "^0.12.1"

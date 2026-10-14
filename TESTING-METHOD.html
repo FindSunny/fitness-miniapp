@@ -196,7 +196,7 @@
   <div class="thesis">能算出来的别靠眼睛 ｜ 能在低层抓住的别留到高层 ｜ 证明不了"看得见"的别写成断言</div>
   <div class="stats">
     <div class="stat"><b>111</b><span>Node 断言 · <em>0.15 秒</em> · 零运行时依赖</span></div>
-    <div class="stat"><b>102</b><span>E2E 断言 · 15 个场景</span></div>
+    <div class="stat"><b>109</b><span>E2E 断言 · 16 个场景</span></div>
     <div class="stat"><b>19</b><span>截图 ＋ 视觉基线</span></div>
     <div class="stat"><b>61%</b><span>断言是<b style="display:inline">领域定制</b>的</span></div>
   </div>
@@ -358,7 +358,7 @@ assert.strictEqual(
       <tr><td><b>1</b></td><td><b>先写语义，再写测试，最后改代码</b></td><td>访谈给的是现象（"列表没反应"），先翻译成状态表（<code>ACCEPTANCE.md</code> 第一节），再写测试，最后才动代码</td><td>语义没定就写测试 = 把猜测固化下来</td></tr>
       <tr><td><b>2</b></td><td><b>断言"用户看得见什么"，不是"实现返回了什么"</b></td><td>早期断言 <code>stateText === '未开始'</code>（照着当时的实现写）→ 改成语义断言后，同一类 bug 立刻暴露</td><td>纯函数层仍要断言返回值 —— 但那是"其中一层"，不是全部</td></tr>
       <tr><td><b>3</b></td><td><b>必须测"往返"：操作 → 离开 → 回来</b></td><td>真机验收发现"记录丢失/历史看不见/状态不跟随"都出在这条缝里</td><td>同一页面实例上断言再多也抓不到</td></tr>
-      <tr><td><b>4</b></td><td><b>低层能抓的，别留到高层</b></td><td>111 条 Node 断言 0.15 秒；102 条 E2E 要 2 分钟。数据错一个数字，界面完全看不出来 —— 只有 L1 能拦</td><td>反过来：真实渲染、手势、原生组件行为，只有 E2E/真机能看到</td></tr>
+      <tr><td><b>4</b></td><td><b>低层能抓的，别留到高层</b></td><td>111 条 Node 断言 0.15 秒；109 条 E2E 要 2 分钟。数据错一个数字，界面完全看不出来 —— 只有 L1 能拦</td><td>反过来：真实渲染、手势、原生组件行为，只有 E2E/真机能看到</td></tr>
       <tr><td><b>5</b></td><td><b>定制断言要绑"上游真相"</b></td><td>来源快照 + 差异必须在案；验收清单编号写进测试名（"验收 36"）</td><td>不绑依据的定制断言，半年后没人敢改</td></tr>
       <tr><td><b>6</b></td><td><b>先怀疑测试，再怀疑代码</b></td><td>三个"测试在撒谎"：场景崩溃报通过、空图算成功、断言全绿但东西是坏的（详见第 9 节）</td><td>光加断言不够，还要给"断言本身"加守卫（条数、产物有效性）</td></tr>
       <tr><td><b>7</b></td><td><b>量出来再定阈值，别拍</b></td><td>视觉基线的容忍度是 7 组对照量出来的（噪声 0.41%–0.54% vs 真变化 1.63%–54.7%）</td><td>事后给噪声加白名单 = 掩盖，不是解决</td></tr>
@@ -447,8 +447,8 @@ assert.strictEqual(
     </div>
     <div class="layer l6">
       <div class="tag">L6<br>集成 E2E</div>
-      <div class="what"><b>真实运行时集成断言</b><div><code>miniprogram-automator</code> → 开发者工具里的小程序运行时（<b>非物理真机</b>）· 15 个场景 102 条</div></div>
-      <div class="right"><div class="cnt">102 条</div><div class="ms">1–2 min</div><div class="bar"><i class="warm" style="width:100%"></i></div></div>
+      <div class="what"><b>真实运行时集成断言</b><div><code>miniprogram-automator</code> → 开发者工具里的小程序运行时（<b>非物理真机</b>）· 16 个场景 109 条</div></div>
+      <div class="right"><div class="cnt">109 条</div><div class="ms">1–2 min</div><div class="bar"><i class="warm" style="width:100%"></i></div></div>
     </div>
     <div class="layer l6b">
       <div class="tag">L6b<br>截图基线</div>
@@ -536,7 +536,7 @@ assert.strictEqual(
         <text x="105" y="144">reLaunch('/pages/step/step?artId=pushup&amp;no=1')</text>
         <text x="110" y="168" fill="#64748b">onLoad / onShow 真实执行</text>
         <text x="105" y="190">evaluate(handler) ★ 调真实事件处理函数</text>
-        <text x="110" y="212" fill="#64748b">不是坐标点击（element.tap() 点不到 bindtap）</text>
+        <text x="110" y="212" fill="#64748b">主体不是坐标点击；element.tap() 真点冒烟另设一节</text>
         <text x="105" y="256" fill="#15803d">setData → 视图层重绘</text>
         <text x="700" y="256" fill="#15803d">写/读进度</text>
         <text x="105" y="280">page.data() / 元素文本 断言</text>
@@ -551,20 +551,20 @@ assert.strictEqual(
 
   <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
     <div class="card pad">
-      <b style="font-size:14px">为什么不用坐标点击</b>
+      <b style="font-size:14px">为什么主体不用坐标点击</b>
       <p class="tiny muted" style="margin:6px 0 0">
-        <code>element.tap()</code> 在自动化实例里点不到 <code>bindtap</code>（试过多轮）；
-        <code>page.callMethod()</code> 也取不到页面方法。
-        最后改成：在 App 侧用 <code>getCurrentPages()</code> 拿到页面实例，直接调它的处理函数 ——
-        <b>代码路径完全一样，只是不经过手指坐标</b>。
+        这套写法稳、快，不依赖坐标与渲染时序；<code>page.callMethod()</code> 也取不到页面方法。
+        旧结论"<code>element.tap()</code> 点不到 <code>bindtap</code>"<b>已修正（2026-10）</b>：
+        探针实测 tap 是成功的，只是导航类生效约 1 秒（当年"tap 完立即断言"才误判）。
+        现在另设"真实点击冒烟"：少量 <code>element.tap()</code> 走真实命中测试，专防"按钮没绑事件"。
       </p>
     </div>
     <div class="card pad">
       <b style="font-size:14px">稳定化三件套</b>
       <ul class="tiny muted" style="margin:6px 0 0;padding-left:20px">
-        <li><b>调真实处理函数</b>（而不是点坐标）</li>
+        <li><b>调真实处理函数</b>（主体；真实点击另设冒烟小节）</li>
         <li><b>探针 + 重试</b>：<code>data()</code> 当探针，节点没就绪就重试；页面切换先等 <code>waitForPage</code></li>
-        <li><b>期望条数常量</b>：<code>EXPECTED_CHECKS = 102</code>，条数对不上直接报警（防"中途崩了却报全绿"）</li>
+        <li><b>期望条数常量</b>：<code>EXPECTED_CHECKS = 109</code>，条数对不上直接报警（防"中途崩了却报全绿"）</li>
       </ul>
     </div>
   </div>
@@ -575,7 +575,7 @@ assert.strictEqual(
       <div class="tscroll"><table>
         <thead><tr><th style="width:26%">坑</th><th style="width:38%">现象</th><th>对策</th></tr></thead>
         <tbody>
-          <tr><td><code>element.tap()</code></td><td>点不到 <code>bindtap</code></td><td>改用 <code>evaluate</code> + <code>getCurrentPages()</code> 调真实处理函数</td></tr>
+          <tr><td><s><code>element.tap()</code> 点不到 <code>bindtap</code></s></td><td><b>旧结论已修正（2026-10）</b>：tap 可用，导航类生效约 1 秒 —— "tap 完立即断言"才被误判成点不动（探针 8/8）</td><td>主体仍用 <code>evaluate</code> + <code>getCurrentPages()</code> 调真实处理函数；另加 7 条真实点击防"绑定断了"</td></tr>
           <tr><td><code>evaluate</code> 里写 <code>setData</code></td><td><code>timeout waiting for automator response</code></td><td>用 SDK 的 <code>page.setData()</code>，且每次重新取栈顶页面</td></tr>
           <tr><td>页面跳转时序</td><td><code>reLaunch</code> 后固定 <code>sleep</code> 不够，偶发 <code>page node not found</code></td><td><code>data()</code> 做探针 + 重试；先 <code>waitForPage</code> 再操作</td></tr>
           <tr><td>跑 E2E 时改项目文件</td><td>工具重编译 → App 重启 → 页面栈清空，测试随机红</td><td><code>compileHotReLoad:false</code> + 每个场景自己 <code>reLaunch</code> + <b>跑之前别动文件</b></td></tr>
@@ -651,7 +651,7 @@ assert.strictEqual(
       <div class="hd">对策：条数守卫 + 崩溃记一条失败</div>
 <pre><span class="c">// 每次增删断言都要改这个常量 —— 值得，
 // 这是唯一能发现"测试没跑完"的办法</span>
-<span class="k">const</span> EXPECTED_CHECKS = <span class="hl">102</span>;
+<span class="k">const</span> EXPECTED_CHECKS = <span class="hl">109</span>;
 
 <span class="k">catch</span> (e) {
   check(<span class="s">`场景「${scenario}」执行完成`</span>, <span class="hl">false</span>, e.message);
@@ -770,7 +770,7 @@ ARTS.forEach(a =&gt; a.steps.forEach((s, i) =&gt; {
       <tr><td><code>tests/store.test.js</code></td><td>8</td><td>进度/通关、首次通关时间不被复习覆盖、草稿即时落盘、记录上限、重置语义</td><td>4 / 1 / 3</td></tr>
       <tr><td><code>tests/page-flow.test.js</code></td><td>47</td><td>直接驱动真实页面：首页推荐、往返、通关流程、列表三态、<b>锁定不可记录</b>、一键档位、极简模式不降标准、分享路径、文案语义红线</td><td><b>38</b> / 0 / 9</td></tr>
       <tr><td><code>tests/ui-quality.test.js</code></td><td>5</td><td>WCAG 对比度（43 组）、字号下限、点按区、禁用纯黑纯灰、截图工具确定性</td><td>0 / <b>5</b> / 0</td></tr>
-      <tr><td><code>e2e/run.js</code></td><td>102</td><td>15 个场景的真实运行时断言（含 5 个场景明确标注"回归"）</td><td>—</td></tr>
+      <tr><td><code>e2e/run.js</code></td><td>109</td><td>16 个场景的真实运行时断言（含 5 个场景明确标注"回归" + §11 真实点击冒烟）</td><td>—</td></tr>
       <tr><td><code>e2e/shots.js</code></td><td>19 张</td><td>状态截图 + 与基线指纹比对 + 空白补拍 + 几何守卫</td><td>—</td></tr>
     </tbody>
   </table>

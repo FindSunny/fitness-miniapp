@@ -1,9 +1,13 @@
 /**
  * 小程序端到端测试（连真实小程序运行环境）
  *
- * 设计（A 方案）：
- *   交互用「调用真实事件处理函数」触发（evaluate + getCurrentPages），
- *   不用 element.tap()/page.callMethod() —— 前者坐标点不到，后者取不到页面方法。
+ * 设计（A 方案 + 真点补丁）：
+ *   主交互用「调用真实事件处理函数」触发（evaluate + getCurrentPages）——稳、快；
+ *   page.callMethod() 不行（SDK 取不到页面方法）。
+ *   另设 §11「真实点击冒烟」：少量 element.tap() 走真实坐标命中测试（与 e2e/tap-probe.js
+ *   同一通道，探针 8/8 通过），专防"按钮 bindtap 漏写/拼错"这类主流程测不出的问题。
+ *   旧结论"element.tap 坐标点不到"已修正：tap 本身是成功的，只是导航类生效要 ~1 秒 ——
+ *   当年 tap 完立即断言，才误判成"点不动"。
  *   导航、wx API、storage 写入全是真实的；元素查询用于「渲染断言」，并每步截图。
  *
  * 用法：
@@ -18,7 +22,7 @@ const SHOTS = path.join(__dirname, 'shots');
 const STORAGE_KEY = 'cf_state_v1';
 // 期望的断言条数：用来发现"中途崩了但显示全部通过"
 // （每次增删断言都要改这个数——它是这道保险的代价，值得）
-const EXPECTED_CHECKS = 102;
+const EXPECTED_CHECKS = 109;
 const results = [];
 let shotIndex = 0;
 let scenario = '(启动)';
@@ -115,6 +119,34 @@ async function recordSet(mp, value) {
     await fire(mp, 'addSet', {}, 'step/step');
   }
   await sleep(250);
+}
+
+/**
+ * 真实点击：element.tap() → 轮询等状态翻转（§11 专用）
+ * 两条实测硬前提：① 别在 tap 后立即断言 —— 导航类生效约 1 秒（这正是旧结论
+ * "坐标点不到"的误判根源：tap 成功、只是还没生效）；② 元素要在视口内。
+ */
+async function tapUntil(mp, sel, expect, { nth = 0, timeout = 5000 } = {}) {
+  const page = await mp.currentPage();
+  const els = page ? await page.$$(sel) : [];
+  const el = els[nth];
+  if (!el) return { ok: false, got: `找不到元素 ${sel}[${nth}]` };
+  try {
+    await el.tap();
+  } catch (e) {
+    return { ok: false, got: 'tap 抛错:' + e.message };
+  }
+  const t0 = Date.now();
+  let got = '(还没变)';
+  while (Date.now() - t0 < timeout) {
+    try {
+      const r = await expect();
+      if (r.ok) return { ok: true, got: r.got, at: Date.now() - t0 };
+      got = r.got;
+    } catch (e) { got = '读取抛错:' + e.message; }
+    await sleep(250);
+  }
+  return { ok: false, got: `等 ${timeout}ms 未生效：${got}` };
 }
 
 (async () => {
@@ -458,6 +490,64 @@ async function recordSet(mp, value) {
     const stepShare = await fire(mp, 'onShareAppMessage', {}, 'step/step');
     check('详情页分享路径锁在这一式，不带 quick 参数',
       stepShare && stepShare.path === '/pages/step/step?artId=pushup&no=1', stepShare && stepShare.path);
+
+    // ============================================================ 11. 真实点击冒烟
+    step('真实点击冒烟：element.tap() 走命中测试 → bindtap（防"按钮没绑事件"）');
+    // 为什么加这一节：本文件其余交互都是 evaluate 直接调页面处理函数 —— 事件绑定
+    // 漏写/拼错照样全绿；这里改用真实坐标点击（同一通道 8/8 通过，见 e2e/tap-probe.js），
+    // 专抓"绑定断了"。前提：tap 后必须轮询等待（导航类生效约 1 秒）。
+    await seed(mp, { version: 2, arts: {}, sessions: [], drafts: {}, steps: {} });
+    page = await retry(() => mp.reLaunch('/pages/index/index'), 3, 1500);
+    await page.waitFor(1100);
+
+    // 反例：点无绑定元素（标题）必须没反应 —— 证明走的是真实命中测试，不是"盲发事件"
+    const h1 = await query(mp, '.h1');
+    check('真点反例：页面标题已渲染（否则反例不算数）', !!h1);
+    if (h1) { await h1.tap().catch(() => {}); await sleep(1200); }
+    let cur1 = await mp.currentPage();
+    check('真点反例：点无绑定的标题没有任何跳转',
+      !!cur1 && cur1.path === 'pages/index/index', cur1 && cur1.path);
+
+    // ① 首页卡片 → 十式列表（bindtap=goArt + data-id）
+    let tap = await tapUntil(mp, '.art-card', async () => {
+      const p = await mp.currentPage();
+      return { ok: !!p && p.path === 'pages/art/art', got: p && p.path };
+    });
+    check('真点①：首页卡片 → 十式列表（goArt + data-id）', tap.ok, tap.got);
+
+    // ② 列表第 1 行 → 详情页（bindtap=goStep + data-no）
+    tap = await tapUntil(mp, '.step-item', async () => {
+      const p = await mp.currentPage();
+      if (!p || p.path !== 'pages/step/step') return { ok: false, got: p && p.path };
+      const d = await p.data();
+      return { ok: d.no === 1, got: 'no=' + d.no };
+    });
+    check('真点②：列表第 1 行 → 第 1 式详情（data-no 生效）', tap.ok, tap.got);
+
+    // ③ 详情页「中级」快捷档位 → 2 组 × 25（bindtap=applyTier，不导航）
+    tap = await tapUntil(mp, '.quick-btn', async () => {
+      const p = await mp.currentPage();
+      if (!p || p.path !== 'pages/step/step') return { ok: false, got: p && p.path };
+      const d = await p.data();
+      return { ok: (d.values || []).join(',') === '25,25', got: '[' + (d.values || []).join(',') + ']' };
+    }, { nth: 1 });
+    check('真点③：「中级」档位 → 填入 2 组 × 25（applyTier）', tap.ok, tap.got);
+
+    // ④ 示意图 → 全屏大图（bindtap=openPose，渲染层出现）
+    tap = await tapUntil(mp, '.pose-box', async () => {
+      const p = await mp.currentPage();
+      const el = p ? await p.$('.lightbox') : null;
+      return { ok: !!el, got: el ? '大图已打开' : '大图没出现' };
+    });
+    check('真点④：示意图 → 全屏大图（openPose）', tap.ok, tap.got);
+
+    // ⑤ 大图任意处 → 关闭（bindtap=closePose，覆盖层）
+    tap = await tapUntil(mp, '.lightbox', async () => {
+      const p = await mp.currentPage();
+      const el = p ? await p.$('.lightbox') : null;
+      return { ok: !el, got: el ? '大图还在' : '已关闭' };
+    });
+    check('真点⑤：大图点任意处 → 关闭（closePose）', tap.ok, tap.got);
 
     // ============================================================ 12. 上线前收口
     step('上线前收口：调试信息只在开发版、版本号在所有环境可见');
